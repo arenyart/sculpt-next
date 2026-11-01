@@ -29,6 +29,8 @@ npm run dev        # http://127.0.0.1:47321
 
 ## What changed from upstream
 
+The full list is in [CHANGELOG.md](CHANGELOG.md). The highlights:
+
 **Build and tooling**
 - webpack 5, Babel, and `raw-loader` are replaced with Vite. GLSL is loaded through `?raw` imports.
 - Imports that depended on webpack's `resolve.modules` (`import Utils from 'misc/Utils'`) are now standard relative ES module paths.
