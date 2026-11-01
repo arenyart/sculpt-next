@@ -1,14 +1,14 @@
-import getOptionsURL from 'misc/getOptionsURL';
-import english from 'gui/tr/english';
-import chinese from 'gui/tr/chinese';
-import japanese from 'gui/tr/japanese';
-import korean from 'gui/tr/korean';
-import russian from 'gui/tr/russian';
-import turkish from 'gui/tr/turkish';
-import swedish from 'gui/tr/swedish';
-import french from 'gui/tr/french';
-import german from 'gui/tr/german';
-import italian from 'gui/tr/italian';
+import getOptionsURL from '../misc/getOptionsURL';
+import english from './tr/english';
+import chinese from './tr/chinese';
+import japanese from './tr/japanese';
+import korean from './tr/korean';
+import russian from './tr/russian';
+import turkish from './tr/turkish';
+import swedish from './tr/swedish';
+import french from './tr/french';
+import german from './tr/german';
+import italian from './tr/italian';
 
 var GuiTR = function (key) {
   var str = GuiTR.languages[GuiTR.select][key] || GuiTR.languages.english[key];
@@ -34,8 +34,8 @@ GuiTR.languages = {
 };
 
 GuiTR.select = 'english';
-var language = window.navigator.language || window.navigator.userLanguage;
-if (language) language = language.substr(0, 2);
+var language = window.navigator.language;
+if (language) language = language.slice(0, 2);
 if (language === 'ja') GuiTR.select = '日本語';
 else if (language === 'zh') GuiTR.select = '中文';
 else if (language === 'ko') GuiTR.select = '한국어';

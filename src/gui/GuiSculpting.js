@@ -1,8 +1,9 @@
-import TR from 'gui/GuiTR';
-import Enums from 'misc/Enums';
-import Tools from 'editing/tools/Tools';
-import getOptionsURL from 'misc/getOptionsURL';
-import GuiSculptingTools from 'gui/GuiSculptingTools';
+import TR from './GuiTR';
+import Enums from '../misc/Enums';
+import Tools from '../editing/tools/Tools';
+import getOptionsURL from '../misc/getOptionsURL';
+import GuiSculptingTools from './GuiSculptingTools';
+import getKeyCode from '../misc/KeyCode';
 
 var GuiTools = GuiSculptingTools.tools;
 
@@ -189,7 +190,7 @@ class GuiSculpting {
       return;
 
     var main = this._main;
-    var shk = getOptionsURL.getShortKey(event.which);
+    var shk = getOptionsURL.getShortKey(getKeyCode(event));
     event.stopPropagation();
 
     if (!main._focusGui || shk === Enums.KeyAction.RADIUS || shk === Enums.KeyAction.INTENSITY)
@@ -241,7 +242,7 @@ class GuiSculpting {
     }
 
     var main = this._main;
-    switch (getOptionsURL.getShortKey(event.which)) {
+    switch (getOptionsURL.getShortKey(getKeyCode(event))) {
     case Enums.KeyAction.RADIUS:
       this._modalBrushRadius = main._focusGui = false;
       var selRadius = this._main.getSculptManager().getSelection();

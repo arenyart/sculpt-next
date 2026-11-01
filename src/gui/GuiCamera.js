@@ -1,6 +1,7 @@
-import TR from 'gui/GuiTR';
-import getOptionsURL from 'misc/getOptionsURL';
-import Enums from 'misc/Enums';
+import TR from './GuiTR';
+import getOptionsURL from '../misc/getOptionsURL';
+import Enums from '../misc/Enums';
+import getKeyCode from '../misc/KeyCode';
 
 class GuiCamera {
 
@@ -81,7 +82,7 @@ class GuiCamera {
       main.render();
     }
 
-    switch (getOptionsURL.getShortKey(event.which)) {
+    switch (getOptionsURL.getShortKey(getKeyCode(event))) {
     case Enums.KeyAction.STRIFE_LEFT:
       camera._moveX = -1;
       break;
@@ -122,7 +123,7 @@ class GuiCamera {
     event.handled = true;
     var camera = this._camera;
 
-    switch (getOptionsURL.getShortKey(event.which)) {
+    switch (getOptionsURL.getShortKey(getKeyCode(event))) {
     case Enums.KeyAction.STRIFE_LEFT:
     case Enums.KeyAction.STRIFE_RIGHT:
       camera._moveX = 0;

@@ -1,6 +1,7 @@
-import TR from 'gui/GuiTR';
-import Enums from 'misc/Enums';
-import StateManager from 'states/StateManager';
+import TR from './GuiTR';
+import Enums from '../misc/Enums';
+import StateManager from '../states/StateManager';
+import getKeyCode from '../misc/KeyCode';
 
 class GuiTablet {
 
@@ -45,7 +46,7 @@ class GuiTablet {
     if (!this._main._focusGui)
       event.preventDefault();
 
-    var key = event.which;
+    var key = getKeyCode(event);
     if (event.ctrlKey && key === 90) { // z key
       this.onUndo();
       event.handled = true;

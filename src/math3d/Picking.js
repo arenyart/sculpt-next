@@ -1,8 +1,8 @@
 import { vec3, mat4 } from 'gl-matrix';
-import Geometry from 'math3d/Geometry';
-import Tablet from 'misc/Tablet';
-import Utils from 'misc/Utils';
-import TR from 'gui/GuiTR';
+import Geometry from './Geometry';
+import Tablet from '../misc/Tablet';
+import Utils from '../misc/Utils';
+import TR from '../gui/GuiTR';
 
 var _TMP_NEAR = [0.0, 0.0, 0.0];
 var _TMP_NEAR_1 = [0.0, 0.0, 0.0];
@@ -437,22 +437,19 @@ class Picking {
 Picking.INIT_ALPHAS_NAMES = [TR('alphaSquare'), TR('alphaSkin')];
 Picking.INIT_ALPHAS_PATHS = ['square.jpg', 'skin.jpg'];
 
-var readAlphas = function () {
-  // check nodejs
-  if (!window.module || !window.module.exports) return;
-  var fs = eval('require')('fs');
-  var path = eval('require')('path');
-
-  var directoryPath = path.join(window.__filename, '../resources/alpha');
-  fs.readdir(directoryPath, function (err, files) {
-    if (err) return;
-    for (var i = 0; i < files.length; ++i) {
-      var fname = files[i];
-      if (fname == 'square.jpg' || fname == 'skin.jpg') continue;
+// The desktop build exposes extra alpha files dropped in resources/alpha (see electron/preload.cjs).
+var readAlphas = async function () {
+  var desktop = typeof window !== 'undefined' && window.sculptglDesktop;
+  if (!desktop || !desktop.listAlphas) return;
+  try {
+    for (const fname of await desktop.listAlphas()) {
+      if (Picking.INIT_ALPHAS_PATHS.includes(fname)) continue;
       Picking.INIT_ALPHAS_NAMES.push(fname);
       Picking.INIT_ALPHAS_PATHS.push(fname);
     }
-  });
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 readAlphas();

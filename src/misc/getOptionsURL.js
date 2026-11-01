@@ -1,4 +1,4 @@
-import Enums from 'misc/Enums';
+import Enums from './Enums';
 
 var keyAction = Enums.KeyAction;
 
@@ -92,13 +92,10 @@ var readShortcuts = function (str) {
 };
 
 var readUrlParameters = function () {
-  var vars = window.location.search.substr(1).split('&');
   var params = {};
-  for (var i = 0, nbVars = vars.length; i < nbVars; i++) {
-    var pair = vars[i].split('=', 2);
-    if (pair.length !== 2) continue;
-    params[pair[0].toLowerCase()] = pair[1];
-  }
+  if (typeof window === 'undefined') return params;
+  for (const [key, value] of new URLSearchParams(window.location.search))
+    params[key.toLowerCase()] = value;
   return params;
 };
 

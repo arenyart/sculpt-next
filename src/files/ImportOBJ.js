@@ -1,5 +1,5 @@
-import Utils from 'misc/Utils';
-import MeshStatic from 'mesh/meshStatic/MeshStatic';
+import Utils from '../misc/Utils';
+import MeshStatic from '../mesh/meshStatic/MeshStatic';
 
 var Import = {};
 
@@ -126,7 +126,7 @@ Import.importOBJ = function (data, gl) {
         split = line.split(/\s+/);
         var blockMRGB = split[1];
         for (var m = 2, mlen = blockMRGB.length; m < mlen; m += 8) {
-          var hex = parseInt(blockMRGB.substr(m, 6), 16);
+          var hex = parseInt(blockMRGB.slice(m, m + 6), 16);
           cArMrgb.push((hex >> 16) * inv255, (hex >> 8 & 0xff) * inv255, (hex & 0xff) * inv255);
         }
 
@@ -136,7 +136,7 @@ Import.importOBJ = function (data, gl) {
         split = line.split(/\s+/);
         var blockMAT = split[1];
         for (var n = 0, nlen = blockMAT.length; n < nlen; n += 6) {
-          var hex2 = parseInt(blockMAT.substr(n, 6), 16);
+          var hex2 = parseInt(blockMAT.slice(n, n + 6), 16);
           mArMat.push((hex2 >> 16) * inv255, (hex2 >> 8 & 0xff) * inv255, (hex2 & 0xff) * inv255);
         }
       }

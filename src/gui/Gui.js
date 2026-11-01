@@ -1,19 +1,19 @@
-import yagui from 'yagui';
-import TR from 'gui/GuiTR';
-import GuiBackground from 'gui/GuiBackground';
-import GuiCamera from 'gui/GuiCamera';
-import GuiConfig from 'gui/GuiConfig';
-import GuiFiles from 'gui/GuiFiles';
-import GuiMesh from 'gui/GuiMesh';
-import GuiTopology from 'gui/GuiTopology';
-import GuiRendering from 'gui/GuiRendering';
-import GuiScene from 'gui/GuiScene';
-import GuiSculpting from 'gui/GuiSculpting';
-import GuiStates from 'gui/GuiStates';
-import GuiTablet from 'gui/GuiTablet';
-import ShaderContour from 'render/shaders/ShaderContour';
+import yagui from '../vendor/yagui/yagui';
+import TR from './GuiTR';
+import GuiBackground from './GuiBackground';
+import GuiCamera from './GuiCamera';
+import GuiConfig from './GuiConfig';
+import GuiFiles from './GuiFiles';
+import GuiMesh from './GuiMesh';
+import GuiTopology from './GuiTopology';
+import GuiRendering from './GuiRendering';
+import GuiScene from './GuiScene';
+import GuiSculpting from './GuiSculpting';
+import GuiStates from './GuiStates';
+import GuiTablet from './GuiTablet';
+import ShaderContour from '../render/shaders/ShaderContour';
 
-import Export from 'files/Export';
+import Export from '../files/Export';
 
 class Gui {
 
@@ -122,12 +122,7 @@ class Gui {
 
   initPrint(guiParent) {
     var menu = guiParent.addMenu('Print it!');
-    // menu.addButton('with Sculpteo', this, 'exportSculpteo');
     menu.addButton('Go to Materialise!', this, 'exportMaterialise');
-  }
-
-  exportSculpteo() {
-    this._export('sculpteo');
   }
 
   exportMaterialise() {

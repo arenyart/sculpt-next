@@ -1,9 +1,9 @@
 import { vec3 } from 'gl-matrix';
-import getOptionsURL from 'misc/getOptionsURL';
-import Utils from 'misc/Utils';
-import Attribute from 'render/Attribute';
-import colorSpaceGLSL from 'render/shaders/glsl/colorSpace.glsl';
-import curvatureGLSL from 'render/shaders/glsl/curvature.glsl';
+import getOptionsURL from '../../misc/getOptionsURL';
+import Utils from '../../misc/Utils';
+import Attribute from '../Attribute';
+import colorSpaceGLSL from './glsl/colorSpace.glsl?raw';
+import curvatureGLSL from './glsl/curvature.glsl?raw';
 
 var ShaderBase = {};
 ShaderBase.vertexName = 'VertexName';
@@ -70,7 +70,7 @@ var processShader = function (str) {
     var extMap = {};
 
     for (var i = 0, nb = matches.length; i < nb; ++i) {
-      var ext = matches[i].substr(matches[i].indexOf('#extension'));
+      var ext = matches[i].slice(matches[i].indexOf('#extension'));
       str = str.replace(matches[i], '');
       if (extMap[ext])
         continue;

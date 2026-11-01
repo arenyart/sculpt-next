@@ -1,0 +1,19 @@
+html,
+body {
+  overscroll-behavior: none;
+}
+
+#canvas {
+  /* Pointer events drive sculpting and gestures; the browser must not pan or zoom the page. */
+  touch-action: none;
+  outline: none;
+}
+
+noscript {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #ddd;
+  font-family: 'Open Sans', sans-serif;
+}

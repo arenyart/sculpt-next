@@ -1,7 +1,7 @@
 import { mat3 } from 'gl-matrix';
-import getOptionsURL from 'misc/getOptionsURL';
-import ShaderBase from 'render/shaders/ShaderBase';
-import pbrGLSL from 'render/shaders/glsl/pbr.glsl';
+import getOptionsURL from '../../misc/getOptionsURL';
+import ShaderBase from './ShaderBase';
+import pbrGLSL from './glsl/pbr.glsl?raw';
 
 var ShaderPBR = ShaderBase.getCopy();
 ShaderPBR.vertexName = ShaderPBR.fragmentName = 'ShadingPBR';
@@ -103,24 +103,20 @@ ShaderPBR.fragment = [
   '}'
 ].join('\n');
 
-// ShaderPBR.onLoadEnvironment = function (gl, tex, main, env) {
-ShaderPBR.onLoadEnvironment = function (xhr, gl, main, env) {
-  // nodejs context : status is 0 for some reasons
-  if (xhr.status && xhr.status !== 200 && (!xhr.response || !xhr.response.byteLength))
-    return;
-
-  // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-  var w = xhr.width || Math.sqrt(xhr.response.byteLength / 8);
-  var h = w * 2;
+/** `source` is either a loaded image or the raw RGBA bytes (ArrayBuffer) of a w x 2w panorama */
+ShaderPBR.onLoadEnvironment = function (source, gl, main, env) {
+  const isBuffer = source instanceof ArrayBuffer;
+  const w = isBuffer ? Math.sqrt(source.byteLength / 8) : source.width;
+  const h = w * 2;
   env.size = [w, h];
 
   env.texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, env.texture);
 
-  if (xhr.response) {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(xhr.response));
+  if (isBuffer) {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(source));
   } else {
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, xhr);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
   }
 
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -136,17 +132,19 @@ ShaderPBR.getOrCreateEnvironment = function (gl, main, env) {
   env.texture = null;
 
   if (env.path.endsWith('png')) {
-    var image = new Image();
+    const image = new Image();
+    image.onload = () => ShaderPBR.onLoadEnvironment(image, gl, main, env);
     image.src = env.path;
-    image.onload = ShaderPBR.onLoadEnvironment.bind(this, image, gl, main, env);
     return null;
   }
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', env.path, true);
-  xhr.responseType = 'arraybuffer';
-  xhr.onload = ShaderPBR.onLoadEnvironment.bind(this, xhr, gl, main, env);
-  xhr.send(null);
+  fetch(env.path)
+    .then((response) => {
+      if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+      return response.arrayBuffer();
+    })
+    .then((buffer) => ShaderPBR.onLoadEnvironment(buffer, gl, main, env))
+    .catch((err) => console.error('Could not load environment ' + env.path, err));
   return null;
 };
 

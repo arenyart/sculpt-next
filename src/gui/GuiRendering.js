@@ -1,8 +1,9 @@
-import TR from 'gui/GuiTR';
-import RenderData from 'mesh/RenderData';
-import Shader from 'render/ShaderLib';
-import getOptionsURL from 'misc/getOptionsURL';
-import Enums from 'misc/Enums';
+import TR from './GuiTR';
+import RenderData from '../mesh/RenderData';
+import Shader from '../render/ShaderLib';
+import getOptionsURL from '../misc/getOptionsURL';
+import Enums from '../misc/Enums';
+import getKeyCode from '../misc/KeyCode';
 
 var ShaderMERGE = Shader[Enums.Shader.MERGE];
 var ShaderUV = Shader[Enums.Shader.UV];
@@ -297,7 +298,7 @@ class GuiRendering {
   // KEY EVENTS
   ////////////////
   onKeyUp(event) {
-    if (getOptionsURL.getShortKey(event.which) === Enums.KeyAction.WIREFRAME && !event.ctrlKey)
+    if (getOptionsURL.getShortKey(getKeyCode(event)) === Enums.KeyAction.WIREFRAME && !event.ctrlKey)
       this._ctrlShowWireframe.setValue(!this._ctrlShowWireframe.getValue());
   }
 }

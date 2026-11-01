@@ -1,23 +1,23 @@
 import { vec3, mat4 } from 'gl-matrix';
-import getOptionsURL from 'misc/getOptionsURL';
-import Enums from 'misc/Enums';
-import Utils from 'misc/Utils';
-import SculptManager from 'editing/SculptManager';
-import Subdivision from 'editing/Subdivision';
-import Import from 'files/Import';
-import Gui from 'gui/Gui';
-import Camera from 'math3d/Camera';
-import Picking from 'math3d/Picking';
-import Background from 'drawables/Background';
-import Mesh from 'mesh/Mesh';
-import Multimesh from 'mesh/multiresolution/Multimesh';
-import Primitives from 'drawables/Primitives';
-import StateManager from 'states/StateManager';
-import RenderData from 'mesh/RenderData';
-import Rtt from 'drawables/Rtt';
-import ShaderLib from 'render/ShaderLib';
-import MeshStatic from 'mesh/meshStatic/MeshStatic';
-import WebGLCaps from 'render/WebGLCaps';
+import getOptionsURL from './misc/getOptionsURL';
+import Enums from './misc/Enums';
+import Utils from './misc/Utils';
+import SculptManager from './editing/SculptManager';
+import Subdivision from './editing/Subdivision';
+import Import from './files/Import';
+import Gui from './gui/Gui';
+import Camera from './math3d/Camera';
+import Picking from './math3d/Picking';
+import Background from './drawables/Background';
+import Mesh from './mesh/Mesh';
+import Multimesh from './mesh/multiresolution/Multimesh';
+import Primitives from './drawables/Primitives';
+import StateManager from './states/StateManager';
+import RenderData from './mesh/RenderData';
+import Rtt from './drawables/Rtt';
+import ShaderLib from './render/ShaderLib';
+import MeshStatic from './mesh/meshStatic/MeshStatic';
+import WebGLCaps from './render/WebGLCaps';
 
 class Scene {
 
@@ -100,22 +100,20 @@ class Scene {
     else this.addSphere();
   }
 
-  addModelURL(url) {
-    var fileType = this.getFileType(url);
+  async addModelURL(url) {
+    const fileType = this.getFileType(url);
     if (!fileType)
       return;
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-
-    xhr.responseType = fileType === 'obj' ? 'text' : 'arraybuffer';
-
-    xhr.onload = function () {
-      if (xhr.status === 200)
-        this.loadScene(xhr.response, fileType);
-    }.bind(this);
-
-    xhr.send(null);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+      const data = fileType === 'obj' ? await response.text() : await response.arrayBuffer();
+      this.loadScene(data, fileType);
+    } catch (err) {
+      console.error('Could not load ' + url, err);
+      this.addSphere();
+    }
   }
 
   getBackground() {

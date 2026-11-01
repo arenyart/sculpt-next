@@ -1,6 +1,7 @@
-import TR from 'gui/GuiTR';
-import Remesh from 'editing/Remesh';
-import ShaderBase from 'render/shaders/ShaderBase';
+import TR from './GuiTR';
+import Remesh from '../editing/Remesh';
+import ShaderBase from '../render/shaders/ShaderBase';
+import getKeyCode from '../misc/KeyCode';
 
 class GuiScene {
 
@@ -254,10 +255,10 @@ class GuiScene {
     if (!this._main._focusGui)
       event.preventDefault();
 
-    if (event.which === 73) { // I
+    if (getKeyCode(event) === 73) { // I
       this.toggleShowHide();
       event.handled = true;
-    } else if (event.which === 68 && event.ctrlKey) { // D
+    } else if (getKeyCode(event) === 68 && event.ctrlKey) { // D
       this._main.duplicateSelection();
       event.handled = true;
     }

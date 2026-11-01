@@ -1,12 +1,12 @@
-import TR from 'gui/GuiTR';
-import { saveAs } from 'file-saver';
-import { zip } from 'zip';
-import Export from 'files/Export';
+import TR from './GuiTR';
+import Export from '../files/Export';
+import FileUtils from '../misc/FileUtils';
 
-import Rtt from 'drawables/Rtt';
-import ShaderPaintUV from 'render/shaders/ShaderPaintUV';
-import ShaderBlur from 'render/shaders/ShaderBlur';
-import Enums from 'misc/Enums';
+import Rtt from '../drawables/Rtt';
+import ShaderPaintUV from '../render/shaders/ShaderPaintUV';
+import ShaderBlur from '../render/shaders/ShaderBlur';
+import Enums from '../misc/Enums';
+import getKeyCode from '../misc/KeyCode';
 
 class GuiFiles {
 
@@ -141,9 +141,7 @@ class GuiFiles {
     this._blurImage(gl, width, height);
 
     var canvas = this._extractTexture(gl, width, height);
-    canvas.toBlob(function (blob) {
-      saveAs(blob, filename + '.png');
-    }.bind(this));
+    canvas.toBlob((blob) => FileUtils.saveAs(blob, filename + '.png'));
 
     // reset viewport size
     this._main.onCanvasResize();
@@ -197,18 +195,9 @@ class GuiFiles {
     this._save(Export.exportBinarySTL(meshes), 'yourMesh.stl');
   }
 
-  _save(data, fileName, useZip) {
-    if (!useZip) return saveAs(data, fileName);
-
-    zip.useWebWorkers = true;
-    zip.workerScriptsPath = 'worker/';
-    zip.createWriter(new zip.BlobWriter('application/zip'), function (zipWriter) {
-      zipWriter.add(fileName, new zip.BlobReader(data), function () {
-        zipWriter.close(function (blob) {
-          saveAs(blob, 'yourMesh.zip');
-        });
-      });
-    }, onerror);
+  async _save(data, fileName, useZip) {
+    if (!useZip) return FileUtils.saveAs(data, fileName);
+    FileUtils.saveAs(await FileUtils.zipBlob(fileName, data), 'yourMesh.zip');
   }
 
   ////////////////
@@ -222,7 +211,7 @@ class GuiFiles {
     if (!this._main._focusGui)
       event.preventDefault();
 
-    var key = event.which;
+    var key = getKeyCode(event);
     if (event.ctrlKey && event.altKey && key === 78) { // N
       this._main.clearScene();
       event.handled = true;

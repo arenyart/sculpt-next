@@ -1,15 +1,20 @@
-import 'misc/Polyfill';
 import { vec3 } from 'gl-matrix';
-import { Manager as HammerManager, Pan, Pinch, Tap } from 'hammerjs';
-import Tablet from 'misc/Tablet';
-import Enums from 'misc/Enums';
-import Utils from 'misc/Utils';
-import Scene from 'Scene';
-import Multimesh from 'mesh/multiresolution/Multimesh';
+import Tablet from './misc/Tablet';
+import Enums from './misc/Enums';
+import Utils from './misc/Utils';
+import FileUtils from './misc/FileUtils';
+import TouchGestures from './misc/TouchGestures';
+import Scene from './Scene';
+import Multimesh from './mesh/multiresolution/Multimesh';
 
-var MOUSE_LEFT = 1;
-var MOUSE_MIDDLE = 2;
-var MOUSE_RIGHT = 3;
+const MOUSE_LEFT = 1;
+const MOUSE_MIDDLE = 2;
+const MOUSE_RIGHT = 3;
+
+// PointerEvent.button (0: main, 1: auxiliary, 2: secondary) to the legacy 1-based numbering
+const toLegacyButton = (button) => (button === 1 ? MOUSE_MIDDLE : button === 2 ? MOUSE_RIGHT : MOUSE_LEFT);
+
+const isTouch = (event) => event.pointerType === 'touch';
 
 // Manage events
 class SculptGL extends Scene {
@@ -34,108 +39,56 @@ class SculptGL extends Scene {
     // masking
     this._maskX = 0;
     this._maskY = 0;
-    this._hammer = new HammerManager(this._canvas);
 
     this._eventProxy = {};
 
-    this.initHammer();
+    this.initTouchGestures();
     this.addEvents();
   }
 
   addEvents() {
-    var canvas = this._canvas;
+    const canvas = this._canvas;
 
-    var cbMouseWheel = this.onMouseWheel.bind(this);
-    var cbOnPointer = this.onPointer.bind(this);
+    // mouse and pen
+    const onPointerMove = Utils.throttle(this.onMouseMove.bind(this), 16.66);
+    canvas.addEventListener('pointerdown', this.onPointerDown.bind(this));
+    canvas.addEventListener('pointermove', (event) => {
+      Tablet.pressure = event.pressure;
+      if (!isTouch(event)) onPointerMove(event);
+    });
+    canvas.addEventListener('pointerup', this.onPointerUp.bind(this));
+    canvas.addEventListener('pointercancel', this.onPointerUp.bind(this));
+    canvas.addEventListener('pointerover', (event) => !isTouch(event) && this.onMouseOver(event));
+    canvas.addEventListener('pointerout', (event) => !isTouch(event) && this.onMouseOut(event));
+    canvas.addEventListener('wheel', this.onMouseWheel.bind(this), { passive: false });
+    // middle-click autoscroll can only be cancelled from the compatibility mouse event
+    canvas.addEventListener('mousedown', (event) => event.button === 1 && event.preventDefault());
 
-    // pointer
-    canvas.addEventListener('pointerdown', cbOnPointer, false);
-    canvas.addEventListener('pointermove', cbOnPointer, false);
+    // key
+    window.addEventListener('keydown', this.onKeyDown.bind(this));
+    window.addEventListener('keyup', this.onKeyUp.bind(this));
 
-    // mouse
-    canvas.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-    canvas.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-    canvas.addEventListener('mouseout', this.onMouseOut.bind(this), false);
-    canvas.addEventListener('mouseover', this.onMouseOver.bind(this), false);
-    canvas.addEventListener('mousemove', Utils.throttle(this.onMouseMove.bind(this), 16.66), false);
-    canvas.addEventListener('mousewheel', cbMouseWheel, false);
-    canvas.addEventListener('DOMMouseScroll', cbMouseWheel, false);
-
-    //key
-    window.addEventListener('keydown', this.onKeyDown.bind(this), false);
-    window.addEventListener('keyup', this.onKeyUp.bind(this), false);
-
-    var cbLoadFiles = this.loadFiles.bind(this);
-    var cbStopAndPrevent = this.stopAndPrevent.bind(this);
     // misc
-    canvas.addEventListener('webglcontextlost', this.onContextLost.bind(this), false);
-    canvas.addEventListener('webglcontextrestored', this.onContextRestored.bind(this), false);
-    window.addEventListener('dragenter', cbStopAndPrevent, false);
-    window.addEventListener('dragover', cbStopAndPrevent, false);
-    window.addEventListener('drop', cbLoadFiles, false);
-    document.getElementById('fileopen').addEventListener('change', cbLoadFiles, false);
+    const cbLoadFiles = this.loadFiles.bind(this);
+    const cbStopAndPrevent = this.stopAndPrevent.bind(this);
+    canvas.addEventListener('webglcontextlost', this.onContextLost.bind(this));
+    canvas.addEventListener('webglcontextrestored', this.onContextRestored.bind(this));
+    window.addEventListener('dragenter', cbStopAndPrevent);
+    window.addEventListener('dragover', cbStopAndPrevent);
+    window.addEventListener('drop', cbLoadFiles);
+    document.getElementById('fileopen').addEventListener('change', cbLoadFiles);
   }
 
-  onPointer(event) {
-    Tablet.pressure = event.pressure;
-  }
-
-  initHammer() {
-    this._hammer.options.enable = true;
-    this._initHammerRecognizers();
-    this._initHammerEvents();
-  }
-
-  _initHammerRecognizers() {
-    var hm = this._hammer;
-    // double tap
-    hm.add(new Tap({
-      event: 'doubletap',
-      pointers: 1,
-      taps: 2,
-      time: 250, // def : 250.  Maximum press time in ms.
-      interval: 450, // def : 300. Maximum time in ms between multiple taps.
-      threshold: 5, // def : 2. While doing a tap some small movement is allowed.
-      posThreshold: 50 // def : 30. The maximum position difference between multiple taps.
-    }));
-
-    // double tap 2 fingers
-    hm.add(new Tap({
-      event: 'doubletap2fingers',
-      pointers: 2,
-      taps: 2,
-      time: 250,
-      interval: 450,
-      threshold: 5,
-      posThreshold: 50
-    }));
-
-    // pan
-    hm.add(new Pan({
-      event: 'pan',
-      pointers: 0,
-      threshold: 0
-    }));
-
-    // pinch
-    hm.add(new Pinch({
-      event: 'pinch',
-      pointers: 2,
-      threshold: 0.1 // Set a minimal thresold on pinch event, to be detected after pan
-    }));
-    hm.get('pinch').recognizeWith(hm.get('pan'));
-  }
-
-  _initHammerEvents() {
-    var hm = this._hammer;
-    hm.on('panstart', this.onPanStart.bind(this));
-    hm.on('panmove', this.onPanMove.bind(this));
-    hm.on('panend pancancel', this.onPanEnd.bind(this));
-
-    hm.on('doubletap', this.onDoubleTap.bind(this));
-    hm.on('doubletap2fingers', this.onDoubleTap2Fingers.bind(this));
-    hm.on('pinchstart', this.onPinchStart.bind(this));
-    hm.on('pinchin pinchout', this.onPinchInOut.bind(this));
+  initTouchGestures() {
+    this._touch = new TouchGestures(this._canvas, {
+      onPanStart: this.onPanStart.bind(this),
+      onPanMove: this.onPanMove.bind(this),
+      onPanEnd: this.onPanEnd.bind(this),
+      onPinchStart: this.onPinchStart.bind(this),
+      onPinch: this.onPinchInOut.bind(this),
+      onDoubleTap: this.onDoubleTap.bind(this),
+      onDoubleTap2Fingers: this.onDoubleTap2Fingers.bind(this)
+    });
   }
 
   stopAndPrevent(event) {
@@ -143,7 +96,8 @@ class SculptGL extends Scene {
     event.preventDefault();
   }
 
-  onContextLost() {
+  onContextLost(event) {
+    event.preventDefault();
     window.alert('Oops... WebGL context lost.');
   }
 
@@ -163,84 +117,63 @@ class SculptGL extends Scene {
   }
 
   ////////////////
-  // MOBILE EVENTS
+  // TOUCH EVENTS
   ////////////////
-  onPanStart(e) {
-    if (e.pointerType === 'mouse')
-      return;
+  onPanStart(center, nbPointers) {
     this._focusGui = false;
-    var evProxy = this._eventProxy;
-    evProxy.pageX = e.center.x;
-    evProxy.pageY = e.center.y;
-    this.onPanUpdateNbPointers(Math.min(3, e.pointers.length));
+    const evProxy = this._eventProxy;
+    evProxy.pageX = center.x;
+    evProxy.pageY = center.y;
+    this.onPanUpdateNbPointers(Math.min(3, nbPointers));
   }
 
-  onPanMove(e) {
-    if (e.pointerType === 'mouse')
-      return;
-    var evProxy = this._eventProxy;
-    evProxy.pageX = e.center.x;
-    evProxy.pageY = e.center.y;
+  onPanMove(center, nbPointers) {
+    const evProxy = this._eventProxy;
+    evProxy.pageX = center.x;
+    evProxy.pageY = center.y;
 
-    var nbPointers = Math.min(3, e.pointers.length);
-    if (nbPointers !== this._lastNbPointers) {
+    const nb = Math.min(3, nbPointers);
+    if (nb !== this._lastNbPointers) {
       this.onDeviceUp();
-      this.onPanUpdateNbPointers(nbPointers);
+      this.onPanUpdateNbPointers(nb);
     }
     this.onDeviceMove(evProxy);
-
-    if (this._isIOS()) {
-      window.clearTimeout(this._timerResetPointer);
-      this._timerResetPointer = window.setTimeout(function () {
-        this._lastNbPointers = 0;
-      }.bind(this), 60);
-    }
-  }
-
-  _isIOS() {
-    if (this._isIOS !== undefined) return this._isIOS;
-    this._isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    return this._isIOS;
   }
 
   onPanUpdateNbPointers(nbPointers) {
-    // called on panstart or panmove (not consistent)
-    var evProxy = this._eventProxy;
-    evProxy.which = nbPointers === 1 && this._lastNbPointers >= 1 ? 3 : nbPointers;
+    // 1 finger sculpts, 2 fingers pan, 3 fingers rotate.
+    // Going back to 1 finger in the middle of a gesture rotates instead of sculpting.
+    const evProxy = this._eventProxy;
+    evProxy.which = nbPointers === 1 && this._lastNbPointers >= 1 ? MOUSE_RIGHT : nbPointers;
     this._lastNbPointers = nbPointers;
     this.onDeviceDown(evProxy);
   }
 
-  onPanEnd(e) {
-    if (e.pointerType === 'mouse')
-      return;
+  onPanEnd() {
     this.onDeviceUp();
-    // we need to detect when all fingers are released
-    window.setTimeout(function () {
-      if (!e.pointers.length) this._lastNbPointers = 0;
-    }.bind(this), 60);
+    this._lastNbPointers = 0;
   }
 
-  onDoubleTap(e) {
+  onDoubleTap(center) {
     if (this._focusGui) {
       return;
     }
 
-    var evProxy = this._eventProxy;
-    evProxy.pageX = e.center.x;
-    evProxy.pageY = e.center.y;
+    const evProxy = this._eventProxy;
+    evProxy.pageX = center.x;
+    evProxy.pageY = center.y;
     this.setMousePosition(evProxy);
 
-    var picking = this._picking;
-    var res = picking.intersectionMouseMeshes();
-    var cam = this._camera;
-    var pivot = [0.0, 0.0, 0.0];
+    const picking = this._picking;
+    const res = picking.intersectionMouseMeshes();
+    const cam = this._camera;
+    const pivot = [0.0, 0.0, 0.0];
     if (!res) {
       return this.resetCameraMeshes();
     }
 
     vec3.transformMat4(pivot, picking.getIntersectionPoint(), picking.getMesh().getMatrix());
-    var zoom = cam._trans[2];
+    let zoom = cam._trans[2];
     if (!cam.isOrthographic()) {
       zoom = Math.min(zoom, vec3.dist(pivot, cam.computePosition()));
     }
@@ -254,14 +187,14 @@ class SculptGL extends Scene {
     this.resetCameraMeshes();
   }
 
-  onPinchStart(e) {
+  onPinchStart(scale) {
     this._focusGui = false;
-    this._lastScale = e.scale;
+    this._lastScale = scale;
   }
 
-  onPinchInOut(e) {
-    var dir = (e.scale - this._lastScale) * 25;
-    this._lastScale = e.scale;
+  onPinchInOut(scale) {
+    const dir = (scale - this._lastScale) * 25;
+    this._lastScale = scale;
     this.onDeviceWheel(dir);
   }
 
@@ -269,9 +202,9 @@ class SculptGL extends Scene {
     if (!meshes) meshes = this._meshes;
 
     if (meshes.length > 0) {
-      var pivot = [0.0, 0.0, 0.0];
-      var box = this.computeBoundingBoxMeshes(meshes);
-      var zoom = 0.8 * this.computeRadiusFromBoundingBox(box);
+      const pivot = [0.0, 0.0, 0.0];
+      const box = this.computeBoundingBoxMeshes(meshes);
+      let zoom = 0.8 * this.computeRadiusFromBoundingBox(box);
       zoom *= this._camera.computeFrustumFit();
       vec3.set(pivot, (box[0] + box[3]) * 0.5, (box[1] + box[4]) * 0.5, (box[2] + box[5]) * 0.5);
       this._camera.setAndFocusOnPivot(pivot, zoom);
@@ -286,52 +219,66 @@ class SculptGL extends Scene {
   // LOAD FILES
   ////////////////
   getFileType(name) {
-    var lower = name.toLowerCase();
-    if (lower.endsWith('.obj')) return 'obj';
-    if (lower.endsWith('.sgl')) return 'sgl';
-    if (lower.endsWith('.stl')) return 'stl';
-    if (lower.endsWith('.ply')) return 'ply';
-    return;
+    return FileUtils.getFileType(name);
   }
 
   loadFiles(event) {
     event.stopPropagation();
     event.preventDefault();
-    var files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
-    for (var i = 0, nb = files.length; i < nb; ++i) {
-      var file = files[i];
-      var fileType = this.getFileType(file.name);
-      this.readFile(file, fileType);
+    const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+    for (const file of files) {
+      this.readFile(file);
     }
   }
 
-  readFile(file, ftype) {
-    var fileType = ftype || this.getFileType(file.name);
+  async readFile(file, ftype) {
+    const fileType = ftype || this.getFileType(file.name);
     if (!fileType)
       return;
 
-    var reader = new FileReader();
-    var self = this;
-    reader.onload = function (evt) {
-      self.loadScene(evt.target.result, fileType);
+    try {
+      const data = fileType === 'obj' ? await file.text() : await file.arrayBuffer();
+      this.loadScene(data, fileType);
+    } catch (err) {
+      console.error(err);
+      window.alert('Could not read ' + file.name + ': ' + err.message);
+    } finally {
       document.getElementById('fileopen').value = '';
-    };
-
-    if (fileType === 'obj')
-      reader.readAsText(file);
-    else
-      reader.readAsArrayBuffer(file);
+    }
   }
 
   ////////////////
   // MOUSE EVENTS
   ////////////////
+  onPointerDown(event) {
+    Tablet.pressure = event.pressure;
+    if (isTouch(event)) return;
+    // keep receiving events (and the end of the stroke) when the cursor leaves the canvas
+    this._canvas.setPointerCapture(event.pointerId);
+    this.onMouseDown(event);
+  }
+
+  onPointerUp(event) {
+    if (isTouch(event)) return;
+    if (this._canvas.hasPointerCapture(event.pointerId))
+      this._canvas.releasePointerCapture(event.pointerId);
+    this.onMouseUp(event);
+  }
+
   onMouseDown(event) {
     event.stopPropagation();
     event.preventDefault();
 
+    const evProxy = this._eventProxy;
+    evProxy.pageX = event.pageX;
+    evProxy.pageY = event.pageY;
+    evProxy.shiftKey = event.shiftKey;
+    evProxy.ctrlKey = event.ctrlKey;
+    evProxy.altKey = event.altKey;
+    evProxy.which = toLegacyButton(event.button);
+
     this._gui.callFunc('onMouseDown', event);
-    this.onDeviceDown(event);
+    this.onDeviceDown(evProxy);
   }
 
   onMouseMove(event) {
@@ -348,6 +295,8 @@ class SculptGL extends Scene {
   }
 
   onMouseOut(event) {
+    // with pointer capture, "out" is only reported once the stroke is released
+    if (this._canvas.hasPointerCapture(event.pointerId)) return;
     this._focusGui = true;
     this._gui.callFunc('onMouseOut', event);
     this.onMouseUp(event);
@@ -365,8 +314,8 @@ class SculptGL extends Scene {
     event.preventDefault();
 
     this._gui.callFunc('onMouseWheel', event);
-    var dir = event.wheelDelta === undefined ? -event.detail : event.wheelDelta;
-    this.onDeviceWheel(dir > 0 ? 1 : -1);
+    if (event.deltaY === 0) return;
+    this.onDeviceWheel(event.deltaY < 0 ? 1 : -1);
   }
 
   ////////////////

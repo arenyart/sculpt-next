@@ -1,12 +1,13 @@
-import TR from 'gui/GuiTR';
-import Remesh from 'editing/Remesh';
-import Mesh from 'mesh/Mesh';
-import MeshStatic from 'mesh/meshStatic/MeshStatic';
-import Multimesh from 'mesh/multiresolution/Multimesh';
-import MeshDynamic from 'mesh/dynamic/MeshDynamic';
-import StateMultiresolution from 'states/StateMultiresolution';
-import getOptionsURL from 'misc/getOptionsURL';
-import Enums from 'misc/Enums';
+import TR from './GuiTR';
+import Remesh from '../editing/Remesh';
+import Mesh from '../mesh/Mesh';
+import MeshStatic from '../mesh/meshStatic/MeshStatic';
+import Multimesh from '../mesh/multiresolution/Multimesh';
+import MeshDynamic from '../mesh/dynamic/MeshDynamic';
+import StateMultiresolution from '../states/StateMultiresolution';
+import getOptionsURL from '../misc/getOptionsURL';
+import Enums from '../misc/Enums';
+import getKeyCode from '../misc/KeyCode';
 
 class GuiMultiresolution {
 
@@ -61,7 +62,7 @@ class GuiMultiresolution {
     if (event.handled === true)
       return;
 
-    var shk = getOptionsURL.getShortKey(event.which);
+    var shk = getOptionsURL.getShortKey(getKeyCode(event));
     event.stopPropagation();
 
     if (shk === Enums.KeyAction.REMESH) {
