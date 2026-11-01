@@ -365,9 +365,11 @@ class Scene {
     };
 
     const canvas = document.getElementById('canvas');
-    const gl = this._gl = canvas.getContext('webgl', attributes) || canvas.getContext('experimental-webgl', attributes);
+    const gl = this._gl = canvas.getContext('webgl', attributes);
     if (!gl) {
-      window.alert('Could not initialise WebGL. No WebGL, no SculptGL. Sorry.');
+      this.showFatalError('WebGL is not available',
+        'SculptGL needs WebGL to render. Enable hardware acceleration in your browser settings, ' +
+        'update your graphics drivers, or try another browser.');
       return;
     }
 
@@ -392,6 +394,18 @@ class Scene {
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+
+  showFatalError(title, message) {
+    const box = document.createElement('div');
+    box.className = 'fatal-error';
+    box.setAttribute('role', 'alert');
+    const h = document.createElement('h1');
+    h.textContent = title;
+    const p = document.createElement('p');
+    p.textContent = message;
+    box.append(h, p);
+    document.body.appendChild(box);
   }
 
   /** Load textures (preload) */

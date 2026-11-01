@@ -7,6 +7,7 @@
   "author": "Stéphane GINIER",
   "license": "MIT",
   "type": "module",
+  "main": "electron/main.js",
   "engines": {
     "node": ">=20.19"
   },
@@ -16,14 +17,19 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "desktop": "vite build && electron .",
+    "desktop:dev": "SCULPTGL_DEV_URL=http://127.0.0.1:47321/ electron .",
+    "package:desktop": "vite build && node electron/package.js"
   },
   "dependencies": {
     "fflate": "^0.8.3",
     "gl-matrix": "^3.4.4"
   },
   "devDependencies": {
+    "@electron/packager": "^20.3.0",
     "@eslint/js": "^10.0.1",
+    "electron": "^45.2.1",
     "eslint": "^10.14.0",
     "globals": "^17.14.0",
     "vite": "^8.3.5",
