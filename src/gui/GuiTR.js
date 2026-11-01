@@ -34,7 +34,7 @@ GuiTR.languages = {
 };
 
 GuiTR.select = 'english';
-let language = window.navigator.language;
+let language = globalThis.navigator?.language;
 if (language) language = language.slice(0, 2);
 if (language === 'ja') GuiTR.select = '日本語';
 else if (language === 'zh') GuiTR.select = '中文';

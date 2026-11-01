@@ -153,15 +153,7 @@ Export.addMesh = function (mesh, data, offsets, colorZbrush, colorAppend) {
 
   bufView = bufView.subarray(0, it);
 
-  if (window.TextDecoder) {
-    const de = new TextDecoder();
-    return data + de.decode(bufView);
-  }
-
-  for (i = 0; i < it; ++i)
-    data += String.fromCharCode(bufView[i]);
-
-  return data;
+  return data + new TextDecoder().decode(bufView);
 };
 
 export default Export;
