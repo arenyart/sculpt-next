@@ -1,16 +1,16 @@
 import GuiUtils from '../utils/GuiUtils';
 import BaseWidget from './BaseWidget';
 
-var vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
-var urlAlpha = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAChJREFUeNpiPHPmDAMMGBsbw9lMDDgA6RKM%2F%2F%2F%2Fh3POnj1LCzsAAgwAQtYIcFfEyzkAAAAASUVORK5CYII%3D")';
+const vendors = ['-moz-', '-o-', '-webkit-', '-ms-', ''];
+const urlAlpha = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAChJREFUeNpiPHPmDAMMGBsbw9lMDDgA6RKM%2F%2F%2F%2Fh3POnj1LCzsAAgwAQtYIcFfEyzkAAAAASUVORK5CYII%3D")';
 
 class Color extends BaseWidget {
 
   constructor(valOrObject, callbackOrKey) {
     super();
 
-    var value = this._getInitialValue(valOrObject, callbackOrKey);
-    var callback = this._getCheckCallback(valOrObject, callbackOrKey);
+    const value = this._getInitialValue(valOrObject, callbackOrKey);
+    const callback = this._getCheckCallback(valOrObject, callbackOrKey);
     if (value) this.color = GuiUtils.getValidColor(value.slice());
     else this.color = [1.0, 0.0, 0.0];
 
@@ -31,7 +31,7 @@ class Color extends BaseWidget {
     // saturation picker
     this.domSaturation = document.createElement('div');
     this.domSaturation.className = 'gui-color-saturation';
-    var zAlphaSat = document.createElement('div');
+    const zAlphaSat = document.createElement('div');
     this.domSaturation.appendChild(zAlphaSat);
     this.domSaturationKnob = document.createElement('div');
     this.domSaturationKnob.className = 'gui-knob-saturation';
@@ -47,11 +47,11 @@ class Color extends BaseWidget {
     this._linearGradient(zAlphaSat, 'top', 'rgba(0,0,0,0)', '#000');
 
     this.domColor.addEventListener('keydown', this._onInputDown.bind(this));
-    this.domSaturation.addEventListener('mousedown', this._onSaturationDown.bind(this));
-    this.domHue.addEventListener('mousedown', this._onHueDown.bind(this));
-    window.addEventListener('mouseup', this._onMouseUp.bind(this));
-    window.addEventListener('mouseout', this._onMouseUp.bind(this));
-    window.addEventListener('mousemove', this._onMouseMove.bind(this));
+    this.domSaturation.addEventListener('pointerdown', this._onSaturationDown.bind(this));
+    this.domHue.addEventListener('pointerdown', this._onHueDown.bind(this));
+    window.addEventListener('pointerup', this._onMouseUp.bind(this));
+    window.addEventListener('pointercancel', this._onMouseUp.bind(this));
+    window.addEventListener('pointermove', this._onMouseMove.bind(this));
 
     // alpha picker
     this.hasAlpha = this.color.length === 4;
@@ -65,7 +65,7 @@ class Color extends BaseWidget {
 
       this._alphaGradient(this.domAlpha, 'top', 'rgba(0,0,0,1.0)', 'rgba(0,0,0,0.0)');
 
-      this.domAlpha.addEventListener('mousedown', this._onAlphaDown.bind(this));
+      this.domAlpha.addEventListener('pointerdown', this._onAlphaDown.bind(this));
       this.domAlpha.appendChild(this.domAlphaKnob);
       this.domPopup.appendChild(this.domAlpha);
     }
@@ -78,13 +78,13 @@ class Color extends BaseWidget {
 
   _onInputDown(ev) {
     ev.stopPropagation();
-    if (ev.keyCode === 13)
+    if (ev.key === 'Enter')
       this.setValue(GuiUtils.hexToRgb(ev.target.value));
   }
 
   _onUpdateSaturation(ev) {
-    var rect = this.domSaturation.getBoundingClientRect();
-    var hsv = GuiUtils.rgbToHsv(this.getValue());
+    const rect = this.domSaturation.getBoundingClientRect();
+    const hsv = GuiUtils.rgbToHsv(this.getValue());
     hsv[1] = Math.min(1.0, Math.max(0.0, (ev.clientX - rect.left) / rect.width));
     hsv[2] = Math.min(1.0, Math.max(0.0, 1.0 - (ev.clientY - rect.top) / rect.width));
     this.setValue(GuiUtils.hsvToRgb(hsv), false, true);
@@ -92,24 +92,24 @@ class Color extends BaseWidget {
   }
 
   _onUpdateHue(ev) {
-    var rect = this.domHue.getBoundingClientRect();
-    var hsv = GuiUtils.rgbToHsv(this.getValue());
+    const rect = this.domHue.getBoundingClientRect();
+    const hsv = GuiUtils.rgbToHsv(this.getValue());
     hsv[0] = Math.min(1.0, Math.max(0.0, 1.0 - (ev.clientY - rect.top) / rect.height));
     this.setValue(GuiUtils.hsvToRgb(hsv), false, true);
     this._updateGui();
   }
 
   _onUpdateAlpha(ev) {
-    var rect = this.domAlpha.getBoundingClientRect();
-    var col = this.getValue();
+    const rect = this.domAlpha.getBoundingClientRect();
+    const col = this.getValue();
     col[3] = this.alpha = Math.min(1.0, Math.max(0.0, 1.0 - (ev.clientY - rect.top) / rect.height));
     this.setValue(col, false, true);
     this._updateGui();
   }
 
   _updateGui() {
-    var color = this.getValue();
-    var hsv = GuiUtils.rgbToHsv(color);
+    const color = this.getValue();
+    const hsv = GuiUtils.rgbToHsv(color);
 
     this.domSaturationKnob.style.marginLeft = this.widgetWidth * hsv[1] - 7 + 'px';
     this.domSaturationKnob.style.marginTop = this.widgetHeight * (1.0 - hsv[2]) - 7 + 'px';
@@ -131,16 +131,19 @@ class Color extends BaseWidget {
   }
 
   _onSaturationDown(ev) {
+    ev.currentTarget.setPointerCapture(ev.pointerId);
     this.editSaturation = true;
     this._onMouseMove(ev);
   }
 
   _onHueDown(ev) {
+    ev.currentTarget.setPointerCapture(ev.pointerId);
     this.editHue = true;
     this._onMouseMove(ev);
   }
 
   _onAlphaDown(ev) {
+    ev.currentTarget.setPointerCapture(ev.pointerId);
     this.editAlpha = true;
     this._onMouseMove(ev);
   }
@@ -151,40 +154,40 @@ class Color extends BaseWidget {
 
   _hueGradient(dom) {
     dom.style.background = '';
-    for (var i = 0, l = vendors.length; i < l; ++i)
+    for (let i = 0, l = vendors.length; i < l; ++i)
       dom.style.cssText += 'background: ' + vendors[i] + 'linear-gradient(top,  #ff0000 0%, #ff00ff 17%, #0000ff 34%, #00ffff 50%, #00ff00 67%, #ffff00 84%, #ff0000 100%);';
   }
 
   _alphaGradient(dom, dir, col1, col2) {
     dom.style.background = '';
-    for (var i = 0, l = vendors.length; i < l; ++i)
+    for (let i = 0, l = vendors.length; i < l; ++i)
       dom.style.cssText += 'background: ' + vendors[i] + 'linear-gradient(' + dir + ', ' + col1 + ',' + col2 + '),' + urlAlpha + ';';
   }
 
   _linearGradient(dom, dir, col1, col2) {
     dom.style.background = '';
-    for (var i = 0, l = vendors.length; i < l; ++i)
+    for (let i = 0, l = vendors.length; i < l; ++i)
       dom.style.cssText += 'background: ' + vendors[i] + 'linear-gradient(' + dir + ', ' + col1 + ' 0%, ' + col2 + ' 100%);';
   }
 
   setValue(color, ignoreCB, ignoreUI) {
-    var c = this.color;
-    for (var i = 0, nbC = color.length; i < nbC; ++i)
+    const c = this.color;
+    for (let i = 0, nbC = color.length; i < nbC; ++i)
       c[i] = color[i];
 
-    var hex = GuiUtils.rgbToHex(color);
+    const hex = GuiUtils.rgbToHex(color);
     this.domInputColor.value = hex;
     if (this.hasAlpha) {
       if (color.length >= 4) this.alpha = color[3];
       else color.push(this.alpha);
-      var col = 'rgba(' + parseInt(color[0] * 255, 10) + ',' + parseInt(color[1] * 255, 10) + ',' + parseInt(color[2] * 255, 10) + ',' + this.alpha + ')';
+      const col = 'rgba(' + parseInt(color[0] * 255, 10) + ',' + parseInt(color[1] * 255, 10) + ',' + parseInt(color[2] * 255, 10) + ',' + this.alpha + ')';
       this._alphaGradient(this.domInputColor, '0deg', col, col);
     } else {
       this.domInputColor.style.background = hex;
     }
 
     // color of text
-    var hsv = GuiUtils.rgbToHsv(color);
+    const hsv = GuiUtils.rgbToHsv(color);
     this.domSaturationKnob.style.borderColor = (hsv[2] < 0.5 || hsv[1] > 0.5) ? '#fff' : '#000';
     this.domInputColor.style.color = (this.alpha > 0.2 && (hsv[2] < 0.5 || hsv[1] > 0.5)) ? '#fff' : '#000';
     if (!ignoreUI) this._updateGui();

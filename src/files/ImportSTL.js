@@ -1,31 +1,31 @@
 import Utils from '../misc/Utils';
 import MeshStatic from '../mesh/meshStatic/MeshStatic';
 
-var Import = {};
+const Import = {};
 
 /** Import STL file */
 Import.importSTL = function (buffer, gl) {
-  var nbTriangles = new Uint32Array(buffer, 80, 1)[0] || 0;
-  var isBinary = 84 + (nbTriangles * 50) === buffer.byteLength;
-  var vb = isBinary ? Import.importBinarySTL(buffer, nbTriangles) : Import.importAsciiSTL(Utils.ab2str(buffer));
-  var vbc;
+  let nbTriangles = new Uint32Array(buffer, 80, 1)[0] || 0;
+  const isBinary = 84 + (nbTriangles * 50) === buffer.byteLength;
+  let vb = isBinary ? Import.importBinarySTL(buffer, nbTriangles) : Import.importAsciiSTL(Utils.ab2str(buffer));
+  let vbc;
   if (isBinary) {
     vbc = vb[1];
     vb = vb[0];
   }
   nbTriangles = vb.length / 9;
-  var mapVertices = new Map();
-  var nbVertices = [0];
-  var iAr = new Uint32Array(nbTriangles * 4);
-  for (var i = 0; i < nbTriangles; ++i) {
-    var idt = i * 4;
-    var idv = i * 9;
+  const mapVertices = new Map();
+  const nbVertices = [0];
+  const iAr = new Uint32Array(nbTriangles * 4);
+  for (let i = 0; i < nbTriangles; ++i) {
+    const idt = i * 4;
+    const idv = i * 9;
     iAr[idt] = Import.detectNewVertex(mapVertices, vb, vbc, idv, nbVertices);
     iAr[idt + 1] = Import.detectNewVertex(mapVertices, vb, vbc, idv + 3, nbVertices);
     iAr[idt + 2] = Import.detectNewVertex(mapVertices, vb, vbc, idv + 6, nbVertices);
     iAr[idt + 3] = Utils.TRI_INDEX;
   }
-  var mesh = new MeshStatic(gl);
+  const mesh = new MeshStatic(gl);
   mesh.setVertices(vb.subarray(0, nbVertices[0] * 3));
   if (vbc)
     mesh.setColors(vbc.subarray(0, nbVertices[0] * 3));
@@ -35,15 +35,15 @@ Import.importSTL = function (buffer, gl) {
 
 /** Check if the vertex already exists */
 Import.detectNewVertex = function (mapVertices, vb, vbc, start, nbVertices) {
-  var x = vb[start];
-  var y = vb[start + 1];
-  var z = vb[start + 2];
-  var hash = x + '+' + y + '+' + z;
-  var idVertex = mapVertices.get(hash);
+  const x = vb[start];
+  const y = vb[start + 1];
+  const z = vb[start + 2];
+  const hash = x + '+' + y + '+' + z;
+  let idVertex = mapVertices.get(hash);
   if (idVertex === undefined) {
     idVertex = nbVertices[0];
     mapVertices.set(hash, idVertex);
-    var id = idVertex * 3;
+    const id = idVertex * 3;
     vb[id] = x;
     vb[id + 1] = y;
     vb[id + 2] = z;
@@ -59,14 +59,14 @@ Import.detectNewVertex = function (mapVertices, vb, vbc, start, nbVertices) {
 
 /** Import Ascii STL file */
 Import.importAsciiSTL = function (data) {
-  var lines = data.split('\n');
-  var nbLength = lines.length;
-  var vb = new Float32Array(Math.ceil(nbLength * 9 / 7));
-  var acc = 0;
-  for (var i = 0; i < nbLength; ++i) {
-    var line = lines[i].trim();
+  const lines = data.split('\n');
+  const nbLength = lines.length;
+  const vb = new Float32Array(Math.ceil(nbLength * 9 / 7));
+  let acc = 0;
+  for (let i = 0; i < nbLength; ++i) {
+    const line = lines[i].trim();
     if (line.startsWith('facet')) {
-      var split = lines[i + 2].trim().split(/\s+/);
+      let split = lines[i + 2].trim().split(/\s+/);
       vb[acc++] = parseFloat(split[1]);
       vb[acc++] = parseFloat(split[2]);
       vb[acc++] = parseFloat(split[3]);
@@ -85,19 +85,19 @@ Import.importAsciiSTL = function (data) {
 
 /** Import binary STL file */
 Import.importBinarySTL = function (buffer, nbTriangles) {
-  var data = new Uint8Array(buffer);
+  const data = new Uint8Array(buffer);
 
-  var dataHeader = data.subarray(0, 80);
-  var colorMagic = String.fromCharCode.apply(null, dataHeader).indexOf('COLOR=') !== -1;
+  const dataHeader = data.subarray(0, 80);
+  const colorMagic = String.fromCharCode.apply(null, dataHeader).indexOf('COLOR=') !== -1;
 
-  var i = 0;
-  var vb = new Uint8Array(nbTriangles * 36);
-  var vbc = new Uint8Array(nbTriangles * 2);
-  var offset = 96;
-  var j = 0;
-  var jc = 0;
+  let i = 0;
+  const vb = new Uint8Array(nbTriangles * 36);
+  let vbc = new Uint8Array(nbTriangles * 2);
+  let offset = 96;
+  let j = 0;
+  let jc = 0;
   for (i = 0; i < nbTriangles; i++) {
-    for (var inc = 0; inc < 36; ++inc) {
+    for (let inc = 0; inc < 36; ++inc) {
       vb[j++] = data[offset++];
     }
     vbc[jc++] = data[offset++];
@@ -105,18 +105,18 @@ Import.importBinarySTL = function (buffer, nbTriangles) {
     offset += 12;
   }
 
-  var uc = new Uint16Array(vbc.buffer);
+  const uc = new Uint16Array(vbc.buffer);
   vbc = new Float32Array(nbTriangles * 9);
-  var inv = 1.0 / 31;
+  const inv = 1.0 / 31;
   for (i = 0; i < nbTriangles; ++i) {
     j = i * 9;
-    var u = uc[i];
+    const u = uc[i];
 
-    var r = 1.0;
-    var g = 1.0;
-    var b = 1.0;
+    let r = 1.0;
+    let g = 1.0;
+    let b = 1.0;
 
-    var bit15 = u & 32768;
+    const bit15 = u & 32768;
     // https://en.wikipedia.org/wiki/STL_(file_format)#Color_in_binary_STL
     if (colorMagic) {
       // Materialise Magics

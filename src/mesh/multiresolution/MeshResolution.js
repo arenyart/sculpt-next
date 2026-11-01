@@ -47,33 +47,33 @@ class MeshResolution extends Mesh {
   /** Go to one level below (up to down) */
   lowerAnalysis(meshUp) {
     this.copyDataFromHigherRes(meshUp);
-    var nbVertices = meshUp.getNbVertices();
-    var subdVerts = new Float32Array(nbVertices * 3);
-    var subdColors = new Float32Array(nbVertices * 3);
-    var subdMaterials = new Float32Array(nbVertices * 3);
+    const nbVertices = meshUp.getNbVertices();
+    const subdVerts = new Float32Array(nbVertices * 3);
+    const subdColors = new Float32Array(nbVertices * 3);
+    const subdMaterials = new Float32Array(nbVertices * 3);
 
     this.computePartialSubdivision(subdVerts, subdColors, subdMaterials, nbVertices);
     meshUp.computeDetails(subdVerts, subdColors, subdMaterials, nbVertices);
   }
 
   copyDataFromHigherRes(meshUp) {
-    var vArDown = this.getVertices();
-    var cArDown = this.getColors();
-    var mArDown = this.getMaterials();
-    var nbVertices = this.getNbVertices();
-    var vArUp = meshUp.getVertices();
-    var cArUp = meshUp.getColors();
-    var mArUp = meshUp.getMaterials();
+    const vArDown = this.getVertices();
+    const cArDown = this.getColors();
+    const mArDown = this.getMaterials();
+    const nbVertices = this.getNbVertices();
+    const vArUp = meshUp.getVertices();
+    const cArUp = meshUp.getColors();
+    const mArUp = meshUp.getMaterials();
 
     if (this.getEvenMapping() === false) {
       vArDown.set(vArUp.subarray(0, nbVertices * 3));
       cArDown.set(cArUp.subarray(0, nbVertices * 3));
       mArDown.set(mArUp.subarray(0, nbVertices * 3));
     } else {
-      var vertMap = this.getVerticesMapping();
-      for (var i = 0; i < nbVertices; ++i) {
-        var id = i * 3;
-        var idUp = vertMap[i] * 3;
+      const vertMap = this.getVerticesMapping();
+      for (let i = 0; i < nbVertices; ++i) {
+        const id = i * 3;
+        const idUp = vertMap[i] * 3;
         vArDown[id] = vArUp[idUp];
         vArDown[id + 1] = vArUp[idUp + 1];
         vArDown[id + 2] = vArUp[idUp + 2];
@@ -88,28 +88,28 @@ class MeshResolution extends Mesh {
   }
 
   computePartialSubdivision(subdVerts, subdColors, subdMaterials, nbVerticesUp) {
-    var vertMap = this.getVerticesMapping();
+    const vertMap = this.getVerticesMapping();
     if (!vertMap) {
       Subdivision.partialSubdivision(this, subdVerts, subdColors, subdMaterials);
       return;
     }
 
-    var verts = new Float32Array(nbVerticesUp * 3);
-    var colors = new Float32Array(nbVerticesUp * 3);
-    var materials = new Float32Array(nbVerticesUp * 3);
+    const verts = new Float32Array(nbVerticesUp * 3);
+    const colors = new Float32Array(nbVerticesUp * 3);
+    const materials = new Float32Array(nbVerticesUp * 3);
 
     Subdivision.partialSubdivision(this, verts, colors, materials);
 
-    var startMapping = this.getEvenMapping() === true ? 0 : this.getNbVertices();
+    const startMapping = this.getEvenMapping() === true ? 0 : this.getNbVertices();
     if (startMapping > 0) {
       subdVerts.set(verts.subarray(0, startMapping * 3));
       subdColors.set(colors.subarray(0, startMapping * 3));
       subdMaterials.set(materials.subarray(0, startMapping * 3));
     }
 
-    for (var i = startMapping; i < nbVerticesUp; ++i) {
-      var id = i * 3;
-      var idUp = vertMap[i] * 3;
+    for (let i = startMapping; i < nbVerticesUp; ++i) {
+      const id = i * 3;
+      const idUp = vertMap[i] * 3;
       subdVerts[idUp] = verts[id];
       subdVerts[idUp + 1] = verts[id + 1];
       subdVerts[idUp + 2] = verts[id + 2];
@@ -124,25 +124,25 @@ class MeshResolution extends Mesh {
 
   /** Apply back the detail vectors */
   applyDetails() {
-    var vrvStartCountUp = this.getVerticesRingVertStartCount();
-    var vertRingVertUp = this.getVerticesRingVert();
-    var vArUp = this.getVertices();
-    var nArUp = this.getNormals();
-    var cArUp = this.getColors();
-    var mArUp = this.getMaterials();
-    var nbVerticesUp = this.getNbVertices();
+    const vrvStartCountUp = this.getVerticesRingVertStartCount();
+    const vertRingVertUp = this.getVerticesRingVert();
+    const vArUp = this.getVertices();
+    const nArUp = this.getNormals();
+    const cArUp = this.getColors();
+    const mArUp = this.getMaterials();
+    const nbVerticesUp = this.getNbVertices();
 
-    var vArTemp = new Float32Array(Utils.getMemory(nbVerticesUp * 3 * 4), 0, nbVerticesUp * 3);
+    const vArTemp = new Float32Array(Utils.getMemory(nbVerticesUp * 3 * 4), 0, nbVerticesUp * 3);
     vArTemp.set(vArUp.subarray(0, nbVerticesUp * 3));
 
-    var dAr = this._detailsXYZ;
-    var dColorAr = this._detailsRGB;
-    var dMaterialAr = this._detailsPBR;
+    const dAr = this._detailsXYZ;
+    const dColorAr = this._detailsRGB;
+    const dMaterialAr = this._detailsPBR;
 
-    var min = Math.min;
-    var max = Math.max;
-    for (var i = 0; i < nbVerticesUp; ++i) {
-      var j = i * 3;
+    const min = Math.min;
+    const max = Math.max;
+    for (let i = 0; i < nbVerticesUp; ++i) {
+      const j = i * 3;
 
       // color delta vec
       cArUp[j] = min(1.0, max(0.0, cArUp[j] + dColorAr[j]));
@@ -155,16 +155,16 @@ class MeshResolution extends Mesh {
       mArUp[j + 2] = min(1.0, max(0.0, mArUp[j + 2] + dMaterialAr[j + 2]));
 
       // vertex coord
-      var vx = vArTemp[j];
-      var vy = vArTemp[j + 1];
-      var vz = vArTemp[j + 2];
+      const vx = vArTemp[j];
+      const vy = vArTemp[j + 1];
+      const vz = vArTemp[j + 2];
 
       // normal vec
-      var nx = nArUp[j];
-      var ny = nArUp[j + 1];
-      var nz = nArUp[j + 2];
+      let nx = nArUp[j];
+      let ny = nArUp[j + 1];
+      let nz = nArUp[j + 2];
       // normalize vector
-      var len = nx * nx + ny * ny + nz * nz;
+      let len = nx * nx + ny * ny + nz * nz;
       if (len === 0.0)
         continue;
 
@@ -174,10 +174,10 @@ class MeshResolution extends Mesh {
       nz *= len;
 
       // tangent vec (vertex neighbor - vertex)
-      var k = vertRingVertUp[vrvStartCountUp[i * 2]] * 3;
-      var tx = vArTemp[k] - vx;
-      var ty = vArTemp[k + 1] - vy;
-      var tz = vArTemp[k + 2] - vz;
+      const k = vertRingVertUp[vrvStartCountUp[i * 2]] * 3;
+      let tx = vArTemp[k] - vx;
+      let ty = vArTemp[k + 1] - vy;
+      let tz = vArTemp[k + 2] - vz;
       // distance to normal plane
       len = tx * nx + ty * ny + tz * nz;
       // project on normal plane
@@ -195,14 +195,14 @@ class MeshResolution extends Mesh {
       tz *= len;
 
       // bi normal/tangent
-      var bix = ny * tz - nz * ty;
-      var biy = nz * tx - nx * tz;
-      var biz = nx * ty - ny * tx;
+      const bix = ny * tz - nz * ty;
+      const biy = nz * tx - nx * tz;
+      const biz = nx * ty - ny * tx;
 
       // displacement/detail vector (object space)
-      var dx = dAr[j];
-      var dy = dAr[j + 1];
-      var dz = dAr[j + 2];
+      const dx = dAr[j];
+      const dy = dAr[j + 1];
+      const dz = dAr[j + 2];
 
       // detail vec in the local frame
       vArUp[j] = vx + nx * dx + tx * dy + bix * dz;
@@ -213,20 +213,20 @@ class MeshResolution extends Mesh {
 
   /** Compute the detail vectors */
   computeDetails(subdVerts, subdColors, subdMaterials, nbVerticesUp) {
-    var vrvStartCountUp = this.getVerticesRingVertStartCount();
-    var vertRingVertUp = this.getVerticesRingVert();
-    var vArUp = this.getVertices();
-    var nArUp = this.getNormals();
-    var cArUp = this.getColors();
-    var mArUp = this.getMaterials();
-    var nbVertices = this.getNbVertices();
+    const vrvStartCountUp = this.getVerticesRingVertStartCount();
+    const vertRingVertUp = this.getVerticesRingVert();
+    const vArUp = this.getVertices();
+    const nArUp = this.getNormals();
+    const cArUp = this.getColors();
+    const mArUp = this.getMaterials();
+    const nbVertices = this.getNbVertices();
 
-    var dAr = this._detailsXYZ = new Float32Array(nbVerticesUp * 3);
-    var dColorAr = this._detailsRGB = new Float32Array(nbVerticesUp * 3);
-    var dMaterialAr = this._detailsPBR = new Float32Array(nbVerticesUp * 3);
+    const dAr = this._detailsXYZ = new Float32Array(nbVerticesUp * 3);
+    const dColorAr = this._detailsRGB = new Float32Array(nbVerticesUp * 3);
+    const dMaterialAr = this._detailsPBR = new Float32Array(nbVerticesUp * 3);
 
-    for (var i = 0; i < nbVertices; ++i) {
-      var j = i * 3;
+    for (let i = 0; i < nbVertices; ++i) {
+      const j = i * 3;
 
       // color delta vec
       dColorAr[j] = cArUp[j] - subdColors[j];
@@ -239,11 +239,11 @@ class MeshResolution extends Mesh {
       dMaterialAr[j + 2] = mArUp[j + 2] - subdMaterials[j + 2];
 
       // normal vec
-      var nx = nArUp[j];
-      var ny = nArUp[j + 1];
-      var nz = nArUp[j + 2];
+      let nx = nArUp[j];
+      let ny = nArUp[j + 1];
+      let nz = nArUp[j + 2];
       // normalize vector
-      var len = nx * nx + ny * ny + nz * nz;
+      let len = nx * nx + ny * ny + nz * nz;
       if (len === 0.0)
         continue;
       len = 1.0 / Math.sqrt(len);
@@ -252,10 +252,10 @@ class MeshResolution extends Mesh {
       nz *= len;
 
       // tangent vec (vertex neighbor - vertex)
-      var k = vertRingVertUp[vrvStartCountUp[i * 2]] * 3;
-      var tx = subdVerts[k] - subdVerts[j];
-      var ty = subdVerts[k + 1] - subdVerts[j + 1];
-      var tz = subdVerts[k + 2] - subdVerts[j + 2];
+      const k = vertRingVertUp[vrvStartCountUp[i * 2]] * 3;
+      let tx = subdVerts[k] - subdVerts[j];
+      let ty = subdVerts[k + 1] - subdVerts[j + 1];
+      let tz = subdVerts[k + 2] - subdVerts[j + 2];
       // distance to normal plane
       len = tx * nx + ty * ny + tz * nz;
       // project on normal plane
@@ -272,14 +272,14 @@ class MeshResolution extends Mesh {
       tz *= len;
 
       // bi normal/tangent
-      var bix = ny * tz - nz * ty;
-      var biy = nz * tx - nx * tz;
-      var biz = nx * ty - ny * tx;
+      const bix = ny * tz - nz * ty;
+      const biy = nz * tx - nx * tz;
+      const biz = nx * ty - ny * tx;
 
       // displacement/detail vector (object space)
-      var dx = vArUp[j] - subdVerts[j];
-      var dy = vArUp[j + 1] - subdVerts[j + 1];
-      var dz = vArUp[j + 2] - subdVerts[j + 2];
+      const dx = vArUp[j] - subdVerts[j];
+      const dy = vArUp[j + 1] - subdVerts[j + 1];
+      const dz = vArUp[j + 2] - subdVerts[j + 2];
 
       // order : n/t/bi
       dAr[j] = nx * dx + ny * dy + nz * dz;

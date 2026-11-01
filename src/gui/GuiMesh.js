@@ -21,7 +21,7 @@ class GuiMesh {
     this.domUl = document.createElement('span');
     this.domUl.appendChild(this.domVerts);
     this.domUl.appendChild(this.domFaces);
-    var style = this.domUl.style;
+    const style = this.domUl.style;
     style.cursor = 'default';
     if (style.float === undefined) style.cssFloat = 'right';
     else style.float = 'right';
@@ -30,7 +30,7 @@ class GuiMesh {
   }
 
   updateMeshInfo() {
-    var mesh = this._main.getMesh();
+    const mesh = this._main.getMesh();
     this.domVerts.innerHTML = TR('meshNbVertices') + (mesh ? mesh.getNbVertices() : 0);
     this.domFaces.innerHTML = TR('meshNbFaces') + (mesh ? mesh.getNbFaces() : 0);
   }

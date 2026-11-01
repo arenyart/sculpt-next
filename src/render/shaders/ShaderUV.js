@@ -1,7 +1,7 @@
 import ShaderBase from './ShaderBase';
 import Attribute from '../Attribute';
 
-var ShaderUV = ShaderBase.getCopy();
+const ShaderUV = ShaderBase.getCopy();
 ShaderUV.vertexName = ShaderUV.fragmentName = 'ShowUV';
 
 ShaderUV.texPath = 'resources/uv.png';
@@ -66,8 +66,8 @@ ShaderUV.bindAttributes = function (mesh) {
   ShaderUV.attributes.aTexCoord.bindToBuffer(mesh.getTexCoordBuffer());
 };
 ShaderUV.updateUniforms = function (mesh, main) {
-  var gl = mesh.getGL();
-  var uniforms = this.uniforms;
+  const gl = mesh.getGL();
+  const uniforms = this.uniforms;
 
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, this.getOrCreateTexture0(gl, ShaderUV.texPath, main) || this.getDummyTexture(gl));

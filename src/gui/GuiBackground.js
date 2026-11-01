@@ -10,11 +10,11 @@ class GuiBackground {
 
   init(guiParent) {
     // background fold
-    var menu = this._menu = guiParent.addMenu(TR('backgroundTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('backgroundTitle'));
 
     this._bg = this._main.getBackground();
 
-    var types = ['Image', 'Environment', 'Ambient env'];
+    const types = ['Image', 'Environment', 'Ambient env'];
     menu.addCombobox('Type', this._bg._type, this.onBackgroundType.bind(this), types);
     this._ctrlBlur = menu.addSlider('Blur', this._bg._blur, this.onEnvBlur.bind(this), 0.0, 1.0, 0.01);
     this._ctrlBlur.setVisibility(this._bg._type === 1);

@@ -3,7 +3,7 @@ import ShaderBase from './ShaderBase';
 import Attribute from '../Attribute';
 import outlineGLSL from './glsl/outline.glsl?raw';
 
-var ShaderContour = ShaderBase.getCopy();
+const ShaderContour = ShaderBase.getCopy();
 ShaderContour.vertexName = ShaderContour.fragmentName = 'SobelContour';
 
 ShaderContour.color = getOptionsURL().outlinecolor;
@@ -37,7 +37,7 @@ ShaderContour.fragment = [
 ].join('\n');
 
 ShaderContour.draw = function (rtt) {
-  var gl = rtt.getGL();
+  const gl = rtt.getGL();
   gl.useProgram(this.program);
 
   ShaderContour.attributes.aVertex.bindToBuffer(rtt.getVertexBuffer());

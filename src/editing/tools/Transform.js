@@ -19,9 +19,9 @@ class Transform extends SculptBase {
   }
 
   preUpdate() {
-    var picking = this._main.getPicking();
+    const picking = this._main.getPicking();
 
-    var mesh = picking.getMesh();
+    const mesh = picking.getMesh();
     this._gizmo.onMouseOver();
     picking._mesh = mesh;
 
@@ -29,9 +29,9 @@ class Transform extends SculptBase {
   }
 
   start(ctrl) {
-    var main = this._main;
-    var mesh = this.getMesh();
-    var picking = main.getPicking();
+    const main = this._main;
+    const mesh = this.getMesh();
+    const picking = main.getPicking();
 
     if (mesh && this._gizmo.onMouseDown()) {
       picking._mesh = mesh;
@@ -55,14 +55,14 @@ class Transform extends SculptBase {
     if (!this.getMesh() || this.isIdentity(this.getMesh().getEditMatrix()))
       return;
 
-    var meshes = this._main.getSelectedMeshes();
-    for (var i = 0; i < meshes.length; ++i) {
+    const meshes = this._main.getSelectedMeshes();
+    for (let i = 0; i < meshes.length; ++i) {
       this._forceToolMesh = meshes[i];
 
       this.pushState();
       if (i > 0) this._main.getStateManager().getCurrentState().squash = true;
 
-      var iVerts = this.getUnmaskedVertices();
+      const iVerts = this.getUnmaskedVertices();
       this._main.getStateManager().pushVertices(iVerts);
       this.applyEditMatrix(iVerts);
 
@@ -73,19 +73,19 @@ class Transform extends SculptBase {
   }
 
   applyEditMatrix(iVerts) {
-    var mesh = this.getMesh();
-    var em = mesh.getEditMatrix();
-    var mAr = mesh.getMaterials();
-    var vAr = mesh.getVertices();
-    var vTemp = [0.0, 0.0, 0.0];
-    for (var i = 0, nb = iVerts.length; i < nb; ++i) {
-      var j = iVerts[i] * 3;
-      var mask = mAr[j + 2];
-      var x = vTemp[0] = vAr[j];
-      var y = vTemp[1] = vAr[j + 1];
-      var z = vTemp[2] = vAr[j + 2];
+    const mesh = this.getMesh();
+    const em = mesh.getEditMatrix();
+    const mAr = mesh.getMaterials();
+    const vAr = mesh.getVertices();
+    const vTemp = [0.0, 0.0, 0.0];
+    for (let i = 0, nb = iVerts.length; i < nb; ++i) {
+      const j = iVerts[i] * 3;
+      const mask = mAr[j + 2];
+      const x = vTemp[0] = vAr[j];
+      const y = vTemp[1] = vAr[j + 1];
+      const z = vTemp[2] = vAr[j + 2];
       vec3.transformMat4(vTemp, vTemp, em);
-      var iMask = 1.0 - mask;
+      const iMask = 1.0 - mask;
       vAr[j] = x * iMask + vTemp[0] * mask;
       vAr[j + 1] = y * iMask + vTemp[1] * mask;
       vAr[j + 2] = z * iMask + vTemp[2] * mask;

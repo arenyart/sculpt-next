@@ -5,8 +5,8 @@ class Slider extends BaseWidget {
   constructor(valOrObject, callbackOrKey, min, max, step) {
     super();
 
-    var value = this._getInitialValue(valOrObject, callbackOrKey);
-    var callback = this._getCheckCallback(valOrObject, callbackOrKey);
+    let value = this._getInitialValue(valOrObject, callbackOrKey);
+    const callback = this._getCheckCallback(valOrObject, callbackOrKey);
     value = value !== undefined ? value : 100;
     min = min !== undefined ? min : 0;
     max = max !== undefined ? max : 200;
@@ -29,9 +29,9 @@ class Slider extends BaseWidget {
     this.domInputText.addEventListener('keydown', this._onKeyDown.bind(this));
     this.domInputText.addEventListener('change', this._onInputText.bind(this));
     this.domInputText.addEventListener('blur', this._onInputText.bind(this));
-    this.domSlider.addEventListener('mousedown', this._onMouseDown.bind(this));
-    window.addEventListener('mouseup', this._onMouseUp.bind(this), true);
-    window.addEventListener('mousemove', this._onMouseMove.bind(this));
+    this.domSlider.addEventListener('pointerdown', this._onMouseDown.bind(this));
+    window.addEventListener('pointerup', this._onMouseUp.bind(this), true);
+    window.addEventListener('pointermove', this._onMouseMove.bind(this));
 
     this.lastValue = value;
     this.isDown = false;
@@ -40,14 +40,14 @@ class Slider extends BaseWidget {
   }
 
   _onInputText(ev) {
-    var val = parseFloat(ev.target.value);
+    const val = parseFloat(ev.target.value);
     if (val !== val || val === this.lastValue) return;
     this.setValue(val);
   }
 
   _onKeyDown(ev) {
     ev.stopPropagation();
-    if (ev.which === 13) // enter
+    if (ev.key === 'Enter')
       this.domInputText.blur();
   }
 
@@ -55,12 +55,13 @@ class Slider extends BaseWidget {
     ev.preventDefault();
     if (!this.isDown)
       return;
-    var rect = this.domSlider.getBoundingClientRect();
-    var val = this.min + (this.max - this.min) * ((ev.clientX - rect.left) / rect.width);
+    const rect = this.domSlider.getBoundingClientRect();
+    const val = this.min + (this.max - this.min) * ((ev.clientX - rect.left) / rect.width);
     this.setValue(val);
   }
 
   _onMouseDown(ev) {
+    this.domSlider.setPointerCapture(ev.pointerId);
     this.isDown = true;
     this._onMouseMove(ev);
   }
@@ -82,7 +83,7 @@ class Slider extends BaseWidget {
     val = Math.max(Math.min(val, this.max), this.min);
     val = Math.round(val / this.step) * this.step;
     this.domInputText.value = val;
-    var per = this.min;
+    let per = this.min;
     if (this.max !== this.min) per = (val - this.min) / (this.max - this.min);
     this.domSliderFill.style.width = 100 * per + '%';
     if (!ignoreCB && this.callback) this.callback(val);

@@ -371,11 +371,11 @@ class SculptGL extends Scene {
 
     this.setMousePosition(event);
 
-    var mouseX = this._mouseX;
-    var mouseY = this._mouseY;
-    var button = event.which;
+    const mouseX = this._mouseX;
+    const mouseY = this._mouseY;
+    const button = event.which;
 
-    var canEdit = false;
+    let canEdit = false;
     if (button === MOUSE_LEFT)
       canEdit = this._sculptManager.start(event.shiftKey);
 
@@ -413,10 +413,10 @@ class SculptGL extends Scene {
       return;
     this.setMousePosition(event);
 
-    var mouseX = this._mouseX;
-    var mouseY = this._mouseY;
-    var action = this._action;
-    var speedFactor = this.getSpeedFactor();
+    const mouseX = this._mouseX;
+    const mouseY = this._mouseY;
+    const action = this._action;
+    const speedFactor = this.getSpeedFactor();
 
     if (action === Enums.Action.CAMERA_ZOOM || (action === Enums.Action.CAMERA_PAN_ZOOM_ALT && !event.altKey)) {
 

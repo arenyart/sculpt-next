@@ -1,23 +1,23 @@
 import Utils from '../misc/Utils';
 
-var Reversion = {};
+const Reversion = {};
 
-var detectExtraordinaryVertices = function (mesh) {
-  var nbVertices = mesh.getNbVertices();
-  var fAr = mesh.getFaces();
-  var onEdge = mesh.getVerticesOnEdge();
-  var vrvStartCount = mesh.getVerticesRingVertStartCount();
-  var vrf = mesh.getVerticesRingFace();
-  var vrfStartCount = mesh.getVerticesRingFaceStartCount();
-  var vExtraTags = new Int8Array(nbVertices);
-  for (var i = 0; i < nbVertices; ++i) {
-    var id = i * 2;
-    var len = vrvStartCount[id + 1];
-    var startFace = vrfStartCount[id];
-    var countFace = vrfStartCount[id + 1];
-    var vBorder = onEdge[i];
-    var nbQuad = 0;
-    for (var j = startFace, endFace = startFace + countFace; j < endFace; ++j) {
+const detectExtraordinaryVertices = function (mesh) {
+  const nbVertices = mesh.getNbVertices();
+  const fAr = mesh.getFaces();
+  const onEdge = mesh.getVerticesOnEdge();
+  const vrvStartCount = mesh.getVerticesRingVertStartCount();
+  const vrf = mesh.getVerticesRingFace();
+  const vrfStartCount = mesh.getVerticesRingFaceStartCount();
+  const vExtraTags = new Int8Array(nbVertices);
+  for (let i = 0; i < nbVertices; ++i) {
+    const id = i * 2;
+    const len = vrvStartCount[id + 1];
+    const startFace = vrfStartCount[id];
+    const countFace = vrfStartCount[id + 1];
+    const vBorder = onEdge[i];
+    let nbQuad = 0;
+    for (let j = startFace, endFace = startFace + countFace; j < endFace; ++j) {
       nbQuad += fAr[vrf[j] * 4 + 3] === Utils.TRI_INDEX ? 0 : 1;
     }
 
@@ -39,9 +39,9 @@ var detectExtraordinaryVertices = function (mesh) {
 };
 
 /** Return the first extraordinary vertex if it exists... or a random vertex otherwise */
-var getSeed = function (mesh, vEvenTags, vExtraTags) {
-  var i = 0;
-  var nbVertices = mesh.getNbVertices();
+const getSeed = function (mesh, vEvenTags, vExtraTags) {
+  let i = 0;
+  const nbVertices = mesh.getNbVertices();
   for (i = 0; i < nbVertices; ++i) {
     if (vEvenTags[i] !== 0)
       continue;
@@ -49,7 +49,7 @@ var getSeed = function (mesh, vEvenTags, vExtraTags) {
       return i;
   }
   // no extraordinary vertices...
-  var onEdge = mesh.getVerticesOnEdge();
+  const onEdge = mesh.getVerticesOnEdge();
   for (i = 0; i < nbVertices; ++i) {
     if (vEvenTags[i] !== 0) continue; // skip already processed vertex
     if (onEdge[i] !== 1) break;
@@ -64,31 +64,31 @@ var getSeed = function (mesh, vEvenTags, vExtraTags) {
 };
 
 /** Tag the even vertices */
-var tagVertices = function (mesh, vExtraTags, vEvenTags) {
-  var tagFlag = ++Utils.TAG_FLAG;
-  var vFlags = mesh.getVerticesTagFlags();
-  var vrvSC = mesh.getVerticesRingVertStartCount();
-  var vrv = mesh.getVerticesRingVert();
-  var onEdge = mesh.getVerticesOnEdge();
+const tagVertices = function (mesh, vExtraTags, vEvenTags) {
+  let tagFlag = ++Utils.TAG_FLAG;
+  const vFlags = mesh.getVerticesTagFlags();
+  const vrvSC = mesh.getVerticesRingVertStartCount();
+  const vrv = mesh.getVerticesRingVert();
+  const onEdge = mesh.getVerticesOnEdge();
 
-  var vSeed = getSeed(mesh, vEvenTags, vExtraTags);
+  const vSeed = getSeed(mesh, vEvenTags, vExtraTags);
   if (vSeed < 0)
     return false;
 
   vEvenTags[vSeed] = 1;
-  var stack = new Uint32Array(Utils.getMemory(mesh.getNbVertices() * 4), 0, mesh.getNbVertices());
+  const stack = new Uint32Array(Utils.getMemory(mesh.getNbVertices() * 4), 0, mesh.getNbVertices());
   stack[0] = vSeed;
-  var curStack = 1;
+  let curStack = 1;
 
   while (curStack > 0) {
-    var idVert = stack[--curStack];
-    var start = vrvSC[idVert * 2];
-    var end = start + vrvSC[idVert * 2 + 1];
-    var i = 0;
-    var stamp = ++tagFlag;
+    const idVert = stack[--curStack];
+    const start = vrvSC[idVert * 2];
+    const end = start + vrvSC[idVert * 2 + 1];
+    let i = 0;
+    let stamp = ++tagFlag;
     // tag the odd vertices
     for (i = start; i < end; ++i) {
-      var oddi = vrv[i];
+      const oddi = vrv[i];
       vFlags[oddi] = stamp;
       // already an even vertex
       if (vEvenTags[oddi] === 1) {
@@ -102,17 +102,17 @@ var tagVertices = function (mesh, vExtraTags, vEvenTags) {
     // visited candidates opposites even vertex
     stamp = ++tagFlag;
     for (i = start; i < end; ++i) {
-      var oddId = vrv[i];
+      const oddId = vrv[i];
       // extraordinary vertex marked as odd vertex
       if (vExtraTags[oddId] !== 0 && !onEdge[oddId]) {
         Utils.TAG_FLAG = tagFlag;
         return false;
       }
-      var oddStart = vrvSC[oddId * 2];
-      var oddEnd = oddStart + vrvSC[oddId * 2 + 1];
+      const oddStart = vrvSC[oddId * 2];
+      const oddEnd = oddStart + vrvSC[oddId * 2 + 1];
       // find opposite vertex
-      for (var j = oddStart; j < oddEnd; ++j) {
-        var evenj = vrv[j];
+      for (let j = oddStart; j < oddEnd; ++j) {
+        const evenj = vrv[j];
         if (evenj === idVert)
           continue;
         if (vFlags[evenj] >= (stamp - 1)) // see comments above
@@ -120,10 +120,10 @@ var tagVertices = function (mesh, vExtraTags, vEvenTags) {
         vFlags[evenj] = stamp;
         if (vEvenTags[evenj] !== 0) // already processed
           continue;
-        var oppStart = vrvSC[evenj * 2];
-        var oppEnd = oppStart + vrvSC[evenj * 2 + 1];
-        var nbOdd = 0;
-        for (var k = oppStart; k < oppEnd; ++k) {
+        const oppStart = vrvSC[evenj * 2];
+        const oppEnd = oppStart + vrvSC[evenj * 2 + 1];
+        let nbOdd = 0;
+        for (let k = oppStart; k < oppEnd; ++k) {
           if (vFlags[vrv[k]] === (stamp - 1))
             nbOdd++;
         }
@@ -141,15 +141,15 @@ var tagVertices = function (mesh, vExtraTags, vEvenTags) {
 };
 
 /** Tag the even vertices */
-var tagEvenVertices = function (mesh, vEvenTags) {
-  var nbVertices = mesh.getNbVertices();
-  var vExtraTags = detectExtraordinaryVertices(mesh);
-  var running = true;
+const tagEvenVertices = function (mesh, vEvenTags) {
+  const nbVertices = mesh.getNbVertices();
+  const vExtraTags = detectExtraordinaryVertices(mesh);
+  let running = true;
   while (running) {
     if (!tagVertices(mesh, vExtraTags, vEvenTags))
       return false;
     running = false;
-    for (var i = 0; i < nbVertices; ++i) {
+    for (let i = 0; i < nbVertices; ++i) {
       if (vEvenTags[i] === 0) {
         running = true;
         break;
@@ -160,28 +160,28 @@ var tagEvenVertices = function (mesh, vEvenTags) {
 };
 
 /** Creates the coarse faces from the tagged vertices */
-var createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
-  var feAr = baseMesh.getFaceEdges();
-  var fArUp = baseMesh.getFaces();
-  var tagEdges = new Int32Array(baseMesh.getNbEdges());
-  var i = 0;
-  var nbFaces = baseMesh.getNbFaces();
-  var acc = 0;
-  var centerQuadUp = new Uint32Array(baseMesh.getNbVertices());
+const createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
+  const feAr = baseMesh.getFaceEdges();
+  const fArUp = baseMesh.getFaces();
+  const tagEdges = new Int32Array(baseMesh.getNbEdges());
+  let i = 0;
+  let nbFaces = baseMesh.getNbFaces();
+  let acc = 0;
+  const centerQuadUp = new Uint32Array(baseMesh.getNbVertices());
 
-  var fArDown = new Uint32Array(nbFaces);
+  const fArDown = new Uint32Array(nbFaces);
   for (i = 0; i < nbFaces; ++i)
     fArDown[i] = Utils.TRI_INDEX;
 
   for (i = 0; i < nbFaces; ++i) {
-    var j = i * 4;
-    var iv1 = fArUp[j];
-    var iv2 = fArUp[j + 1];
-    var iv3 = fArUp[j + 2];
-    var iv4 = fArUp[j + 3];
-    var tag1 = vEvenTags[iv1];
-    var tag2 = vEvenTags[iv2];
-    var tag3 = vEvenTags[iv3];
+    const j = i * 4;
+    const iv1 = fArUp[j];
+    const iv2 = fArUp[j + 1];
+    const iv3 = fArUp[j + 2];
+    const iv4 = fArUp[j + 3];
+    const tag1 = vEvenTags[iv1];
+    const tag2 = vEvenTags[iv2];
+    const tag3 = vEvenTags[iv3];
     if (iv4 === Utils.TRI_INDEX) {
       // center tri
       if (tag1 + tag2 + tag3 === -3) {
@@ -195,9 +195,9 @@ var createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
       continue;
     }
     //quad
-    var ivCorner = 0;
-    var ivCenter = 0;
-    var oppEdge = 0;
+    let ivCorner = 0;
+    let ivCenter = 0;
+    let oppEdge = 0;
     if (tag1 === 1) {
       ivCorner = iv1;
       ivCenter = iv3;
@@ -220,7 +220,7 @@ var createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
       tagEdges[feAr[j + 1]] = iv4 + 1;
     }
 
-    var quad = centerQuadUp[ivCenter] - 1;
+    const quad = centerQuadUp[ivCenter] - 1;
     if (quad < 0) {
       triFaceOrQuadCenter[acc] = -ivCenter - 1;
       fArDown[acc * 4 + 3] = ivCorner;
@@ -228,7 +228,7 @@ var createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
       continue;
     }
 
-    var idQuad = quad * 4;
+    const idQuad = quad * 4;
     if (oppEdge < 0) {
       // no opposite edge
       if (fArDown[idQuad + 2] >= (Utils.TRI_INDEX - 1)) {
@@ -258,19 +258,19 @@ var createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
 
   nbFaces /= 4;
   for (i = 0; i < nbFaces; ++i) {
-    var cen = triFaceOrQuadCenter[i];
-    var idFace = i * 4;
+    const cen = triFaceOrQuadCenter[i];
+    const idFace = i * 4;
     if (cen < 0) { // quad
       // Sometimes... the way we revert quads does not always work
       // because of non-consistency clock wise order between neighbor quads
-      var cmp = Utils.TRI_INDEX - 1;
+      const cmp = Utils.TRI_INDEX - 1;
       if (fArDown[idFace] >= cmp || fArDown[idFace + 1] >= Utils.TRI_INDEX || fArDown[idFace + 2] >= Utils.TRI_INDEX)
         return false;
       continue;
     }
 
     // tri
-    var id = cen * 4;
+    const id = cen * 4;
     fArDown[idFace] = tagEdges[feAr[id]] - 1;
     fArDown[idFace + 1] = tagEdges[feAr[id + 1]] - 1;
     fArDown[idFace + 2] = tagEdges[feAr[id + 2]] - 1;
@@ -281,21 +281,21 @@ var createFaces = function (baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter) {
 };
 
 /** Creates the vertices of the mesh */
-var createVertices = function (baseMesh, newMesh, triFaceOrQuadCenter) {
-  var acc = 0;
-  var vertexMapUp = new Uint32Array(baseMesh.getNbVertices());
+const createVertices = function (baseMesh, newMesh, triFaceOrQuadCenter) {
+  let acc = 0;
+  const vertexMapUp = new Uint32Array(baseMesh.getNbVertices());
   newMesh.setVerticesMapping(vertexMapUp);
-  var fArDown = newMesh.getFaces();
-  var tagVert = new Int32Array(baseMesh.getNbVertices());
-  var i = 0;
-  var len = newMesh.getNbFaces() * 4;
+  const fArDown = newMesh.getFaces();
+  const tagVert = new Int32Array(baseMesh.getNbVertices());
+  let i = 0;
+  let len = newMesh.getNbFaces() * 4;
 
   for (i = 0; i < len; ++i) {
-    var iv = fArDown[i];
+    const iv = fArDown[i];
     if (iv === Utils.TRI_INDEX)
       continue;
 
-    var tag = tagVert[iv] - 1;
+    let tag = tagVert[iv] - 1;
     if (tag === -1) {
       tag = acc++;
       tagVert[iv] = tag + 1;
@@ -305,18 +305,18 @@ var createVertices = function (baseMesh, newMesh, triFaceOrQuadCenter) {
   }
 
   newMesh.setVertices(new Float32Array(acc * 3));
-  var fArUp = baseMesh.getFaces();
-  var vrf = baseMesh.getVerticesRingFace();
-  var vrfStartCount = baseMesh.getVerticesRingFaceStartCount();
-  var tagMid = new Uint8Array(baseMesh.getNbVertices());
+  const fArUp = baseMesh.getFaces();
+  const vrf = baseMesh.getVerticesRingFace();
+  const vrfStartCount = baseMesh.getVerticesRingFaceStartCount();
+  const tagMid = new Uint8Array(baseMesh.getNbVertices());
   len /= 4;
+  let mid1, mid2, mid3, mid4, mid5;
+  let tag1, tag2, tag3, tag4, tag5;
   for (i = 0; i < len; ++i) {
-    var iCenter = triFaceOrQuadCenter[i];
-    var mid1, mid2, mid3, mid4, mid5;
-    var tag1, tag2, tag3, tag4, tag5;
+    const iCenter = triFaceOrQuadCenter[i];
     if (iCenter >= 0) {
       // tri
-      var id = iCenter * 4;
+      const id = iCenter * 4;
       mid1 = fArUp[id + 1];
       mid2 = fArUp[id + 2];
       mid3 = fArUp[id];
@@ -325,19 +325,19 @@ var createVertices = function (baseMesh, newMesh, triFaceOrQuadCenter) {
     } else {
       // quad
       mid5 = -iCenter - 1;
-      var idQuadDown = i * 4;
-      var corner1 = vertexMapUp[fArDown[idQuadDown]];
-      var corner2 = vertexMapUp[fArDown[idQuadDown + 1]];
-      var corner3 = vertexMapUp[fArDown[idQuadDown + 2]];
-      var corner4 = vertexMapUp[fArDown[idQuadDown + 3]];
-      var start = vrfStartCount[mid5 * 2];
-      var end = start + 4;
-      for (var j = start; j < end; ++j) {
-        var idQuad = vrf[j] * 4;
-        var id1 = fArUp[idQuad];
-        var id2 = fArUp[idQuad + 1];
-        var id3 = fArUp[idQuad + 2];
-        var id4 = fArUp[idQuad + 3];
+      const idQuadDown = i * 4;
+      const corner1 = vertexMapUp[fArDown[idQuadDown]];
+      const corner2 = vertexMapUp[fArDown[idQuadDown + 1]];
+      const corner3 = vertexMapUp[fArDown[idQuadDown + 2]];
+      const corner4 = vertexMapUp[fArDown[idQuadDown + 3]];
+      const start = vrfStartCount[mid5 * 2];
+      const end = start + 4;
+      for (let j = start; j < end; ++j) {
+        const idQuad = vrf[j] * 4;
+        const id1 = fArUp[idQuad];
+        const id2 = fArUp[idQuad + 1];
+        const id3 = fArUp[idQuad + 2];
+        const id4 = fArUp[idQuad + 3];
         if (id1 === corner1) mid1 = id2;
         else if (id2 === corner1) mid1 = id3;
         else if (id3 === corner1) mid1 = id4;
@@ -389,18 +389,18 @@ var createVertices = function (baseMesh, newMesh, triFaceOrQuadCenter) {
 };
 
 /** Copy the vertices data from up to low */
-var copyVerticesData = function (baseMesh, newMesh) {
-  var vArUp = baseMesh.getVertices();
-  var cArUp = baseMesh.getColors();
-  var mArUp = baseMesh.getMaterials();
-  var vArDown = newMesh.getVertices();
-  var cArDown = new Float32Array(vArDown.length);
-  var mArDown = new Float32Array(vArDown.length);
+const copyVerticesData = function (baseMesh, newMesh) {
+  const vArUp = baseMesh.getVertices();
+  const cArUp = baseMesh.getColors();
+  const mArUp = baseMesh.getMaterials();
+  const vArDown = newMesh.getVertices();
+  const cArDown = new Float32Array(vArDown.length);
+  const mArDown = new Float32Array(vArDown.length);
   newMesh.setColors(cArDown);
   newMesh.setMaterials(mArDown);
-  var vertexMapUp = newMesh.getVerticesMapping();
-  var i = 0;
-  var nbVertices = newMesh.getNbVertices();
+  const vertexMapUp = newMesh.getVerticesMapping();
+  let i = 0;
+  const nbVertices = newMesh.getNbVertices();
   for (i = 0; i < nbVertices; ++i) {
     if (vertexMapUp[i] >= nbVertices)
       break;
@@ -408,10 +408,10 @@ var copyVerticesData = function (baseMesh, newMesh) {
 
   if (i === nbVertices) {
     // we don't have to keep the vertex mapping
-    var fArDown = newMesh.getFaces();
-    var nb = fArDown.length;
+    const fArDown = newMesh.getFaces();
+    const nb = fArDown.length;
     for (i = 0; i < nb; ++i) {
-      var idv = fArDown[i];
+      const idv = fArDown[i];
       if (idv !== Utils.TRI_INDEX)
         fArDown[i] = vertexMapUp[idv];
     }
@@ -426,8 +426,8 @@ var copyVerticesData = function (baseMesh, newMesh) {
     // we keep the vertex mapping
     newMesh.setEvenMapping(true);
     for (i = 0; i < nbVertices; ++i) {
-      var id = i * 3;
-      var idUp = vertexMapUp[i] * 3;
+      const id = i * 3;
+      const idUp = vertexMapUp[i] * 3;
       vArDown[id] = vArUp[idUp];
       vArDown[id + 1] = vArUp[idUp + 1];
       vArDown[id + 2] = vArUp[idUp + 2];
@@ -442,34 +442,34 @@ var copyVerticesData = function (baseMesh, newMesh) {
 };
 
 /** Computes uv faces and uv coordinates for center vertices */
-var computeFaceTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter, uvMap) {
-  var fArUp = baseMesh.getFaces();
-  var fArUVUp = baseMesh.getFacesTexCoord();
-  var vrfSC = baseMesh.getVerticesRingFaceStartCount();
-  var vrf = baseMesh.getVerticesRingFace();
-  var dupUp = baseMesh.getVerticesDuplicateStartCount();
+const computeFaceTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter, uvMap) {
+  const fArUp = baseMesh.getFaces();
+  const fArUVUp = baseMesh.getFacesTexCoord();
+  const vrfSC = baseMesh.getVerticesRingFaceStartCount();
+  const vrf = baseMesh.getVerticesRingFace();
+  const dupUp = baseMesh.getVerticesDuplicateStartCount();
 
-  var fAr = newMesh.getFaces();
-  var fArUV = new Uint32Array(fAr);
-  var vertexMapUp = newMesh.getVerticesMapping();
+  const fAr = newMesh.getFaces();
+  const fArUV = new Uint32Array(fAr);
+  const vertexMapUp = newMesh.getVerticesMapping();
 
-  for (var i = 0, len = fAr.length; i < len; ++i) {
-    var iv = fAr[i];
+  for (let i = 0, len = fAr.length; i < len; ++i) {
+    const iv = fAr[i];
     if (iv === Utils.TRI_INDEX)
       continue;
 
-    var ivUp = vertexMapUp[iv];
+    const ivUp = vertexMapUp[iv];
     if (dupUp[ivUp * 2] === 0)
       continue;
 
     // vertex with duplicates
-    var index = i % 4;
-    var iCen = triFaceOrQuadCenter[(i - index) / 4];
-    var vertUV = Utils.TRI_INDEX;
+    const index = i % 4;
+    let iCen = triFaceOrQuadCenter[(i - index) / 4];
+    let vertUV = Utils.TRI_INDEX;
     if (iCen >= 0) {
       // tri
-      var idCen = iCen * 4;
-      var mid1, mid2;
+      const idCen = iCen * 4;
+      let mid1, mid2;
       if (index === 0) {
         mid1 = fArUp[idCen + 1];
         mid2 = fArUp[idCen];
@@ -480,13 +480,13 @@ var computeFaceTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter, uvM
         mid1 = fArUp[idCen];
         mid2 = fArUp[idCen + 2];
       }
-      var startTri = vrfSC[ivUp * 2];
-      var endTri = startTri + vrfSC[ivUp * 2 + 1];
-      for (var idt = startTri; idt < endTri; ++idt) {
-        var idTri = vrf[idt] * 4;
-        var idMid1 = fArUp[idTri];
-        var idMid2 = fArUp[idTri + 1];
-        var idMid3 = fArUp[idTri + 2];
+      const startTri = vrfSC[ivUp * 2];
+      const endTri = startTri + vrfSC[ivUp * 2 + 1];
+      for (let idt = startTri; idt < endTri; ++idt) {
+        const idTri = vrf[idt] * 4;
+        const idMid1 = fArUp[idTri];
+        const idMid2 = fArUp[idTri + 1];
+        const idMid3 = fArUp[idTri + 2];
         if (idMid1 === mid1) {
           if (idMid2 === mid2) vertUV = fArUVUp[idTri + 2];
         } else if (idMid2 === mid1) {
@@ -499,10 +499,10 @@ var computeFaceTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter, uvM
     } else {
       // quad
       iCen = -iCen - 1;
-      var startQuad = vrfSC[iCen * 2];
-      var endQuad = startQuad + 4;
-      for (var idq = startQuad; idq < endQuad; ++idq) {
-        var idQuad = vrf[idq] * 4;
+      const startQuad = vrfSC[iCen * 2];
+      const endQuad = startQuad + 4;
+      for (let idq = startQuad; idq < endQuad; ++idq) {
+        const idQuad = vrf[idq] * 4;
         if (fArUp[idQuad] === ivUp) vertUV = fArUVUp[idQuad];
         else if (fArUp[idQuad + 1] === ivUp) vertUV = fArUVUp[idQuad + 1];
         else if (fArUp[idQuad + 2] === ivUp) vertUV = fArUVUp[idQuad + 2];
@@ -517,28 +517,28 @@ var computeFaceTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter, uvM
 };
 
 /** Apply the reverse of a subdivision for the texCoord mesh */
-var computeTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter) {
-  var dupUp = baseMesh.getVerticesDuplicateStartCount();
+const computeTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter) {
+  const dupUp = baseMesh.getVerticesDuplicateStartCount();
 
-  var nbVertices = newMesh.getNbVertices();
-  var dup = new Uint32Array(nbVertices * 2);
-  var vertexMapUp = newMesh.getVerticesMapping();
+  const nbVertices = newMesh.getNbVertices();
+  const dup = new Uint32Array(nbVertices * 2);
+  const vertexMapUp = newMesh.getVerticesMapping();
 
-  var uvArUp = baseMesh.getTexCoords();
-  var uvAr = new Float32Array(Utils.getMemory(baseMesh.getNbTexCoords() * 4 * 2), 0, baseMesh.getNbTexCoords() * 2);
-  var uvMap = new Uint32Array(nbVertices);
-  var nbTexCoords = nbVertices;
-  for (var i = 0; i < nbVertices; ++i) {
-    var ivUp = vertexMapUp[i];
-    var start = dupUp[ivUp * 2];
+  const uvArUp = baseMesh.getTexCoords();
+  const uvAr = new Float32Array(Utils.getMemory(baseMesh.getNbTexCoords() * 4 * 2), 0, baseMesh.getNbTexCoords() * 2);
+  const uvMap = new Uint32Array(nbVertices);
+  let nbTexCoords = nbVertices;
+  for (let i = 0; i < nbVertices; ++i) {
+    const ivUp = vertexMapUp[i];
+    const start = dupUp[ivUp * 2];
     uvAr[i * 2] = uvArUp[ivUp * 2];
     uvAr[i * 2 + 1] = uvArUp[ivUp * 2 + 1];
     if (start === 0)
       continue;
     // vertex with duplicates
-    var startOld = uvMap[i] = start - nbTexCoords;
-    var nbDupl = dupUp[ivUp * 2 + 1];
-    for (var j = nbTexCoords, end = nbTexCoords + nbDupl; j < end; ++j) {
+    const startOld = uvMap[i] = start - nbTexCoords;
+    const nbDupl = dupUp[ivUp * 2 + 1];
+    for (let j = nbTexCoords, end = nbTexCoords + nbDupl; j < end; ++j) {
       uvAr[j * 2] = uvArUp[(startOld + j) * 2];
       uvAr[j * 2 + 1] = uvArUp[(startOld + j) * 2 + 1];
     }
@@ -554,16 +554,16 @@ var computeTexCoords = function (baseMesh, newMesh, triFaceOrQuadCenter) {
 
 /** Apply the reverse of a subdivision */
 Reversion.computeReverse = function (baseMesh, newMesh) {
-  var nbFaces = baseMesh.getNbFaces();
+  const nbFaces = baseMesh.getNbFaces();
   if (nbFaces % 4 !== 0)
     return false;
 
   // 0 not processed, -1 odd vertex, 1 even vertex
-  var vEvenTags = new Int8Array(baseMesh.getNbVertices());
+  const vEvenTags = new Int8Array(baseMesh.getNbVertices());
   if (!tagEvenVertices(baseMesh, vEvenTags))
     return false;
 
-  var triFaceOrQuadCenter = new Int32Array(nbFaces / 4);
+  const triFaceOrQuadCenter = new Int32Array(nbFaces / 4);
   if (!createFaces(baseMesh, newMesh, vEvenTags, triFaceOrQuadCenter))
     return false;
 

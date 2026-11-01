@@ -5,10 +5,10 @@ import getOptionsURL from '../misc/getOptionsURL';
 import Enums from '../misc/Enums';
 import getKeyCode from '../misc/KeyCode';
 
-var ShaderMERGE = Shader[Enums.Shader.MERGE];
-var ShaderUV = Shader[Enums.Shader.UV];
-var ShaderPBR = Shader[Enums.Shader.PBR];
-var ShaderMatcap = Shader[Enums.Shader.MATCAP];
+const ShaderMERGE = Shader[Enums.Shader.MERGE];
+const ShaderUV = Shader[Enums.Shader.UV];
+const ShaderPBR = Shader[Enums.Shader.PBR];
+const ShaderMatcap = Shader[Enums.Shader.MATCAP];
 
 class GuiRendering {
 
@@ -27,11 +27,11 @@ class GuiRendering {
   }
 
   init(guiParent) {
-    var menu = this._menu = guiParent.addMenu(TR('renderingTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('renderingTitle'));
     menu.close();
 
     // shader selection
-    var optionsShaders = [];
+    const optionsShaders = [];
     optionsShaders[Enums.Shader.MATCAP] = TR('renderingMatcap');
     optionsShaders[Enums.Shader.PBR] = TR('renderingPBR');
     optionsShaders[Enums.Shader.NORMAL] = TR('renderingNormal');
@@ -46,15 +46,15 @@ class GuiRendering {
     this._ctrlFilmic = menu.addCheckbox(TR('renderingFilmic'), ShaderMERGE.FILMIC, this.onFilmic.bind(this));
 
     // environments
-    var optionEnvs = {};
-    for (var i = 0, envs = ShaderPBR.environments, l = envs.length; i < l; ++i)
+    const optionEnvs = {};
+    for (let i = 0, envs = ShaderPBR.environments, l = envs.length; i < l; ++i)
       optionEnvs[i] = envs[i].name;
     this._ctrlEnvTitle = menu.addTitle(TR('renderingEnvironment'));
     this._ctrlEnv = menu.addCombobox('', ShaderPBR.idEnv, this.onEnvironmentChanged.bind(this), optionEnvs);
 
     // matcap texture
-    var optionMatcaps = {};
-    for (var j = 0, mats = ShaderMatcap.matcaps, k = mats.length; j < k; ++j)
+    const optionMatcaps = {};
+    for (let j = 0, mats = ShaderMatcap.matcaps, k = mats.length; j < k; ++j)
       optionMatcaps[j] = mats[j].name;
     this._ctrlMatcapTitle = menu.addTitle(TR('renderingMaterial'));
     this._ctrlMatcap = menu.addCombobox(TR('renderingMatcap'), 0, this.onMatcapChanged.bind(this), optionMatcaps);
@@ -109,20 +109,20 @@ class GuiRendering {
   }
 
   onTransparencyChanged(val) {
-    var meshes = this._main.getSelectedMeshes();
-    for (var i = 0, nb = meshes.length; i < nb; ++i) {
+    const meshes = this._main.getSelectedMeshes();
+    for (let i = 0, nb = meshes.length; i < nb; ++i) {
       meshes[i].setOpacity(1.0 - val / 100.0);
     }
     this._main.render();
   }
 
   onShaderChanged(val) {
-    var main = this._main;
+    const main = this._main;
 
-    var warning = false;
-    var meshes = this._main.getSelectedMeshes();
-    for (var i = 0, nb = meshes.length; i < nb; ++i) {
-      var mesh = meshes[i];
+    let warning = false;
+    const meshes = this._main.getSelectedMeshes();
+    for (let i = 0, nb = meshes.length; i < nb; ++i) {
+      const mesh = meshes[i];
 
       if (mesh) {
         if (val === Enums.Shader.UV && !mesh.hasUV()) {
@@ -142,9 +142,9 @@ class GuiRendering {
   }
 
   onMatcapChanged(value) {
-    var meshes = this._main.getSelectedMeshes();
-    for (var i = 0, nb = meshes.length; i < nb; ++i) {
-      var mesh = meshes[i];
+    const meshes = this._main.getSelectedMeshes();
+    for (let i = 0, nb = meshes.length; i < nb; ++i) {
+      const mesh = meshes[i];
       if (mesh.getShaderType() !== Enums.Shader.MATCAP)
         mesh.setShaderType(Enums.Shader.MATCAP);
       mesh.setMatcap(value);
@@ -153,24 +153,24 @@ class GuiRendering {
   }
 
   onFlatShading(bool) {
-    var meshes = this._main.getSelectedMeshes();
-    for (var i = 0, nb = meshes.length; i < nb; ++i) {
+    const meshes = this._main.getSelectedMeshes();
+    for (let i = 0, nb = meshes.length; i < nb; ++i) {
       meshes[i].setFlatShading(bool);
     }
     this._main.render();
   }
 
   onShowWireframe(bool) {
-    var meshes = this._main.getSelectedMeshes();
-    for (var i = 0, nb = meshes.length; i < nb; ++i) {
+    const meshes = this._main.getSelectedMeshes();
+    for (let i = 0, nb = meshes.length; i < nb; ++i) {
       meshes[i].setShowWireframe(bool);
     }
     this._main.render();
   }
 
   addEvents() {
-    var cbLoadTex = this.loadTextureUV.bind(this);
-    var cbLoadMatcap = this.loadMatcap.bind(this);
+    const cbLoadTex = this.loadTextureUV.bind(this);
+    const cbLoadMatcap = this.loadMatcap.bind(this);
     document.getElementById('textureopen').addEventListener('change', cbLoadTex, false);
     document.getElementById('matcapopen').addEventListener('change', cbLoadMatcap, false);
 
@@ -185,7 +185,7 @@ class GuiRendering {
   }
 
   updateMesh() {
-    var mesh = this._main.getMesh();
+    const mesh = this._main.getMesh();
     if (!mesh) {
       this._menu.setVisibility(false);
       return;
@@ -202,9 +202,9 @@ class GuiRendering {
   }
 
   updateVisibility() {
-    var mesh = this._main.getMesh();
+    const mesh = this._main.getMesh();
     if (!mesh) return;
-    var val = mesh.getShaderType();
+    const val = mesh.getShaderType();
     this._ctrlMatcapTitle.setVisibility(val === Enums.Shader.MATCAP);
     this._ctrlMatcap.setVisibility(val === Enums.Shader.MATCAP);
     this._ctrlImportMatcap.setVisibility(val === Enums.Shader.MATCAP);
@@ -236,12 +236,12 @@ class GuiRendering {
     if (event.target.files.length === 0)
       return;
 
-    var file = event.target.files[0];
+    const file = event.target.files[0];
     if (!file.type.match('image.*'))
       return;
 
-    var reader = new FileReader();
-    var main = this._main;
+    const reader = new FileReader();
+    const main = this._main;
     reader.onload = function (evt) {
       // urk...
       ShaderUV.texture0 = undefined;
@@ -257,27 +257,27 @@ class GuiRendering {
     if (event.target.files.length === 0)
       return;
 
-    var file = event.target.files[0];
+    const file = event.target.files[0];
     if (!file.type.match('image.*'))
       return;
 
-    var reader = new FileReader();
-    var main = this._main;
-    var ctrl = this._ctrlMatcap;
+    const reader = new FileReader();
+    const main = this._main;
+    const ctrl = this._ctrlMatcap;
 
     reader.onload = function (evt) {
-      var img = new Image();
+      const img = new Image();
       img.src = evt.target.result;
 
       img.onload = function () {
-        var idMatcap = ShaderMatcap.matcaps.length;
+        const idMatcap = ShaderMatcap.matcaps.length;
         ShaderMatcap.matcaps.push({
           name: file.name
         });
 
         ShaderMatcap.createTexture(main._gl, img, idMatcap);
 
-        var entry = {};
+        const entry = {};
         entry[idMatcap] = file.name;
         ctrl.addOptions(entry);
         ctrl.setValue(idMatcap);

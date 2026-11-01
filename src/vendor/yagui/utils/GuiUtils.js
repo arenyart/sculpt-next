@@ -1,27 +1,27 @@
-var GuiUtils = {};
+const GuiUtils = {};
 
 GuiUtils.rgbToHsv = function (rgb) {
-  var r = rgb[0];
-  var g = rgb[1];
-  var b = rgb[2];
-  var maxRGB = Math.max(r, g, b);
-  var minRGB = Math.min(r, g, b);
+  const r = rgb[0];
+  const g = rgb[1];
+  const b = rgb[2];
+  const maxRGB = Math.max(r, g, b);
+  const minRGB = Math.min(r, g, b);
   if (minRGB === maxRGB) return [0, 0, minRGB];
-  var d = (r === minRGB) ? g - b : ((b === minRGB) ? r - g : b - r);
-  var h = (r === minRGB) ? 3 : ((b === minRGB) ? 1 : 5);
+  const d = (r === minRGB) ? g - b : ((b === minRGB) ? r - g : b - r);
+  const h = (r === minRGB) ? 3 : ((b === minRGB) ? 1 : 5);
   return [(h - d / (maxRGB - minRGB)) / 6, (maxRGB - minRGB) / maxRGB, maxRGB];
 };
 
 GuiUtils.hsvToRgb = function (hsv) {
-  var h = hsv[0] * 6;
-  var s = hsv[1];
-  var v = hsv[2];
-  var i = Math.floor(h);
-  var f = h - i;
-  var p = v * (1.0 - s);
-  var q = v * (1.0 - f * s);
-  var t = v * (1.0 - (1.0 - f) * s);
-  var mod = i % 6;
+  const h = hsv[0] * 6;
+  const s = hsv[1];
+  const v = hsv[2];
+  const i = Math.floor(h);
+  const f = h - i;
+  const p = v * (1.0 - s);
+  const q = v * (1.0 - f * s);
+  const t = v * (1.0 - (1.0 - f) * s);
+  const mod = i % 6;
   if (mod === 0) return [v, t, p];
   else if (mod === 1) return [q, v, p];
   else if (mod === 2) return [p, v, t];
@@ -31,7 +31,7 @@ GuiUtils.hsvToRgb = function (hsv) {
 };
 
 GuiUtils.getValidColor = function (color) {
-  for (var i = 0, len = color.length; i < len; ++i) color[i] = Math.max(0.0, Math.min(1.0, color[i]));
+  for (let i = 0, len = color.length; i < len; ++i) color[i] = Math.max(0.0, Math.min(1.0, color[i]));
   return color;
 };
 
@@ -41,39 +41,39 @@ GuiUtils.getStrColor = function (color) {
 };
 
 GuiUtils.getColorMult = function (color, fac) {
-  var out = [color[0] * fac, color[1] * fac, color[2] * fac];
+  const out = [color[0] * fac, color[1] * fac, color[2] * fac];
   if (color.length === 4) out.push(color[3]);
   return GuiUtils.getValidColor(out);
 };
 
 GuiUtils.getColorAdd = function (color, add) {
-  var out = [color[0] + add, color[1] + add, color[2] + add];
+  const out = [color[0] + add, color[1] + add, color[2] + add];
   if (color.length === 4) out.push(color[3]);
   return GuiUtils.getValidColor(out);
 };
 
 GuiUtils.rgbToHex = function (rgb) {
-  var h = '#';
-  for (var i = 0; i < 3; ++i) {
-    var c = Math.round(rgb[i] * 255).toString(16);
+  let h = '#';
+  for (let i = 0; i < 3; ++i) {
+    const c = Math.round(rgb[i] * 255).toString(16);
     h += c.length === 1 ? '0' + c : c;
   }
   return h;
 };
 
 GuiUtils.hexToRgb = function (hex) {
-  var i = 0;
+  let i = 0;
   if (hex[0] === '#') hex = hex.slice(1);
-  var h = hex;
+  let h = hex;
   if (hex.length > 6) h = hex.slice(0, 6);
   else if (hex.length < 6) {
     h = '';
     for (i = 0; i < 3; ++i)
       h += hex[i] ? hex[i] + hex[i] : '00';
   }
-  var col = [0, 0, 0];
+  const col = [0, 0, 0];
   for (i = 0; i < 3; ++i) {
-    var c = parseInt(h[i * 2] + h[i * 2 + 1], 16);
+    const c = parseInt(h[i * 2] + h[i * 2 + 1], 16);
     col[i] = (c !== c ? 0 : c) / 255;
   }
   return col;

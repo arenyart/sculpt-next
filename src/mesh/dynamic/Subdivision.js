@@ -3,7 +3,7 @@ import Utils from '../../misc/Utils';
 import Geometry from '../../math3d/Geometry';
 import Smooth from '../../editing/tools/Smooth';
 
-var SubData = {
+const SubData = {
   _mesh: null,
   _linear: false, // linear subdivision
   _verticesMap: new Map(), // to detect new vertices at the middle of edge (for subdivision)
@@ -16,28 +16,28 @@ var SubData = {
 };
 
 /** Fill crack on one triangle */
-var fillTriangle = function (iTri, iv1, iv2, iv3, ivMid) {
-  var mesh = SubData._mesh;
+const fillTriangle = function (iTri, iv1, iv2, iv3, ivMid) {
+  const mesh = SubData._mesh;
 
-  var vrv = mesh.getVerticesRingVert();
-  var vrf = mesh.getVerticesRingFace();
-  var pil = mesh.getFacePosInLeaf();
-  var fleaf = mesh.getFaceLeaf();
-  var fstf = mesh.getFacesStateFlags();
-  var fAr = mesh.getFaces();
+  const vrv = mesh.getVerticesRingVert();
+  const vrf = mesh.getVerticesRingFace();
+  const pil = mesh.getFacePosInLeaf();
+  const fleaf = mesh.getFaceLeaf();
+  const fstf = mesh.getFacesStateFlags();
+  const fAr = mesh.getFaces();
 
-  var j = iTri * 4;
+  let j = iTri * 4;
   fAr[j] = iv1;
   fAr[j + 1] = ivMid;
   fAr[j + 2] = iv3;
   fAr[j + 3] = Utils.TRI_INDEX;
-  var leaf = fleaf[iTri];
-  var iTrisLeaf = leaf._iFaces;
+  const leaf = fleaf[iTri];
+  const iTrisLeaf = leaf._iFaces;
 
   vrv[ivMid].push(iv3);
   vrv[iv3].push(ivMid);
 
-  var iNewTri = mesh.getNbTriangles();
+  const iNewTri = mesh.getNbTriangles();
   vrf[ivMid].push(iTri, iNewTri);
 
   j = iNewTri * 4;
@@ -61,30 +61,30 @@ var fillTriangle = function (iTri, iv1, iv2, iv3, ivMid) {
  * of the edge. If several split are needed, it first chooses the split that minimize
  * the valence of the vertex.
  */
-var fillTriangles = function (iTris) {
-  var mesh = SubData._mesh;
-  var vrv = mesh.getVerticesRingVert();
-  var fAr = mesh.getFaces();
+const fillTriangles = function (iTris) {
+  const mesh = SubData._mesh;
+  const vrv = mesh.getVerticesRingVert();
+  const fAr = mesh.getFaces();
 
-  var nbTris = iTris.length;
-  var iTrisNext = new Uint32Array(Utils.getMemory(4 * 2 * nbTris), 0, 2 * nbTris);
-  var nbNext = 0;
-  var vMap = SubData._verticesMap;
-  for (var i = 0; i < nbTris; ++i) {
-    var iTri = iTris[i];
-    var j = iTri * 4;
-    var iv1 = fAr[j];
-    var iv2 = fAr[j + 1];
-    var iv3 = fAr[j + 2];
+  const nbTris = iTris.length;
+  const iTrisNext = new Uint32Array(Utils.getMemory(4 * 2 * nbTris), 0, 2 * nbTris);
+  let nbNext = 0;
+  const vMap = SubData._verticesMap;
+  for (let i = 0; i < nbTris; ++i) {
+    const iTri = iTris[i];
+    const j = iTri * 4;
+    const iv1 = fAr[j];
+    const iv2 = fAr[j + 1];
+    const iv3 = fAr[j + 2];
 
-    var val1 = vMap.get(Math.min(iv1, iv2) + '+' + Math.max(iv1, iv2));
-    var val2 = vMap.get(Math.min(iv2, iv3) + '+' + Math.max(iv2, iv3));
-    var val3 = vMap.get(Math.min(iv1, iv3) + '+' + Math.max(iv1, iv3));
+    const val1 = vMap.get(Math.min(iv1, iv2) + '+' + Math.max(iv1, iv2));
+    const val2 = vMap.get(Math.min(iv2, iv3) + '+' + Math.max(iv2, iv3));
+    const val3 = vMap.get(Math.min(iv1, iv3) + '+' + Math.max(iv1, iv3));
 
-    var num1 = vrv[iv1].length;
-    var num2 = vrv[iv2].length;
-    var num3 = vrv[iv3].length;
-    var split = 0;
+    const num1 = vrv[iv1].length;
+    const num2 = vrv[iv2].length;
+    const num3 = vrv[iv3].length;
+    let split = 0;
     if (val1) {
       if (val2) {
         if (val3) {
@@ -118,25 +118,25 @@ var fillTriangles = function (iTris) {
  * 3. Compute angle between those two normals
  * 4. Move the new vertex along its normal with a strengh proportional to the angle computed at step 3.
  */
-var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
-  var mesh = SubData._mesh;
-  var vAr = mesh.getVertices();
-  var nAr = mesh.getNormals();
-  var cAr = mesh.getColors();
-  var mAr = mesh.getMaterials();
-  var fAr = mesh.getFaces();
+const halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
+  const mesh = SubData._mesh;
+  const vAr = mesh.getVertices();
+  const nAr = mesh.getNormals();
+  const cAr = mesh.getColors();
+  const mAr = mesh.getMaterials();
+  const fAr = mesh.getFaces();
 
-  var pil = mesh.getFacePosInLeaf();
-  var fleaf = mesh.getFaceLeaf();
-  var vrv = mesh.getVerticesRingVert();
-  var vrf = mesh.getVerticesRingFace();
-  var fstf = mesh.getFacesStateFlags();
-  var vstf = mesh.getVerticesStateFlags();
+  const pil = mesh.getFacePosInLeaf();
+  const fleaf = mesh.getFaceLeaf();
+  const vrv = mesh.getVerticesRingVert();
+  const vrf = mesh.getVerticesRingFace();
+  const fstf = mesh.getFacesStateFlags();
+  const vstf = mesh.getVerticesStateFlags();
 
-  var vMap = SubData._verticesMap;
-  var key = Math.min(iv1, iv2) + '+' + Math.max(iv1, iv2);
-  var isNewVertex = false;
-  var ivMid = vMap.get(key);
+  const vMap = SubData._verticesMap;
+  const key = Math.min(iv1, iv2) + '+' + Math.max(iv1, iv2);
+  let isNewVertex = false;
+  let ivMid = vMap.get(key);
   if (ivMid === undefined) {
     ivMid = mesh.getNbVertices();
     isNewVertex = true;
@@ -144,13 +144,13 @@ var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
   }
 
   vrv[iv3].push(ivMid);
-  var id = iTri * 4;
+  let id = iTri * 4;
   fAr[id] = iv1;
   fAr[id + 1] = ivMid;
   fAr[id + 2] = iv3;
   fAr[id + 3] = Utils.TRI_INDEX;
 
-  var iNewTri = mesh.getNbTriangles();
+  const iNewTri = mesh.getNbTriangles();
   id = iNewTri * 4;
   fAr[id] = ivMid;
   fAr[id + 1] = iv2;
@@ -160,8 +160,8 @@ var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
 
   vrf[iv3].push(iNewTri);
   Utils.replaceElement(vrf[iv2], iTri, iNewTri);
-  var leaf = fleaf[iTri];
-  var iTrisLeaf = leaf._iFaces;
+  const leaf = fleaf[iTri];
+  const iTrisLeaf = leaf._iFaces;
   fleaf[iNewTri] = leaf;
   pil[iNewTri] = iTrisLeaf.length;
   iTrisLeaf.push(iNewTri);
@@ -174,25 +174,25 @@ var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
   }
 
   //new vertex
-  var id1 = iv1 * 3;
-  var v1x = vAr[id1];
-  var v1y = vAr[id1 + 1];
-  var v1z = vAr[id1 + 2];
-  var n1x = nAr[id1];
-  var n1y = nAr[id1 + 1];
-  var n1z = nAr[id1 + 2];
+  const id1 = iv1 * 3;
+  const v1x = vAr[id1];
+  const v1y = vAr[id1 + 1];
+  const v1z = vAr[id1 + 2];
+  let n1x = nAr[id1];
+  let n1y = nAr[id1 + 1];
+  let n1z = nAr[id1 + 2];
 
-  var id2 = iv2 * 3;
-  var v2x = vAr[id2];
-  var v2y = vAr[id2 + 1];
-  var v2z = vAr[id2 + 2];
-  var n2x = nAr[id2];
-  var n2y = nAr[id2 + 1];
-  var n2z = nAr[id2 + 2];
+  const id2 = iv2 * 3;
+  const v2x = vAr[id2];
+  const v2y = vAr[id2 + 1];
+  const v2z = vAr[id2 + 2];
+  let n2x = nAr[id2];
+  let n2y = nAr[id2 + 1];
+  let n2z = nAr[id2 + 2];
 
-  var n1n2x = n1x + n2x;
-  var n1n2y = n1y + n2y;
-  var n1n2z = n1z + n2z;
+  const n1n2x = n1x + n2x;
+  const n1n2y = n1y + n2y;
+  const n1n2z = n1z + n2z;
   id = ivMid * 3;
   nAr[id] = n1n2x * 0.5;
   nAr[id + 1] = n1n2y * 0.5;
@@ -209,7 +209,7 @@ var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
     vAr[id + 1] = (v1y + v2y) * 0.5;
     vAr[id + 2] = (v1z + v2z) * 0.5;
   } else {
-    var len = n1x * n1x + n1y * n1y + n1z * n1z;
+    let len = n1x * n1x + n1y * n1y + n1z * n1z;
     if (len === 0.0) {
       n1x = 1.0;
     } else {
@@ -227,16 +227,16 @@ var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
       n2y *= len;
       n2z *= len;
     }
-    var dot = n1x * n2x + n1y * n2y + n1z * n2z;
-    var angle = 0;
+    const dot = n1x * n2x + n1y * n2y + n1z * n2z;
+    let angle = 0;
     if (dot <= -1) angle = Math.PI;
     else if (dot >= 1) angle = 0;
     else angle = Math.acos(dot);
 
-    var edgex = v1x - v2x;
-    var edgey = v1y - v2y;
-    var edgez = v1z - v2z;
-    var offset = angle * 0.12;
+    const edgex = v1x - v2x;
+    const edgey = v1y - v2y;
+    const edgez = v1z - v2z;
+    let offset = angle * 0.12;
     offset *= Math.sqrt(edgex * edgex + edgey * edgey + edgez * edgez);
     len = n1n2x * n1n2x + n1n2y * n1n2y + n1n2z * n1n2z;
     if (len > 0) offset /= Math.sqrt(len);
@@ -258,21 +258,21 @@ var halfEdgeSplit = function (iTri, iv1, iv2, iv3) {
 };
 
 /** Find the edge to be split (0 otherwise) */
-var findSplit = (function () {
-  var v1 = [0.0, 0.0, 0.0];
-  var v2 = [0.0, 0.0, 0.0];
-  var v3 = [0.0, 0.0, 0.0];
-  var tis = Geometry.triangleInsideSphere;
-  var pit = Geometry.pointInsideTriangle;
+const findSplit = (function () {
+  const v1 = [0.0, 0.0, 0.0];
+  const v2 = [0.0, 0.0, 0.0];
+  const v3 = [0.0, 0.0, 0.0];
+  const tis = Geometry.triangleInsideSphere;
+  const pit = Geometry.pointInsideTriangle;
   return function (iTri, checkInsideSphere) {
-    var mesh = SubData._mesh;
-    var vAr = mesh.getVertices();
-    var fAr = mesh.getFaces();
+    const mesh = SubData._mesh;
+    const vAr = mesh.getVertices();
+    const fAr = mesh.getFaces();
 
-    var id = iTri * 4;
-    var ind1 = fAr[id] * 3;
-    var ind2 = fAr[id + 1] * 3;
-    var ind3 = fAr[id + 2] * 3;
+    const id = iTri * 4;
+    const ind1 = fAr[id] * 3;
+    const ind2 = fAr[id + 1] * 3;
+    const ind3 = fAr[id + 2] * 3;
     v1[0] = vAr[ind1];
     v1[1] = vAr[ind1 + 1];
     v1[2] = vAr[ind1 + 2];
@@ -286,14 +286,14 @@ var findSplit = (function () {
     if (checkInsideSphere && !tis(SubData._center, SubData._radius2, v1, v2, v3) && !pit(SubData._center, v1, v2, v3))
       return 0;
 
-    var mAr = mesh.getMaterials();
-    var m1 = mAr[ind1 + 2];
-    var m2 = mAr[ind2 + 2];
-    var m3 = mAr[ind3 + 2];
+    const mAr = mesh.getMaterials();
+    const m1 = mAr[ind1 + 2];
+    const m2 = mAr[ind2 + 2];
+    const m3 = mAr[ind3 + 2];
 
-    var length1 = vec3.sqrDist(v1, v2);
-    var length2 = vec3.sqrDist(v2, v3);
-    var length3 = vec3.sqrDist(v1, v3);
+    const length1 = vec3.sqrDist(v1, v2);
+    const length2 = vec3.sqrDist(v2, v3);
+    const length3 = vec3.sqrDist(v1, v3);
     if (length1 > length2 && length1 > length3) return (m1 + m2) * 0.5 * length1 > SubData._edgeMax2 ? 1 : 0;
     else if (length2 > length3) return (m2 + m3) * 0.5 * length2 > SubData._edgeMax2 ? 2 : 0;
     else return (m1 + m3) * 0.5 * length3 > SubData._edgeMax2 ? 3 : 0;
@@ -301,14 +301,14 @@ var findSplit = (function () {
 })();
 
 /** Subdivide all the triangles that need to be subdivided */
-var subdivideTriangles = function (iTrisSubd, split) {
-  var fAr = SubData._mesh.getFaces();
-  var nbTris = iTrisSubd.length;
-  for (var i = 0; i < nbTris; ++i) {
-    var iTri = iTrisSubd[i];
-    var splitNum = split[i];
+const subdivideTriangles = function (iTrisSubd, split) {
+  const fAr = SubData._mesh.getFaces();
+  const nbTris = iTrisSubd.length;
+  for (let i = 0; i < nbTris; ++i) {
+    const iTri = iTrisSubd[i];
+    let splitNum = split[i];
     if (splitNum === 0) splitNum = findSplit(iTri);
-    var ind = iTri * 4;
+    const ind = iTri * 4;
     if (splitNum === 1) halfEdgeSplit(iTri, fAr[ind], fAr[ind + 1], fAr[ind + 2]);
     else if (splitNum === 2) halfEdgeSplit(iTri, fAr[ind + 1], fAr[ind + 2], fAr[ind]);
     else if (splitNum === 3) halfEdgeSplit(iTri, fAr[ind + 2], fAr[ind], fAr[ind + 1]);
@@ -316,17 +316,17 @@ var subdivideTriangles = function (iTrisSubd, split) {
 };
 
 /** Detect which triangles to split and the edge that need to be split */
-var initSplit = function (iTris) {
-  var nbTris = iTris.length;
+const initSplit = function (iTris) {
+  const nbTris = iTris.length;
 
-  var buffer = Utils.getMemory((4 + 1) * nbTris);
-  var iTrisSubd = new Uint32Array(buffer, 0, nbTris);
-  var split = new Uint8Array(buffer, 4 * nbTris, nbTris);
+  const buffer = Utils.getMemory((4 + 1) * nbTris);
+  const iTrisSubd = new Uint32Array(buffer, 0, nbTris);
+  const split = new Uint8Array(buffer, 4 * nbTris, nbTris);
 
-  var acc = 0;
-  for (var i = 0; i < nbTris; ++i) {
-    var iTri = iTris[i];
-    var splitNum = findSplit(iTri, true);
+  let acc = 0;
+  for (let i = 0; i < nbTris; ++i) {
+    const iTri = iTris[i];
+    const splitNum = findSplit(iTri, true);
     if (splitNum === 0) continue;
     split[acc] = splitNum;
     iTrisSubd[acc++] = iTri;
@@ -343,15 +343,15 @@ var initSplit = function (iTris) {
  * 5. Smooth newly created vertices (along the plane defined by their own normals)
  * 6. Tag the newly created vertices if they are inside the sculpt brush radius
  */
-var subdivide = function (iTris) {
-  var mesh = SubData._mesh;
-  var nbVertsInit = mesh.getNbVertices();
-  var nbTrisInit = mesh.getNbTriangles();
+const subdivide = function (iTris) {
+  const mesh = SubData._mesh;
+  const nbVertsInit = mesh.getNbVertices();
+  const nbTrisInit = mesh.getNbTriangles();
   SubData._verticesMap = new Map();
 
-  var res = initSplit(iTris);
-  var iTrisSubd = res[0];
-  var split = res[1];
+  const res = initSplit(iTris);
+  let iTrisSubd = res[0];
+  let split = res[1];
   if (iTrisSubd.length > 5) {
     iTrisSubd = mesh.expandsFaces(iTrisSubd, 3);
     split = new Uint8Array(iTrisSubd.length);
@@ -365,9 +365,9 @@ var subdivide = function (iTris) {
   mesh.reAllocateArrays(split.length);
   subdivideTriangles(iTrisSubd, split);
 
-  var i = 0;
-  var nbNewTris = mesh.getNbTriangles() - nbTrisInit;
-  var newTriangles = new Uint32Array(nbNewTris);
+  let i = 0;
+  let nbNewTris = mesh.getNbTriangles() - nbTrisInit;
+  let newTriangles = new Uint32Array(nbNewTris);
   for (i = 0; i < nbNewTris; ++i)
     newTriangles[i] = nbTrisInit + i;
   newTriangles = mesh.expandsFaces(newTriangles, 1);
@@ -377,19 +377,19 @@ var subdivide = function (iTris) {
   SubData._states.pushVertices(mesh.getVerticesFromFaces(iTrisSubd));
   SubData._states.pushFaces(iTrisSubd);
 
-  var temp = iTris;
-  var nbTris = iTris.length;
+  let temp = iTris;
+  const nbTris = iTris.length;
   iTris = new Uint32Array(nbTris + newTriangles.length);
   iTris.set(temp);
   iTris.set(newTriangles, nbTris);
 
-  var ftf = mesh.getFacesTagFlags();
-  var nbTrisMask = iTris.length;
-  var iTrisMask = new Uint32Array(Utils.getMemory(nbTrisMask * 4), 0, nbTrisMask);
-  var nbTriMask = 0;
-  var tagFlag = ++Utils.TAG_FLAG;
+  const ftf = mesh.getFacesTagFlags();
+  const nbTrisMask = iTris.length;
+  let iTrisMask = new Uint32Array(Utils.getMemory(nbTrisMask * 4), 0, nbTrisMask);
+  let nbTriMask = 0;
+  const tagFlag = ++Utils.TAG_FLAG;
   for (i = 0; i < nbTrisMask; ++i) {
-    var iTri = iTris[i];
+    const iTri = iTris[i];
     if (ftf[iTri] === tagFlag)
       continue;
     ftf[iTri] = tagFlag;
@@ -397,7 +397,7 @@ var subdivide = function (iTris) {
   }
   iTrisMask = new Uint32Array(iTrisMask.subarray(0, nbTriMask));
 
-  var nbTrianglesOld = mesh.getNbTriangles();
+  const nbTrianglesOld = mesh.getNbTriangles();
   while (newTriangles.length > 0) {
     mesh.reAllocateArrays(newTriangles.length);
     newTriangles = fillTriangles(newTriangles);
@@ -410,40 +410,40 @@ var subdivide = function (iTris) {
   for (i = 0; i < nbNewTris; ++i)
     iTrisMask[nbTriMask + i] = nbTrianglesOld + i;
 
-  var nbVNew = mesh.getNbVertices() - nbVertsInit;
-  var vNew = new Uint32Array(nbVNew);
+  let nbVNew = mesh.getNbVertices() - nbVertsInit;
+  let vNew = new Uint32Array(nbVNew);
   for (i = 0; i < nbVNew; ++i)
     vNew[i] = nbVertsInit + i;
 
   vNew = mesh.expandsVertices(vNew, 1);
   if (!SubData._linear) {
-    var expV = vNew.subarray(nbVNew);
-    var smo = new Smooth();
+    const expV = vNew.subarray(nbVNew);
+    const smo = new Smooth();
     smo.setToolMesh(mesh);
     smo.smoothTangent(expV, 1.0);
   }
 
-  var vAr = mesh.getVertices();
-  var vscf = mesh.getVerticesSculptFlags();
-  var centerPoint = SubData._center;
-  var xcen = centerPoint[0];
-  var ycen = centerPoint[1];
-  var zcen = centerPoint[2];
+  const vAr = mesh.getVertices();
+  const vscf = mesh.getVerticesSculptFlags();
+  const centerPoint = SubData._center;
+  const xcen = centerPoint[0];
+  const ycen = centerPoint[1];
+  const zcen = centerPoint[2];
 
-  var vertexSculptMask = Utils.SCULPT_FLAG;
+  const vertexSculptMask = Utils.SCULPT_FLAG;
   nbVNew = vNew.length;
   for (i = 0; i < nbVNew; ++i) {
-    var ind = vNew[i];
-    var j = ind * 3;
-    var dx = vAr[j] - xcen;
-    var dy = vAr[j + 1] - ycen;
-    var dz = vAr[j + 2] - zcen;
+    const ind = vNew[i];
+    const j = ind * 3;
+    const dx = vAr[j] - xcen;
+    const dy = vAr[j + 1] - ycen;
+    const dz = vAr[j + 2] - zcen;
     vscf[ind] = (dx * dx + dy * dy + dz * dz) < SubData._radius2 ? vertexSculptMask : vertexSculptMask - 1;
   }
   return iTrisMask;
 };
 
-var Subdivision = {};
+const Subdivision = {};
 
 /** Subdivide until every selected triangles comply with a detail level */
 Subdivision.subdivision = function (mesh, iTris, center, radius2, detail2, states, linear) {
@@ -454,7 +454,7 @@ Subdivision.subdivision = function (mesh, iTris, center, radius2, detail2, state
   SubData._edgeMax2 = detail2;
   SubData._states = states;
 
-  var nbTriangles = 0;
+  let nbTriangles = 0;
   while (nbTriangles !== mesh.getNbTriangles()) {
     nbTriangles = mesh.getNbTriangles();
     iTris = subdivide(iTris);

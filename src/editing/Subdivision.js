@@ -1,6 +1,6 @@
 import Utils from '../misc/Utils';
 
-var Subdivision = {};
+const Subdivision = {};
 Subdivision.LINEAR = false;
 
 //       v3
@@ -37,21 +37,21 @@ class OddVertexComputer {
   }
 
   computeTriangleEdgeVertex(iv1, iv2, iv3, ide) {
-    var vAr = this._vAr;
-    var cAr = this._cAr;
-    var mAr = this._mAr;
-    var eAr = this._eAr;
-    var vArOut = this._vArOut;
-    var cArOut = this._cArOut;
-    var mArOut = this._mArOut;
-    var tagEdges = this._tagEdges;
-    var id1 = iv1 * 3;
-    var id2 = iv2 * 3;
-    var idOpp = iv3 * 3;
-    var testEdge = tagEdges[ide] - 1;
-    var ivMid = testEdge === -1 ? this._nbVertices++ : testEdge;
-    var idMid = ivMid * 3;
-    var edgeValue = eAr[ide];
+    const vAr = this._vAr;
+    const cAr = this._cAr;
+    const mAr = this._mAr;
+    const eAr = this._eAr;
+    const vArOut = this._vArOut;
+    const cArOut = this._cArOut;
+    const mArOut = this._mArOut;
+    const tagEdges = this._tagEdges;
+    const id1 = iv1 * 3;
+    const id2 = iv2 * 3;
+    const idOpp = iv3 * 3;
+    const testEdge = tagEdges[ide] - 1;
+    const ivMid = testEdge === -1 ? this._nbVertices++ : testEdge;
+    const idMid = ivMid * 3;
+    const edgeValue = eAr[ide];
     if (edgeValue === 1 || edgeValue >= 3 || Subdivision.LINEAR) { // mid edge vertex or non manifold shit
       if (testEdge !== -1) // no need to recompute weird non manifold stuffs
         return ivMid;
@@ -97,22 +97,22 @@ class OddVertexComputer {
   }
 
   computeQuadEdgeVertex(iv1, iv2, iv3, iv4, ide) {
-    var vAr = this._vAr;
-    var cAr = this._cAr;
-    var mAr = this._mAr;
-    var eAr = this._eAr;
-    var vArOut = this._vArOut;
-    var cArOut = this._cArOut;
-    var mArOut = this._mArOut;
-    var tagEdges = this._tagEdges;
-    var id1 = iv1 * 3;
-    var id2 = iv2 * 3;
-    var idOpp = iv3 * 3;
-    var idOpp2 = iv4 * 3;
-    var testEdge = tagEdges[ide] - 1;
-    var ivMid = testEdge === -1 ? this._nbVertices++ : testEdge;
-    var idMid = ivMid * 3;
-    var edgeValue = eAr[ide];
+    const vAr = this._vAr;
+    const cAr = this._cAr;
+    const mAr = this._mAr;
+    const eAr = this._eAr;
+    const vArOut = this._vArOut;
+    const cArOut = this._cArOut;
+    const mArOut = this._mArOut;
+    const tagEdges = this._tagEdges;
+    const id1 = iv1 * 3;
+    const id2 = iv2 * 3;
+    const idOpp = iv3 * 3;
+    const idOpp2 = iv4 * 3;
+    const testEdge = tagEdges[ide] - 1;
+    const ivMid = testEdge === -1 ? this._nbVertices++ : testEdge;
+    const idMid = ivMid * 3;
+    const edgeValue = eAr[ide];
     if (edgeValue === 1 || edgeValue >= 3 || Subdivision.LINEAR) { // mid edge vertex or non manifold shit
       if (testEdge !== -1) // no need to recompute weird non manifold stuffs
         return ivMid;
@@ -158,18 +158,18 @@ class OddVertexComputer {
   }
 
   computeFaceVertex(iv1, iv2, iv3, iv4) {
-    var id1 = iv1 * 3;
-    var id2 = iv2 * 3;
-    var id3 = iv3 * 3;
-    var id4 = iv4 * 3;
-    var vAr = this._vAr;
-    var cAr = this._cAr;
-    var mAr = this._mAr;
-    var vArOut = this._vArOut;
-    var cArOut = this._cArOut;
-    var mArOut = this._mArOut;
-    var ivCen = this._nbVertices++;
-    var idCen = ivCen * 3;
+    const id1 = iv1 * 3;
+    const id2 = iv2 * 3;
+    const id3 = iv3 * 3;
+    const id4 = iv4 * 3;
+    const vAr = this._vAr;
+    const cAr = this._cAr;
+    const mAr = this._mAr;
+    const vArOut = this._vArOut;
+    const cArOut = this._cArOut;
+    const mArOut = this._mArOut;
+    const ivCen = this._nbVertices++;
+    const idCen = ivCen * 3;
     vArOut[idCen] = 0.25 * (vAr[id1] + vAr[id2] + vAr[id3] + vAr[id4]);
     vArOut[idCen + 1] = 0.25 * (vAr[id1 + 1] + vAr[id2 + 1] + vAr[id3 + 1] + vAr[id4 + 1]);
     vArOut[idCen + 2] = 0.25 * (vAr[id1 + 2] + vAr[id2 + 2] + vAr[id3 + 2] + vAr[id4 + 2]);
@@ -186,44 +186,44 @@ class OddVertexComputer {
 }
 
 /** Even vertices smoothing */
-var applyEvenSmooth = function (baseMesh, even, colorOut, materialOut) {
-  var nbVerts = baseMesh.getNbVertices();
+const applyEvenSmooth = function (baseMesh, even, colorOut, materialOut) {
+  const nbVerts = baseMesh.getNbVertices();
 
   colorOut.set(baseMesh.getColors().subarray(0, nbVerts * 3));
   materialOut.set(baseMesh.getMaterials().subarray(0, nbVerts * 3));
 
-  var vArOld = baseMesh.getVertices();
-  var fArOld = baseMesh.getFaces();
-  var eArOld = baseMesh.getEdges();
-  var feArOld = baseMesh.getFaceEdges();
-  var vertOnEdgeOld = baseMesh.getVerticesOnEdge();
-  var vrvStartCount = baseMesh.getVerticesRingVertStartCount();
-  var vertRingVert = baseMesh.getVerticesRingVert();
-  var vrfStartCount = baseMesh.getVerticesRingFaceStartCount();
-  var vertRingFace = baseMesh.getVerticesRingFace();
-  var onlyTri = baseMesh.hasOnlyTriangles();
+  const vArOld = baseMesh.getVertices();
+  const fArOld = baseMesh.getFaces();
+  const eArOld = baseMesh.getEdges();
+  const feArOld = baseMesh.getFaceEdges();
+  const vertOnEdgeOld = baseMesh.getVerticesOnEdge();
+  const vrvStartCount = baseMesh.getVerticesRingVertStartCount();
+  const vertRingVert = baseMesh.getVerticesRingVert();
+  const vrfStartCount = baseMesh.getVerticesRingFaceStartCount();
+  const vertRingFace = baseMesh.getVerticesRingFace();
+  const onlyTri = baseMesh.hasOnlyTriangles();
 
-  for (var i = 0; i < nbVerts; ++i) {
-    var j = i * 3;
-    var avx = 0.0;
-    var avy = 0.0;
-    var avz = 0.0;
-    var beta = 0.0;
-    var alpha = 0.0;
-    var k = 0;
-    var id = 0;
+  for (let i = 0; i < nbVerts; ++i) {
+    const j = i * 3;
+    let avx = 0.0;
+    let avy = 0.0;
+    let avz = 0.0;
+    let beta = 0.0;
+    let alpha = 0.0;
+    let k = 0;
+    let id = 0;
 
     // edge vertex
     if (vertOnEdgeOld[i] || Subdivision.LINEAR) {
-      var startF = vrfStartCount[i * 2];
-      var endF = startF + vrfStartCount[i * 2 + 1];
+      const startF = vrfStartCount[i * 2];
+      const endF = startF + vrfStartCount[i * 2 + 1];
       for (k = startF; k < endF; ++k) {
-        var idFace = vertRingFace[k] * 4;
-        var i1 = fArOld[idFace];
-        var i2 = fArOld[idFace + 1];
-        var i3 = fArOld[idFace + 2];
-        var i4 = fArOld[idFace + 3];
-        var isTri = i4 === Utils.TRI_INDEX;
+        const idFace = vertRingFace[k] * 4;
+        const i1 = fArOld[idFace];
+        const i2 = fArOld[idFace + 1];
+        const i3 = fArOld[idFace + 2];
+        const i4 = fArOld[idFace + 3];
+        const isTri = i4 === Utils.TRI_INDEX;
         id = Utils.TRI_INDEX;
 
         if (i1 === i) {
@@ -260,9 +260,9 @@ var applyEvenSmooth = function (baseMesh, even, colorOut, materialOut) {
       }
       continue;
     }
-    var start = vrvStartCount[i * 2];
-    var count = vrvStartCount[i * 2 + 1];
-    var end = start + count;
+    const start = vrvStartCount[i * 2];
+    const count = vrvStartCount[i * 2 + 1];
+    const end = start + count;
     // interior vertex
     for (k = start; k < end; ++k) {
       id = vertRingVert[k] * 3;
@@ -287,24 +287,24 @@ var applyEvenSmooth = function (baseMesh, even, colorOut, materialOut) {
       even[j + 2] = vArOld[j + 2] * alpha + avz * beta;
       continue;
     }
-    var oppx = 0.0;
-    var oppy = 0.0;
-    var oppz = 0.0;
-    var gamma = 0.0;
+    let oppx = 0.0;
+    let oppy = 0.0;
+    let oppz = 0.0;
+    let gamma = 0.0;
 
-    var startFace = vrfStartCount[i * 2];
-    var endFace = startFace + vrfStartCount[i * 2 + 1];
-    var nbQuad = 0;
+    const startFace = vrfStartCount[i * 2];
+    const endFace = startFace + vrfStartCount[i * 2 + 1];
+    let nbQuad = 0;
     for (k = startFace; k < endFace; ++k) {
       id = vertRingFace[k] * 4;
-      var iv4 = fArOld[id + 3];
+      const iv4 = fArOld[id + 3];
       if (iv4 === Utils.TRI_INDEX) continue;
 
       nbQuad++;
-      var iv1 = fArOld[id];
-      var iv2 = fArOld[id + 1];
-      var iv3 = fArOld[id + 2];
-      var ivOpp = 0;
+      const iv1 = fArOld[id];
+      const iv2 = fArOld[id + 1];
+      const iv3 = fArOld[id + 2];
+      let ivOpp = 0;
       if (iv1 === i) ivOpp = iv3 * 3;
       else if (iv2 === i) ivOpp = iv4 * 3;
       else if (iv3 === i) ivOpp = iv1 * 3;
@@ -358,18 +358,18 @@ var applyEvenSmooth = function (baseMesh, even, colorOut, materialOut) {
 };
 
 /** Odd vertices smoothing */
-var applyOddSmooth = function (mesh, odds, colorOut, materialOut, fArOut) {
-  var fAr = mesh.getFaces();
-  var feAr = mesh.getFaceEdges();
-  var oddComputer = new OddVertexComputer(mesh, odds, colorOut, materialOut);
-  for (var i = 0, len = mesh.getNbFaces(); i < len; ++i) {
-    var id = i * 4;
-    var iv1 = fAr[id];
-    var iv2 = fAr[id + 1];
-    var iv3 = fAr[id + 2];
-    var iv4 = fAr[id + 3];
-    var isQuad = iv4 !== Utils.TRI_INDEX;
-    var ivMid1, ivMid2, ivMid3, ivMid4, ivCen;
+const applyOddSmooth = function (mesh, odds, colorOut, materialOut, fArOut) {
+  const fAr = mesh.getFaces();
+  const feAr = mesh.getFaceEdges();
+  const oddComputer = new OddVertexComputer(mesh, odds, colorOut, materialOut);
+  for (let i = 0, len = mesh.getNbFaces(); i < len; ++i) {
+    let id = i * 4;
+    const iv1 = fAr[id];
+    const iv2 = fAr[id + 1];
+    const iv3 = fAr[id + 2];
+    const iv4 = fAr[id + 3];
+    const isQuad = iv4 !== Utils.TRI_INDEX;
+    let ivMid1, ivMid2, ivMid3, ivMid4, ivCen;
 
     if (isQuad) {
       ivMid1 = oddComputer.computeQuadEdgeVertex(iv1, iv2, iv3, iv4, feAr[id]);
@@ -411,44 +411,44 @@ var applyOddSmooth = function (mesh, odds, colorOut, materialOut, fArOut) {
 };
 
 /** Computes uv faces and uv coordinates for center vertices */
-var computeFaceTexCoords = function (mesh, newMesh, tagEdges) {
-  var fArUVOld = mesh.getFacesTexCoord();
-  var fAr = newMesh.getFaces();
-  var fArUV = new Uint32Array(fAr.length);
-  var feAr = mesh.getFaceEdges();
+const computeFaceTexCoords = function (mesh, newMesh, tagEdges) {
+  const fArUVOld = mesh.getFacesTexCoord();
+  const fAr = newMesh.getFaces();
+  const fArUV = new Uint32Array(fAr.length);
+  const feAr = mesh.getFaceEdges();
 
-  var nbVertices = mesh.getNbVertices();
-  var offset = newMesh.getNbVertices() - nbVertices;
+  const nbVertices = mesh.getNbVertices();
+  const offset = newMesh.getNbVertices() - nbVertices;
 
-  var startCount = newMesh.getVerticesDuplicateStartCount();
-  var uvAr = newMesh.getTexCoords();
-  for (var i = 0, len = mesh.getNbFaces(); i < len; ++i) {
-    var id = i * 4;
-    var iuv1 = fArUVOld[id];
-    var iuv2 = fArUVOld[id + 1];
-    var iuv3 = fArUVOld[id + 2];
-    var iuv4 = fArUVOld[id + 3];
+  const startCount = newMesh.getVerticesDuplicateStartCount();
+  const uvAr = newMesh.getTexCoords();
+  for (let i = 0, len = mesh.getNbFaces(); i < len; ++i) {
+    let id = i * 4;
+    let iuv1 = fArUVOld[id];
+    let iuv2 = fArUVOld[id + 1];
+    let iuv3 = fArUVOld[id + 2];
+    let iuv4 = fArUVOld[id + 3];
     if (iuv1 >= nbVertices) iuv1 += offset;
     if (iuv2 >= nbVertices) iuv2 += offset;
     if (iuv3 >= nbVertices) iuv3 += offset;
     if (iuv4 !== Utils.TRI_INDEX && iuv4 >= nbVertices) iuv4 += offset;
 
-    var ide = feAr[id];
-    var tg1 = tagEdges[ide] - 1;
+    let ide = feAr[id];
+    let tg1 = tagEdges[ide] - 1;
     if (tg1 < 0)
       tg1 = startCount[(-tg1 - 1) * 2];
     else if (startCount[tg1 * 2] > 0)
       tagEdges[ide] = -tg1;
 
     ide = feAr[id + 1];
-    var tg2 = tagEdges[ide] - 1;
+    let tg2 = tagEdges[ide] - 1;
     if (tg2 < 0)
       tg2 = startCount[(-tg2 - 1) * 2];
     else if (startCount[tg2 * 2] > 0)
       tagEdges[ide] = -tg2;
 
     ide = feAr[id + 2];
-    var tg3 = tagEdges[ide] - 1;
+    let tg3 = tagEdges[ide] - 1;
     if (tg3 < 0)
       tg3 = startCount[(-tg3 - 1) * 2];
     else if (startCount[tg3 * 2] > 0)
@@ -457,7 +457,7 @@ var computeFaceTexCoords = function (mesh, newMesh, tagEdges) {
     id *= 4;
     if (iuv4 !== Utils.TRI_INDEX) {
       ide = feAr[i * 4 + 3];
-      var tg4 = tagEdges[ide] - 1;
+      let tg4 = tagEdges[ide] - 1;
       if (tg4 < 0)
         tg4 = startCount[(-tg4 - 1) * 2];
       else if (startCount[tg4 * 2] > 0)
@@ -474,7 +474,7 @@ var computeFaceTexCoords = function (mesh, newMesh, tagEdges) {
       fArUV[id + 15] = iuv4;
 
       // even averaging for center quad
-      var im = fAr[id + 2] * 2;
+      const im = fAr[id + 2] * 2;
       uvAr[im] = (uvAr[iuv1 * 2] + uvAr[iuv2 * 2] + uvAr[iuv3 * 2] + uvAr[iuv4 * 2]) * 0.25;
       uvAr[im + 1] = (uvAr[iuv1 * 2 + 1] + uvAr[iuv2 * 2 + 1] + uvAr[iuv3 * 2 + 1] + uvAr[iuv4 * 2 + 1]) * 0.25;
     } else {
@@ -492,54 +492,54 @@ var computeFaceTexCoords = function (mesh, newMesh, tagEdges) {
 };
 
 /** Subdivide tex coords mesh */
-var computeTexCoords = function (mesh, newMesh, tagEdges) {
-  var newNbVertices = newMesh.getNbVertices();
-  var startCount = new Uint32Array(newNbVertices * 2);
+const computeTexCoords = function (mesh, newMesh, tagEdges) {
+  const newNbVertices = newMesh.getNbVertices();
+  const startCount = new Uint32Array(newNbVertices * 2);
   startCount.set(mesh.getVerticesDuplicateStartCount());
 
-  var fArOld = mesh.getFaces();
-  var fArUVOld = mesh.getFacesTexCoord();
+  const fArOld = mesh.getFaces();
+  const fArUVOld = mesh.getFacesTexCoord();
 
-  var bound = newMesh.getNbFaces() * 3;
-  var uvArOld = mesh.getTexCoords();
-  var uvAr = new Float32Array(Utils.getMemory(bound * 4 * 2), 0, bound * 2);
+  const bound = newMesh.getNbFaces() * 3;
+  const uvArOld = mesh.getTexCoords();
+  const uvAr = new Float32Array(Utils.getMemory(bound * 4 * 2), 0, bound * 2);
 
-  var i = 0;
-  var len = mesh.getNbVertices();
-  var offset = newNbVertices - len;
+  let i = 0;
+  let len = mesh.getNbVertices();
+  const offset = newNbVertices - len;
   // reorder even duplicates vertex indices
   for (i = 0; i < len; ++i) {
-    var start = startCount[i * 2];
+    const start = startCount[i * 2];
     if (start > 0)
       startCount[i * 2] = start + offset;
   }
   uvAr.set(uvArOld);
   uvAr.set(uvArOld.subarray(len * 2), (len + offset) * 2);
-  var nbTexCoords = mesh.getNbTexCoords();
+  const nbTexCoords = mesh.getNbTexCoords();
 
-  var acc = offset + nbTexCoords;
-  var feAr = mesh.getFaceEdges();
+  let acc = offset + nbTexCoords;
+  const feAr = mesh.getFaceEdges();
 
   // compute uv for new odd vertices
-  var tagUVMin = new Uint32Array(tagEdges.length);
-  var tagUVMax = new Uint32Array(tagEdges.length);
+  const tagUVMin = new Uint32Array(tagEdges.length);
+  const tagUVMax = new Uint32Array(tagEdges.length);
   len = fArOld.length;
   for (i = 0; i < len; ++i) {
-    var ide = feAr[i];
+    const ide = feAr[i];
     if (ide === Utils.TRI_INDEX)
       continue;
 
-    var iNext = (i + 1) % 4 === 0 ? i - 3 : i + 1;
-    var iuv1 = fArUVOld[i];
-    var iuv2 = fArUVOld[iNext];
+    const iNext = (i + 1) % 4 === 0 ? i - 3 : i + 1;
+    const iuv1 = fArUVOld[i];
+    let iuv2 = fArUVOld[iNext];
     if (iuv2 === Utils.TRI_INDEX)
       iuv2 = fArUVOld[i - 2];
-    var tg = tagEdges[ide] - 1;
+    const tg = tagEdges[ide] - 1;
 
     // test if we already processed this edge
-    var tgMax = tagUVMax[ide];
-    var iuvMax = iuv1 > iuv2 ? iuv1 : iuv2;
-    var iuvMin = iuv1 < iuv2 ? iuv1 : iuv2;
+    const tgMax = tagUVMax[ide];
+    const iuvMax = iuv1 > iuv2 ? iuv1 : iuv2;
+    const iuvMin = iuv1 < iuv2 ? iuv1 : iuv2;
     if (tgMax !== 0) {
       // test if we already processed this UV edge or if it's a duplicate
       if (tgMax !== iuvMax || tagUVMin[ide] !== iuvMin) {
@@ -556,7 +556,7 @@ var computeTexCoords = function (mesh, newMesh, tagEdges) {
       tagUVMax[ide] = iuvMax;
     }
   }
-  var texCoords = new Float32Array(acc * 2);
+  const texCoords = new Float32Array(acc * 2);
   texCoords.set(uvAr.subarray(0, acc * 2));
 
   newMesh.setTexCoords(texCoords);
@@ -567,13 +567,13 @@ var computeTexCoords = function (mesh, newMesh, tagEdges) {
 
 /** Apply a complete subdivision (by updating the topology) */
 Subdivision.fullSubdivision = function (baseMesh, newMesh) {
-  var nbVertices = baseMesh.getNbVertices() + baseMesh.getNbEdges() + baseMesh.getNbQuads();
+  const nbVertices = baseMesh.getNbVertices() + baseMesh.getNbEdges() + baseMesh.getNbQuads();
   newMesh.setVertices(new Float32Array(nbVertices * 3));
   newMesh.setColors(new Float32Array(nbVertices * 3));
   newMesh.setMaterials(new Float32Array(nbVertices * 3));
   newMesh.setFaces(new Uint32Array(baseMesh.getNbFaces() * 4 * 4));
   applyEvenSmooth(baseMesh, newMesh.getVertices(), newMesh.getColors(), newMesh.getMaterials());
-  var tags = applyOddSmooth(baseMesh, newMesh.getVertices(), newMesh.getColors(), newMesh.getMaterials(), newMesh.getFaces());
+  const tags = applyOddSmooth(baseMesh, newMesh.getVertices(), newMesh.getColors(), newMesh.getMaterials(), newMesh.getFaces());
   if (baseMesh.hasUV())
     computeTexCoords(baseMesh, newMesh, tags);
   newMesh.allocateArrays();

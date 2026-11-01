@@ -1,4 +1,4 @@
-var SurfaceNets = {};
+const SurfaceNets = {};
 SurfaceNets.BLOCK = false;
 
 /**
@@ -9,12 +9,12 @@ SurfaceNets.BLOCK = false;
  */
 
 // This is just the vertex number of each cube
-var computeCubeEdges = function () {
-  var cubeEdges = new Uint32Array(24);
-  var k = 0;
-  for (var i = 0; i < 8; ++i) {
-    for (var j = 1; j <= 4; j <<= 1) {
-      var p = i ^ j;
+const computeCubeEdges = function () {
+  const cubeEdges = new Uint32Array(24);
+  let k = 0;
+  for (let i = 0; i < 8; ++i) {
+    for (let j = 1; j <= 4; j <<= 1) {
+      const p = i ^ j;
       if (i <= p) {
         cubeEdges[k++] = i;
         cubeEdges[k++] = p;
@@ -24,16 +24,16 @@ var computeCubeEdges = function () {
   return cubeEdges;
 };
 
-var computeEdgeTable = function (cubeEdges) {
+const computeEdgeTable = function (cubeEdges) {
   //Initialize the intersection table.
   //  This is a 2^(cube configuration) ->  2^(edge configuration) map
   //  There is one entry for each possible cube configuration, and the output is a 12-bit vector enumerating all edges crossing the 0-level.
-  var edgeTable = new Uint32Array(256);
-  for (var i = 0; i < 256; ++i) {
-    var em = 0;
-    for (var j = 0; j < 24; j += 2) {
-      var a = !!(i & (1 << cubeEdges[j]));
-      var b = !!(i & (1 << cubeEdges[j + 1]));
+  const edgeTable = new Uint32Array(256);
+  for (let i = 0; i < 256; ++i) {
+    let em = 0;
+    for (let j = 0; j < 24; j += 2) {
+      const a = !!(i & (1 << cubeEdges[j]));
+      const b = !!(i & (1 << cubeEdges[j + 1]));
       em |= a !== b ? (1 << (j >> 1)) : 0;
     }
     edgeTable[i] = em;
@@ -42,34 +42,34 @@ var computeEdgeTable = function (cubeEdges) {
 };
 
 //Precompute edge table, like Paul Bourke does.
-var cubeEdges = computeCubeEdges();
-var edgeTable = computeEdgeTable(cubeEdges);
+const cubeEdges = computeCubeEdges();
+const edgeTable = computeEdgeTable(cubeEdges);
 
-var readScalarValues = function (voxels, grid, dims, n, cols, mats) {
-  var colors = voxels.colorField;
-  var materials = voxels.materialField;
-  var data = voxels.distanceField;
+const readScalarValues = function (voxels, grid, dims, n, cols, mats) {
+  const colors = voxels.colorField;
+  const materials = voxels.materialField;
+  const data = voxels.distanceField;
 
   //Read in 8 field values around this vertex and store them in an array
   //Also calculate 8-bit mask, like in marching cubes, so we can speed up sign checks later
-  var c1 = 0;
-  var c2 = 0;
-  var c3 = 0;
-  var m1 = 0;
-  var m2 = 0;
-  var m3 = 0;
-  var invSum = 0;
+  let c1 = 0;
+  let c2 = 0;
+  let c3 = 0;
+  let m1 = 0;
+  let m2 = 0;
+  let m3 = 0;
+  let invSum = 0;
 
-  var mask = 0;
-  var g = 0;
-  var rx = dims[0];
-  var rxy = dims[0] * dims[1];
-  for (var k = 0; k < 2; ++k) {
-    for (var j = 0; j < 2; ++j) {
-      for (var i = 0; i < 2; ++i) {
-        var id = n + i + j * rx + k * rxy;
-        var id3 = id * 3;
-        var p = data[id];
+  let mask = 0;
+  let g = 0;
+  const rx = dims[0];
+  const rxy = dims[0] * dims[1];
+  for (let k = 0; k < 2; ++k) {
+    for (let j = 0; j < 2; ++j) {
+      for (let i = 0; i < 2; ++i) {
+        const id = n + i + j * rx + k * rxy;
+        const id3 = id * 3;
+        let p = data[id];
         grid[g] = p;
         mask |= (p < 0.0) ? (1 << g) : 0;
         g++;
@@ -96,12 +96,12 @@ var readScalarValues = function (voxels, grid, dims, n, cols, mats) {
   return mask;
 };
 
-var vTemp = [0.0, 0.0, 0.0];
-var interpolateVertices = function (edgeMask, cubeEdges, grid, x, vertices) {
+const vTemp = [0.0, 0.0, 0.0];
+const interpolateVertices = function (edgeMask, cubeEdges, grid, x, vertices) {
   vTemp[0] = vTemp[1] = vTemp[2] = 0.0;
-  var edgeCount = 0;
+  let edgeCount = 0;
   //For every edge of the cube...
-  for (var i = 0; i < 12; ++i) {
+  for (let i = 0; i < 12; ++i) {
     //Use edge mask to check if it is crossed
     if (!(edgeMask & (1 << i)))
       continue;
@@ -109,17 +109,17 @@ var interpolateVertices = function (edgeMask, cubeEdges, grid, x, vertices) {
     if (SurfaceNets.BLOCK)
       continue;
     //Now find the point of intersection
-    var e0 = cubeEdges[i << 1]; //Unpack vertices
-    var e1 = cubeEdges[(i << 1) + 1];
-    var g0 = grid[e0]; //Unpack grid values
-    var t = g0 - grid[e1]; //Compute point of intersection
+    const e0 = cubeEdges[i << 1]; //Unpack vertices
+    const e1 = cubeEdges[(i << 1) + 1];
+    const g0 = grid[e0]; //Unpack grid values
+    let t = g0 - grid[e1]; //Compute point of intersection
     if (Math.abs(t) < 1e-7)
       continue;
     t = g0 / t;
 
     //Interpolate vertices and add up intersections (this can be done without multiplying)
-    for (var j = 0, k = 1; j < 3; ++j, k <<= 1) {
-      var a = e0 & k;
+    for (let j = 0, k = 1; j < 3; ++j, k <<= 1) {
+      const a = e0 & k;
       if (a !== (e1 & k))
         vTemp[j] += a ? 1.0 - t : t;
       else
@@ -127,30 +127,30 @@ var interpolateVertices = function (edgeMask, cubeEdges, grid, x, vertices) {
     }
   }
   //Now we just average the edge intersections and add them to coordinate
-  var s = 1.0 / edgeCount;
-  for (var l = 0; l < 3; ++l)
+  const s = 1.0 / edgeCount;
+  for (let l = 0; l < 3; ++l)
     vTemp[l] = x[l] + s * vTemp[l];
   vertices.push(vTemp[0], vTemp[1], vTemp[2]);
 };
 
-var createFace = function (edgeMask, mask, buffer, R, m, x, faces) {
+const createFace = function (edgeMask, mask, buffer, R, m, x, faces) {
   //Now we need to add faces together, to do this we just loop over 3 basis components
-  for (var i = 0; i < 3; ++i) {
+  for (let i = 0; i < 3; ++i) {
     //The first three entries of the edgeMask count the crossings along the edge
     if (!(edgeMask & (1 << i)))
       continue;
 
     // i = axes we are point along.  iu, iv = orthogonal axes
-    var iu = (i + 1) % 3;
-    var iv = (i + 2) % 3;
+    const iu = (i + 1) % 3;
+    const iv = (i + 2) % 3;
 
     //If we are on a boundary, skip it
     if (x[iu] === 0 || x[iv] === 0)
       continue;
 
     //Otherwise, look up adjacent edges in buffer
-    var du = R[iu];
-    var dv = R[iv];
+    const du = R[iu];
+    const dv = R[iv];
 
     //Remember to flip orientation depending on the sign of the corner.
     if (mask & 1)
@@ -161,18 +161,18 @@ var createFace = function (edgeMask, mask, buffer, R, m, x, faces) {
 };
 
 SurfaceNets.computeSurface = function (voxels) {
-  var dims = voxels.dims;
+  const dims = voxels.dims;
 
-  var vertices = [];
-  var cols = [];
-  var mats = [];
-  var faces = [];
-  var n = 0;
-  var x = new Int32Array(3);
-  var R = new Int32Array([1, (dims[0] + 1), (dims[0] + 1) * (dims[1] + 1)]);
-  var grid = new Float32Array(8);
-  var nbBuf = 1;
-  var buffer = new Int32Array(R[2] * 2);
+  const vertices = [];
+  const cols = [];
+  const mats = [];
+  const faces = [];
+  let n = 0;
+  const x = new Int32Array(3);
+  const R = new Int32Array([1, (dims[0] + 1), (dims[0] + 1) * (dims[1] + 1)]);
+  const grid = new Float32Array(8);
+  let nbBuf = 1;
+  const buffer = new Int32Array(R[2] * 2);
 
   //March over the voxel grid
   for (x[2] = 0; x[2] < dims[2] - 1; ++x[2], n += dims[0], nbBuf ^= 1, R[2] = -R[2]) {
@@ -180,17 +180,17 @@ SurfaceNets.computeSurface = function (voxels) {
     //m is the pointer into the buffer we are going to use.  
     //This is slightly obtuse because javascript does not have good support for packed data structures, so we must use typed arrays :(
     //The contents of the buffer will be the indices of the vertices on the previous x/y slice of the volume
-    var m = 1 + (dims[0] + 1) * (1 + nbBuf * (dims[1] + 1));
+    let m = 1 + (dims[0] + 1) * (1 + nbBuf * (dims[1] + 1));
 
     for (x[1] = 0; x[1] < dims[1] - 1; ++x[1], ++n, m += 2) {
       for (x[0] = 0; x[0] < dims[0] - 1; ++x[0], ++n, ++m) {
 
-        var mask = readScalarValues(voxels, grid, dims, n, cols, mats);
+        const mask = readScalarValues(voxels, grid, dims, n, cols, mats);
         //Check for early termination if cell does not intersect boundary
         if (mask === 0 || mask === 0xff)
           continue;
         //Sum up edge intersections
-        var edgeMask = edgeTable[mask];
+        const edgeMask = edgeTable[mask];
         buffer[m] = vertices.length / 3;
         interpolateVertices(edgeMask, cubeEdges, grid, x, vertices);
         createFace(edgeMask, mask, buffer, R, m, x, faces);

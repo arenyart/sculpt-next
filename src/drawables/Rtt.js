@@ -2,7 +2,7 @@ import Buffer from '../render/Buffer';
 import Shader from '../render/ShaderLib';
 import WebGLCaps from '../render/WebGLCaps';
 
-var singletonBuffer;
+let singletonBuffer;
 
 class Rtt {
 
@@ -51,7 +51,7 @@ class Rtt {
   }
 
   init() {
-    var gl = this._gl;
+    const gl = this._gl;
 
     if (!singletonBuffer) {
       singletonBuffer = new Buffer(gl, gl.ARRAY_BUFFER, gl.STATIC_DRAW);
@@ -70,7 +70,7 @@ class Rtt {
   }
 
   onResize(width, height) {
-    var gl = this._gl;
+    const gl = this._gl;
 
     this._invSize[0] = 1.0 / width;
     this._invSize[1] = 1.0 / height;
@@ -78,11 +78,11 @@ class Rtt {
     gl.bindTexture(gl.TEXTURE_2D, this._texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, this._type, null);
 
-    var filter = this._filterNearest ? gl.NEAREST : gl.LINEAR;
+    const filter = this._filterNearest ? gl.NEAREST : gl.LINEAR;
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
 
-    var wrap = this._wrapRepeat ? gl.REPEAT : gl.CLAMP_TO_EDGE;
+    const wrap = this._wrapRepeat ? gl.REPEAT : gl.CLAMP_TO_EDGE;
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrap);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrap);
 

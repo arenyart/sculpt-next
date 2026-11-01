@@ -9,6 +9,15 @@ body {
   outline: none;
 }
 
+/* draggable GUI widgets: keep touch drags from scrolling the page */
+.gui-slider,
+.gui-resize,
+.gui-color-saturation,
+.gui-color-hue,
+.gui-color-alpha {
+  touch-action: none;
+}
+
 noscript {
   position: fixed;
   inset: 0;

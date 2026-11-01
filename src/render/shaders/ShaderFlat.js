@@ -1,6 +1,6 @@
 import ShaderBase from './ShaderBase';
 
-var ShaderFlat = ShaderBase.getCopy();
+const ShaderFlat = ShaderBase.getCopy();
 ShaderFlat.vertexName = ShaderFlat.fragmentName = 'FlatColor';
 
 ShaderFlat.uniforms = {};

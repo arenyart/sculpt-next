@@ -1,9 +1,9 @@
 import Utils from '../misc/Utils';
 import MeshStatic from '../mesh/meshStatic/MeshStatic';
 
-var Import = {};
+const Import = {};
 
-var typeToOctet = function (type) {
+const typeToOctet = function (type) {
   switch (type) {
   case 'uchar':
   case 'char':
@@ -30,8 +30,8 @@ var typeToOctet = function (type) {
   }
 };
 
-var getParseFunc = function (type, isFloat) {
-  var fac = isFloat ? 1.0 / 255.0 : 1;
+const getParseFunc = function (type, isFloat) {
+  const fac = isFloat ? 1.0 / 255.0 : 1;
   switch (type) {
   case 'char':
   case 'uchar':
@@ -60,9 +60,9 @@ var getParseFunc = function (type, isFloat) {
   }
 };
 
-var getBinaryRead = function (dview, prop, isFloat) {
-  var fac = isFloat ? 1.0 / 255.0 : 1;
-  var offset = prop.offsetOctet;
+const getBinaryRead = function (dview, prop, isFloat) {
+  const fac = isFloat ? 1.0 / 255.0 : 1;
+  const offset = prop.offsetOctet;
   switch (prop.type) {
   case 'int8':
   case 'char':
@@ -107,11 +107,11 @@ var getBinaryRead = function (dview, prop, isFloat) {
   }
 };
 
-var readHeader = function (buffer) {
-  var data = Utils.ab2str(buffer);
-  var lines = data.split('\n');
+const readHeader = function (buffer) {
+  const data = Utils.ab2str(buffer);
+  const lines = data.split('\n');
 
-  var infos = {
+  const infos = {
     isBinary: false,
     start: 0,
     elements: [],
@@ -124,11 +124,11 @@ var readHeader = function (buffer) {
     offsetOctet: 0
   };
 
-  var i = 0;
-  var split;
+  let i = 0;
+  let split;
 
   while (true) {
-    var line = lines[i++];
+    let line = lines[i++];
     infos.offsetOctet += line.length + 1;
     infos.offsetLine = i;
 
@@ -149,7 +149,7 @@ var readHeader = function (buffer) {
     } else if (line.startsWith('property')) {
 
       split = line.split(/\s+/);
-      var isList = split[1] === 'list';
+      const isList = split[1] === 'list';
       infos.elements[infos.elements.length - 1].properties.push({
         type: split[isList ? 2 : 1],
         type2: isList ? split[3] : undefined,
@@ -168,14 +168,14 @@ var readHeader = function (buffer) {
 ///////////////
 // READ VERTEX
 ///////////////
-var prepareElements = function (element, infos) {
-  var props = element.properties;
-  var objProperties = element.objProperties = {};
+const prepareElements = function (element, infos) {
+  const props = element.properties;
+  const objProperties = element.objProperties = {};
   element.offsetOctet = 0;
 
-  for (var i = 0, nbProps = props.length; i < nbProps; ++i) {
-    var prop = props[i];
-    var objProp = objProperties[prop.name] = {};
+  for (let i = 0, nbProps = props.length; i < nbProps; ++i) {
+    const prop = props[i];
+    const objProp = objProperties[prop.name] = {};
     objProp.type = prop.type;
     objProp.type2 = prop.type2;
     if (infos.isBinary) {
@@ -191,34 +191,34 @@ var prepareElements = function (element, infos) {
 // READ VERTEX
 ///////////////
 
-var readAsciiVertex = function (element, infos, vAr, cAr) {
+const readAsciiVertex = function (element, infos, vAr, cAr) {
 
-  var count = element.count;
-  var lines = infos.lines;
-  var props = element.objProperties;
-  var offsetLine = infos.offsetLine;
+  const count = element.count;
+  const lines = infos.lines;
+  const props = element.objProperties;
+  const offsetLine = infos.offsetLine;
 
-  var parseX = getParseFunc(props.x.type, true);
-  var parseY = getParseFunc(props.y.type, true);
-  var parseZ = getParseFunc(props.z.type, true);
+  const parseX = getParseFunc(props.x.type, true);
+  const parseY = getParseFunc(props.y.type, true);
+  const parseZ = getParseFunc(props.z.type, true);
 
-  var xID = props.x.id;
-  var yID = props.y.id;
-  var zID = props.z.id;
+  const xID = props.x.id;
+  const yID = props.y.id;
+  const zID = props.z.id;
 
-  var parseR, parseG, parseB;
+  let parseR, parseG, parseB;
   if (props.red) parseR = getParseFunc(props.red.type, true);
   if (props.green) parseG = getParseFunc(props.green.type, true);
   if (props.blue) parseB = getParseFunc(props.blue.type, true);
 
-  var rID, gID, bID;
+  let rID, gID, bID;
   if (props.red) rID = props.red.id;
   if (props.green) gID = props.green.id;
   if (props.blue) bID = props.blue.id;
 
-  for (var i = 0; i < count; ++i) {
-    var id = i * 3;
-    var split = lines[offsetLine + i].trim().split(/\s+/);
+  for (let i = 0; i < count; ++i) {
+    const id = i * 3;
+    const split = lines[offsetLine + i].trim().split(/\s+/);
     vAr[id] = parseX(split[xID]);
     vAr[id + 1] = parseY(split[yID]);
     vAr[id + 2] = parseZ(split[zID]);
@@ -230,25 +230,25 @@ var readAsciiVertex = function (element, infos, vAr, cAr) {
   infos.offsetLine += count;
 };
 
-var readBinaryVertex = function (element, infos, vAr, cAr) {
-  var count = element.count;
-  var props = element.objProperties;
-  var offsetOctet = element.offsetOctet;
-  var lenOctet = offsetOctet * count;
+const readBinaryVertex = function (element, infos, vAr, cAr) {
+  const count = element.count;
+  const props = element.objProperties;
+  const offsetOctet = element.offsetOctet;
+  const lenOctet = offsetOctet * count;
 
-  var dview = new DataView(infos.buffer, infos.offsetOctet, lenOctet);
-  var readX = getBinaryRead(dview, props.x, true);
-  var readY = getBinaryRead(dview, props.y, true);
-  var readZ = getBinaryRead(dview, props.z, true);
+  const dview = new DataView(infos.buffer, infos.offsetOctet, lenOctet);
+  const readX = getBinaryRead(dview, props.x, true);
+  const readY = getBinaryRead(dview, props.y, true);
+  const readZ = getBinaryRead(dview, props.z, true);
 
-  var readR, readG, readB;
+  let readR, readG, readB;
   if (props.red) readR = getBinaryRead(dview, props.red, true);
   if (props.green) readG = getBinaryRead(dview, props.green, true);
   if (props.blue) readB = getBinaryRead(dview, props.blue, true);
 
-  for (var i = 0; i < count; ++i) {
-    var id = i * 3;
-    var offset = i * offsetOctet;
+  for (let i = 0; i < count; ++i) {
+    const id = i * 3;
+    const offset = i * offsetOctet;
 
     vAr[id] = readX(offset);
     vAr[id + 1] = readY(offset);
@@ -261,13 +261,13 @@ var readBinaryVertex = function (element, infos, vAr, cAr) {
   infos.offsetOctet += lenOctet;
 };
 
-var readElementVertex = function (element, infos) {
+const readElementVertex = function (element, infos) {
 
   prepareElements(element, infos);
 
-  var vAr = infos.vertices = new Float32Array(element.count * 3);
-  var cAr;
-  var props = element.objProperties;
+  const vAr = infos.vertices = new Float32Array(element.count * 3);
+  let cAr;
+  const props = element.objProperties;
   if (props.red || props.green || props.blue)
     cAr = infos.colors = new Float32Array(element.count * 3);
 
@@ -280,24 +280,24 @@ var readElementVertex = function (element, infos) {
 /////////////
 // READ INDEX
 /////////////
-var readAsciiIndex = function (element, infos, fAr) {
+const readAsciiIndex = function (element, infos, fAr) {
 
-  var count = element.count;
-  var lines = infos.lines;
-  var props = element.objProperties;
-  var offsetLine = infos.offsetLine;
+  const count = element.count;
+  const lines = infos.lines;
+  const props = element.objProperties;
+  const offsetLine = infos.offsetLine;
 
-  var propIndex = props.vertex_index || props.vertex_indices;
+  const propIndex = props.vertex_index || props.vertex_indices;
 
-  var parseCount = getParseFunc(propIndex.type);
-  var parseIndex = getParseFunc(propIndex.type2);
+  const parseCount = getParseFunc(propIndex.type);
+  const parseIndex = getParseFunc(propIndex.type2);
 
-  var id = propIndex.id;
+  const id = propIndex.id;
 
-  var idFace = 0;
-  for (var i = 0; i < count; ++i) {
-    var split = lines[offsetLine + i].trim().split(/\s+/);
-    var nbVert = parseCount(split[0]);
+  let idFace = 0;
+  for (let i = 0; i < count; ++i) {
+    const split = lines[offsetLine + i].trim().split(/\s+/);
+    const nbVert = parseCount(split[0]);
     if (nbVert !== 3 && nbVert !== 4)
       continue;
 
@@ -311,27 +311,27 @@ var readAsciiIndex = function (element, infos, fAr) {
   infos.offsetLine += count;
 };
 
-var readBinaryIndex = function (element, infos, fAr, dummy) {
-  var count = element.count;
-  var props = element.objProperties;
-  var pidx = props && (props.vertex_index || props.vertex_indices);
-  var propIndex = pidx || element.properties[0];
+const readBinaryIndex = function (element, infos, fAr, dummy) {
+  const count = element.count;
+  const props = element.objProperties;
+  const pidx = props && (props.vertex_index || props.vertex_indices);
+  const propIndex = pidx || element.properties[0];
 
-  var dview = new DataView(infos.buffer, infos.offsetOctet);
-  var readCount = getBinaryRead(dview, propIndex);
+  const dview = new DataView(infos.buffer, infos.offsetOctet);
+  const readCount = getBinaryRead(dview, propIndex);
 
-  var readIndex = getBinaryRead(dview, {
+  const readIndex = getBinaryRead(dview, {
     type: propIndex.type2,
     offsetOctet: propIndex.offsetOctet + typeToOctet(propIndex.type)
   });
 
-  var nbOctetIndex = typeToOctet(propIndex.type2);
-  var offsetOctet = element.offsetOctet;
-  var offsetCurrent = 0;
+  const nbOctetIndex = typeToOctet(propIndex.type2);
+  const offsetOctet = element.offsetOctet;
+  let offsetCurrent = 0;
 
-  var idf = 0;
-  for (var i = 0; i < count; ++i) {
-    var nbVert = readCount(offsetCurrent);
+  let idf = 0;
+  for (let i = 0; i < count; ++i) {
+    const nbVert = readCount(offsetCurrent);
 
     if (nbVert === 3 || nbVert === 4) {
       fAr[idf++] = readIndex(offsetCurrent);
@@ -348,20 +348,20 @@ var readBinaryIndex = function (element, infos, fAr, dummy) {
   infos.offsetOctet += offsetCurrent;
 };
 
-var readElementIndex = function (element, infos) {
+const readElementIndex = function (element, infos) {
 
   prepareElements(element, infos);
 
-  var fAr = infos.faces = new Uint32Array(element.count * 4);
+  const fAr = infos.faces = new Uint32Array(element.count * 4);
   if (!infos.isBinary)
     readAsciiIndex(element, infos, fAr);
   else
     readBinaryIndex(element, infos, fAr);
 };
 
-var skipElement = function (element, infos) {
+const skipElement = function (element, infos) {
 
-  var count = element.count;
+  const count = element.count;
 
   if (!infos.isBinary) {
 
@@ -376,12 +376,12 @@ var skipElement = function (element, infos) {
 
 Import.importPLY = function (buffer, gl) {
 
-  var infos = readHeader(buffer);
-  var elements = infos.elements;
+  const infos = readHeader(buffer);
+  const elements = infos.elements;
 
-  for (var i = 0, nbElts = elements.length; i < nbElts; ++i) {
+  for (let i = 0, nbElts = elements.length; i < nbElts; ++i) {
 
-    var element = elements[i];
+    const element = elements[i];
 
     if (element.name === 'vertex') {
       readElementVertex(element, infos);
@@ -392,7 +392,7 @@ Import.importPLY = function (buffer, gl) {
     }
   }
 
-  var mesh = new MeshStatic(gl);
+  const mesh = new MeshStatic(gl);
   mesh.setVertices(infos.vertices);
   mesh.setFaces(infos.faces);
   mesh.setColors(infos.colors);

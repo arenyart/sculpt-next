@@ -2,8 +2,8 @@ import getOptionsURL from '../misc/getOptionsURL';
 import Buffer from '../render/Buffer';
 import ShaderMatcap from '../render/shaders/ShaderMatcap';
 
-var RenderData = function (gl) {
-  var opts = getOptionsURL();
+const RenderData = function (gl) {
+  const opts = getOptionsURL();
 
   return {
     _gl: gl,

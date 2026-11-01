@@ -29,7 +29,7 @@ class Multimesh extends Mesh {
     this._meshes = [new MeshResolution(mesh, true)];
     this.setSelection(0);
 
-    var gl = mesh.getGL();
+    const gl = mesh.getGL();
     this._indexBuffer = new Buffer(gl, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW);
     this._wireframeBuffer = new Buffer(gl, gl.ELEMENT_ARRAY_BUFFER, gl.STATIC_DRAW);
   }
@@ -47,12 +47,12 @@ class Multimesh extends Mesh {
     if ((this._meshes.length - 1) !== this._sel)
       return this.getCurrentMesh();
 
-    var nbFaces = this.getCurrentMesh().getNbFaces();
-    var strTimer = 'addLevel : ' + nbFaces + ' -> ' + nbFaces * 4;
+    const nbFaces = this.getCurrentMesh().getNbFaces();
+    const strTimer = 'addLevel : ' + nbFaces + ' -> ' + nbFaces * 4;
     console.time(strTimer);
 
-    var baseMesh = this.getCurrentMesh();
-    var newMesh = new MeshResolution(baseMesh);
+    const baseMesh = this.getCurrentMesh();
+    const newMesh = new MeshResolution(baseMesh);
     baseMesh.setVerticesMapping(undefined);
 
     Subdivision.fullSubdivision(baseMesh, newMesh);
@@ -70,10 +70,10 @@ class Multimesh extends Mesh {
     if (this._sel !== 0)
       return this.getCurrentMesh();
 
-    var baseMesh = this.getCurrentMesh();
-    var newMesh = new MeshResolution(baseMesh);
+    const baseMesh = this.getCurrentMesh();
+    const newMesh = new MeshResolution(baseMesh);
 
-    var status = Reversion.computeReverse(baseMesh, newMesh);
+    const status = Reversion.computeReverse(baseMesh, newMesh);
     if (!status)
       return;
 
@@ -111,7 +111,7 @@ class Multimesh extends Mesh {
     this.updateDuplicateColorsAndMaterials();
     this.updateBuffers();
 
-    var mesh = this._meshes[this.getLowIndexRender()];
+    const mesh = this._meshes[this.getLowIndexRender()];
     this._indexBuffer.update(mesh.getTriangles());
     this._wireframeBuffer.update(mesh.getWireframe());
   }
@@ -126,15 +126,15 @@ class Multimesh extends Mesh {
   }
 
   findIndexFromMesh(mesh) {
-    var meshes = this._meshes;
-    for (var i = 0, l = meshes.length; i < l; ++i) {
+    const meshes = this._meshes;
+    for (let i = 0, l = meshes.length; i < l; ++i) {
       if (mesh === meshes[i])
         return i;
     }
   }
 
   selectMesh(mesh) {
-    var val = this.findIndexFromMesh(mesh);
+    const val = this.findIndexFromMesh(mesh);
     this.selectResolution(val);
   }
 
@@ -172,10 +172,10 @@ class Multimesh extends Mesh {
   }
 
   getLowIndexRender() {
-    var limit = 500000;
-    var sel = this._sel;
+    const limit = 500000;
+    let sel = this._sel;
     while (sel >= 0) {
-      var mesh = this._meshes[sel];
+      const mesh = this._meshes[sel];
       // we disable low rendering for lower resolution mesh with
       // an index indirection for even vertices
       if (mesh.getEvenMapping() === true)
@@ -188,9 +188,9 @@ class Multimesh extends Mesh {
   }
 
   _renderLow(main) {
-    var render = this.getRenderData();
-    var tmpSel = this._sel;
-    var tmpIndex = this.getIndexBuffer();
+    const render = this.getRenderData();
+    const tmpSel = this._sel;
+    const tmpIndex = this.getIndexBuffer();
     this.setSelection(this.getLowIndexRender());
     render._indexBuffer = this._indexBuffer;
 
@@ -201,9 +201,9 @@ class Multimesh extends Mesh {
   }
 
   _renderWireframeLow(main) {
-    var render = this.getRenderData();
-    var tmpSel = this._sel;
-    var tmpWire = this.getWireframeBuffer();
+    const render = this.getRenderData();
+    const tmpSel = this._sel;
+    const tmpWire = this.getWireframeBuffer();
     this.setSelection(this.getLowIndexRender());
     render._wireframeBuffer = this._wireframeBuffer;
 

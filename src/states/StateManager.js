@@ -16,13 +16,13 @@ class StateManager {
   }
 
   pushStateCustom(undocb, redocb, squash) {
-    var st = new StCustom(undocb, redocb);
+    const st = new StCustom(undocb, redocb);
     st.squash = squash;
     this.pushState(st);
   }
 
   pushStateAddRemove(addMesh, remMesh, squash) {
-    var st = new StAddRemove(this._main, addMesh, remMesh);
+    const st = new StAddRemove(this._main, addMesh, remMesh);
     st.squash = squash;
     this.pushState(st);
   }
@@ -55,8 +55,8 @@ class StateManager {
 
   setNewMaxStack(maxStack) {
     StateManager.STACK_LENGTH = maxStack;
-    var undos = this._undos;
-    var redos = this._redos;
+    const undos = this._undos;
+    const redos = this._redos;
     while (this._curUndoIndex >= maxStack) {
       undos.shift();
       --this._curUndoIndex;
@@ -69,7 +69,7 @@ class StateManager {
 
   pushState(state) {
     ++Utils.STATE_FLAG;
-    var undos = this._undos;
+    const undos = this._undos;
     if (this._curUndoIndex === -1) undos.length = 0;
     else if (undos.length >= StateManager.STACK_LENGTH) {
       undos.shift();
@@ -100,8 +100,8 @@ class StateManager {
     if (!this._undos.length || this._curUndoIndex < 0)
       return;
 
-    var state = this.getCurrentState();
-    var redoState = state.createRedo();
+    const state = this.getCurrentState();
+    const redoState = state.createRedo();
     redoState.squash = state.squash;
     this._redos.push(redoState);
     state.undo();
@@ -115,7 +115,7 @@ class StateManager {
     if (!this._redos.length)
       return;
 
-    var state = this._redos[this._redos.length - 1];
+    const state = this._redos[this._redos.length - 1];
     state.redo();
     this._curUndoIndex++;
     this._redos.pop();

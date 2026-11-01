@@ -1,29 +1,29 @@
 import Enums from './Enums';
 
-var keyAction = Enums.KeyAction;
+const keyAction = Enums.KeyAction;
 
-var queryBool = function (value, def) {
+const queryBool = function (value, def) {
   if (value === undefined) return def;
   return value !== 'false' && value !== '0';
 };
 
-var queryNumber = function (value, min, max, def) {
-  var f = parseFloat(value);
+const queryNumber = function (value, min, max, def) {
+  const f = parseFloat(value);
   if (!f && f !== 0.0) return def;
   return Math.max(min, Math.min(max, f));
 };
 
-var queryInteger = function (value, min, max, def) {
-  var f = parseInt(value, 10);
+const queryInteger = function (value, min, max, def) {
+  const f = parseInt(value, 10);
   if (!f && f !== 0.0) return def;
   return Math.max(min, Math.min(max, f));
 };
 
-var queryColor = function (color, def) {
+const queryColor = function (color, def) {
   if (!color) return def;
-  var arr = color.split(',');
+  const arr = color.split(',');
   if (arr.length < 3) return def;
-  var out = def.slice();
+  const out = def.slice();
   out[0] = parseInt(arr[0] || 0, 10) / 255;
   out[1] = parseInt(arr[1] || 0, 10) / 255;
   out[2] = parseInt(arr[2] || 0, 10) / 255;
@@ -31,8 +31,8 @@ var queryColor = function (color, def) {
   return out;
 };
 
-var readShortcuts = function (str) {
-  var shortcuts = {};
+const readShortcuts = function (str) {
+  const shortcuts = {};
 
   // tools
   shortcuts['0'.charCodeAt(0)] = keyAction.MOVE;
@@ -73,48 +73,48 @@ var readShortcuts = function (str) {
   if (!str)
     return shortcuts;
 
-  var vars = str.split(',');
-  for (var i = 0, nbVars = vars.length; i < nbVars; i++) {
-    var pair = vars[i].split(':', 2);
+  const vars = str.split(',');
+  for (let i = 0, nbVars = vars.length; i < nbVars; i++) {
+    const pair = vars[i].split(':', 2);
     if (pair.length !== 2) continue;
 
-    var key = pair[1].toUpperCase();
-    var tInt = parseInt(key, 10);
+    let key = pair[1].toUpperCase();
+    const tInt = parseInt(key, 10);
     // check if we consider it as charcode
     if (tInt === tInt && tInt >= 10) key = tInt;
     else key = key.charCodeAt(0);
 
-    var keyac = keyAction[pair[0].toUpperCase()];
+    const keyac = keyAction[pair[0].toUpperCase()];
     if (keyac !== undefined) shortcuts[key] = keyac;
   }
 
   return shortcuts;
 };
 
-var readUrlParameters = function () {
-  var params = {};
+const readUrlParameters = function () {
+  const params = {};
   if (typeof window === 'undefined') return params;
   for (const [key, value] of new URLSearchParams(window.location.search))
     params[key.toLowerCase()] = value;
   return params;
 };
 
-var getEnum = function (obj, str, def) {
+const getEnum = function (obj, str, def) {
   if (str) {
-    var val = obj[str.toUpperCase()];
+    const val = obj[str.toUpperCase()];
     if (val !== undefined) return val;
   }
   return def;
 };
 
-var options;
-var getOptionsURL = function () {
+let options;
+const getOptionsURL = function () {
   if (options)
     return options;
 
   options = {};
 
-  var params = readUrlParameters();
+  const params = readUrlParameters();
 
   // misc
   options.language = params.language; // english/chinese/korean/japanese/russian/turkish/swedish/french/german

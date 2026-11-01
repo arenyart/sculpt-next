@@ -2,26 +2,26 @@ import Utils from '../misc/Utils';
 import MeshStatic from '../mesh/meshStatic/MeshStatic';
 import Mesh from '../mesh/Mesh';
 
-var Edge = function (v1, v2) {
+const Edge = function (v1, v2) {
   this.previous = null;
   this.next = null;
   this.v1 = v1;
   this.v2 = v2;
 };
 
-var detectHole = function (borderEdges) {
+const detectHole = function (borderEdges) {
   if (borderEdges.length <= 2)
     return;
-  var nbEdges = borderEdges.length;
-  var iEnd = borderEdges[0].v1;
-  var iLast = borderEdges[0].v2;
-  var first = borderEdges[0];
-  var last = first;
+  let nbEdges = borderEdges.length;
+  const iEnd = borderEdges[0].v1;
+  let iLast = borderEdges[0].v2;
+  const first = borderEdges[0];
+  let last = first;
 
   borderEdges[0] = borderEdges[--nbEdges];
-  var i = 0;
+  let i = 0;
   while (i < nbEdges) {
-    var testEdge = borderEdges[i];
+    const testEdge = borderEdges[i];
     if (testEdge.v1 === iLast) {
       testEdge.previous = last;
       last.next = testEdge;
@@ -42,34 +42,34 @@ var detectHole = function (borderEdges) {
   return first;
 };
 
-var detectHoles = function (mesh) {
-  var eAr = mesh.getEdges();
-  var fAr = mesh.getFaces();
-  var feAr = mesh.getFaceEdges();
-  var borderEdges = [];
-  for (var i = 0, len = mesh.getNbFaces(); i < len; ++i) {
-    var id = i * 4;
-    var iv4 = feAr[id + 3];
-    var isQuad = iv4 !== Utils.TRI_INDEX;
+const detectHoles = function (mesh) {
+  const eAr = mesh.getEdges();
+  const fAr = mesh.getFaces();
+  const feAr = mesh.getFaceEdges();
+  const borderEdges = [];
+  for (let i = 0, len = mesh.getNbFaces(); i < len; ++i) {
+    const id = i * 4;
+    const iv4 = feAr[id + 3];
+    const isQuad = iv4 !== Utils.TRI_INDEX;
     if (eAr[feAr[id]] === 1) borderEdges.push(new Edge(fAr[id], fAr[id + 1]));
     if (eAr[feAr[id + 1]] === 1) borderEdges.push(new Edge(fAr[id + 1], fAr[id + 2]));
     if (eAr[feAr[id + 2]] === 1) borderEdges.push(new Edge(fAr[id + 2], fAr[isQuad ? id + 3 : id]));
     if (isQuad && eAr[iv4] === 1) borderEdges.push(new Edge(fAr[id + 3], fAr[id]));
   }
 
-  var holes = [];
+  const holes = [];
   while (true) {
-    var firstEdge = detectHole(borderEdges);
+    const firstEdge = detectHole(borderEdges);
     if (!firstEdge) break;
     holes.push(firstEdge);
   }
   return holes;
 };
 
-var advancingFrontMesh = function (mesh, firstEdge, newTris, newVerts, newColors, newMaterials) {
-  var vAr = mesh.getVertices();
-  var cAr = mesh.getColors();
-  var mAr = mesh.getMaterials();
+const advancingFrontMesh = function (mesh, firstEdge, newTris, newVerts, newColors, newMaterials) {
+  const vAr = mesh.getVertices();
+  const cAr = mesh.getColors();
+  const mAr = mesh.getMaterials();
   // var current = firstEdge;
   // var count = 1;
   // while (current.next !== firstEdge) {
@@ -79,25 +79,25 @@ var advancingFrontMesh = function (mesh, firstEdge, newTris, newVerts, newColors
   // console.log(count)
 
   // TODO : stupid naive hole filling for now
-  var last = mesh.getNbVertices() + newVerts.length / 3;
-  var current = firstEdge;
-  var avx = 0.0;
-  var avy = 0.0;
-  var avz = 0.0;
+  const last = mesh.getNbVertices() + newVerts.length / 3;
+  let current = firstEdge;
+  let avx = 0.0;
+  let avy = 0.0;
+  let avz = 0.0;
 
-  var colr = 0.0;
-  var colg = 0.0;
-  var colb = 0.0;
+  let colr = 0.0;
+  let colg = 0.0;
+  let colb = 0.0;
 
-  var mat1 = 0.0;
-  var mat2 = 0.0;
-  var mat3 = 0.0;
-  var count = 0;
+  let mat1 = 0.0;
+  let mat2 = 0.0;
+  let mat3 = 0.0;
+  let count = 0;
   do {
-    var next = current.next;
-    var iv1 = current.v1;
-    var iv2 = current.v2;
-    var iv3 = next.v2;
+    const next = current.next;
+    let iv1 = current.v1;
+    let iv2 = current.v2;
+    let iv3 = next.v2;
 
     newTris.push(iv1, iv2, last, Utils.TRI_INDEX);
     iv1 *= 3;
@@ -116,18 +116,18 @@ var advancingFrontMesh = function (mesh, firstEdge, newTris, newVerts, newColors
     mat2 += mAr[iv1 + 1];
     mat3 += mAr[iv1 + 2];
 
-    var v2x = vAr[iv2];
-    var v2y = vAr[iv2 + 1];
-    var v2z = vAr[iv2 + 2];
+    const v2x = vAr[iv2];
+    const v2y = vAr[iv2 + 1];
+    const v2z = vAr[iv2 + 2];
     // compute normals
-    var ax = vAr[iv1] - v2x;
-    var ay = vAr[iv1 + 1] - v2y;
-    var az = vAr[iv1 + 2] - v2z;
-    var bx = vAr[iv3] - v2x;
-    var by = vAr[iv3 + 1] - v2y;
-    var bz = vAr[iv3 + 2] - v2z;
-    var alen = ax * ax + ay * ay + az * az;
-    var blen = bx * bx + by * by + bz * bz;
+    const ax = vAr[iv1] - v2x;
+    const ay = vAr[iv1 + 1] - v2y;
+    const az = vAr[iv1 + 2] - v2z;
+    const bx = vAr[iv3] - v2x;
+    const by = vAr[iv3 + 1] - v2y;
+    const bz = vAr[iv3 + 2] - v2z;
+    const alen = ax * ax + ay * ay + az * az;
+    const blen = bx * bx + by * by + bz * bz;
     current.angle = Math.acos((ax * bx + ay * by + az * bz) / Math.sqrt(alen * blen));
     current = next;
   } while (current !== firstEdge);
@@ -137,8 +137,8 @@ var advancingFrontMesh = function (mesh, firstEdge, newTris, newVerts, newColors
   newMaterials.push(mat1 / count, mat2 / count, mat3 / count);
 };
 
-var createMesh = function (mesh, vertices, faces, colors, materials) {
-  var newMesh = new MeshStatic();
+const createMesh = function (mesh, vertices, faces, colors, materials) {
+  const newMesh = new MeshStatic();
   newMesh.setID(mesh.getID());
   newMesh.setVertices(vertices);
   if (colors) newMesh.setColors(colors);
@@ -156,31 +156,31 @@ var createMesh = function (mesh, vertices, faces, colors, materials) {
   return newMesh;
 };
 
-var closeHoles = function (mesh) {
-  var holes = detectHoles(mesh);
+const closeHoles = function (mesh) {
+  const holes = detectHoles(mesh);
   if (holes.length === 0)
     return mesh;
 
-  var newFaces = [];
-  var newVerts = [];
-  var newColors = [];
-  var newMaterials = [];
+  const newFaces = [];
+  const newVerts = [];
+  const newColors = [];
+  const newMaterials = [];
   // console.time('closeHoles');
-  for (var i = 0, nbHoles = holes.length; i < nbHoles; ++i)
+  for (let i = 0, nbHoles = holes.length; i < nbHoles; ++i)
     advancingFrontMesh(mesh, holes[i], newFaces, newVerts, newColors, newMaterials);
   // console.timeEnd('closeHoles');
 
-  var oldVertsLen = mesh.getNbVertices() * 3;
-  var newVertsLen = oldVertsLen + newVerts.length;
+  const oldVertsLen = mesh.getNbVertices() * 3;
+  const newVertsLen = oldVertsLen + newVerts.length;
 
   // set vertices
-  var vertices = new Float32Array(newVertsLen);
+  const vertices = new Float32Array(newVertsLen);
   vertices.set(mesh.getVertices().subarray(0, oldVertsLen));
   // set colors
-  var colors = new Float32Array(newVertsLen);
+  const colors = new Float32Array(newVertsLen);
   colors.set(mesh.getColors().subarray(0, oldVertsLen));
   // set materials
-  var materials = new Float32Array(newVertsLen);
+  const materials = new Float32Array(newVertsLen);
   materials.set(mesh.getMaterials().subarray(0, oldVertsLen));
 
   if (newVertsLen > oldVertsLen) {
@@ -190,7 +190,7 @@ var closeHoles = function (mesh) {
   }
 
   // set faces
-  var faces = new Uint32Array(mesh.getNbFaces() * 4 + newFaces.length);
+  const faces = new Uint32Array(mesh.getNbFaces() * 4 + newFaces.length);
   faces.set(mesh.getFaces());
   if (newFaces.length > 0)
     faces.set(newFaces, mesh.getNbFaces() * 4);
@@ -198,17 +198,17 @@ var closeHoles = function (mesh) {
   return createMesh(mesh, vertices, faces, colors, materials);
 };
 
-var HoleFilling = {};
+const HoleFilling = {};
 
 HoleFilling.createClosedMesh = function (mesh) {
-  var closed = closeHoles(mesh);
+  let closed = closeHoles(mesh);
   if (closed === mesh) {
-    var lenv = mesh.getNbVertices() * 3;
-    var lenf = mesh.getNbFaces() * 4;
-    var faces = new Uint32Array(mesh.getFaces().subarray(0, lenf));
-    var vertices = new Float32Array(mesh.getVertices().subarray(0, lenv));
-    var colors = new Float32Array(mesh.getColors().subarray(0, lenv));
-    var materials = new Float32Array(mesh.getMaterials().subarray(0, lenv));
+    const lenv = mesh.getNbVertices() * 3;
+    const lenf = mesh.getNbFaces() * 4;
+    const faces = new Uint32Array(mesh.getFaces().subarray(0, lenf));
+    const vertices = new Float32Array(mesh.getVertices().subarray(0, lenv));
+    const colors = new Float32Array(mesh.getColors().subarray(0, lenv));
+    const materials = new Float32Array(mesh.getMaterials().subarray(0, lenv));
     closed = createMesh(mesh, vertices, faces, colors, materials);
   }
   return closed;

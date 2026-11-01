@@ -1,4 +1,4 @@
-var TR = {
+const TR = {
   // background
   backgroundTitle: '背景',
   backgroundReset: '重設',
@@ -51,7 +51,6 @@ var TR = {
   sceneAddTorus: '加入圓環',
   sceneSelection: '選取項目',
   sceneMerge: '合併選取項目',
-  sceneDuplicate: '刪除選擇',
   sceneDuplicate: null,
 
   // mesh

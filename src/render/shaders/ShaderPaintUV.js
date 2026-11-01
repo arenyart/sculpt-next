@@ -1,7 +1,7 @@
 import ShaderBase from './ShaderBase';
 import Attribute from '../Attribute';
 
-var ShaderPaintUV = ShaderBase.getCopy();
+const ShaderPaintUV = ShaderBase.getCopy();
 ShaderPaintUV.CHANNEL_VALUE = 0; // 0 color, 1 roughness, 2 metalness
 ShaderPaintUV.vertexName = ShaderPaintUV.fragmentName = 'PaintUV';
 
@@ -48,7 +48,7 @@ ShaderPaintUV.bindAttributes = function (mesh) {
 };
 
 ShaderPaintUV.updateUniforms = function (mesh) {
-  var gl = mesh.getGL();
+  const gl = mesh.getGL();
   gl.uniform1i(this.uniforms.uChannelPaint, ShaderPaintUV.CHANNEL_VALUE);
 };
 

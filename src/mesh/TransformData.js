@@ -1,6 +1,6 @@
 import { vec3, mat3, mat4 } from 'gl-matrix';
 
-var TransformData = function () {
+const TransformData = function () {
   return {
     _center: vec3.create(), // center of the mesh (local space, before transformation)
     _matrix: mat4.create(), // transformation matrix of the mesh

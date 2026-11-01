@@ -16,7 +16,7 @@ class StateColorAndMaterial {
 
   undo() {
     this.pullVertices();
-    var mesh = this._mesh;
+    const mesh = this._mesh;
     mesh.updateDuplicateColorsAndMaterials();
     mesh.updateDrawArrays();
     mesh.updateColorBuffer();
@@ -29,25 +29,25 @@ class StateColorAndMaterial {
   }
 
   createRedo() {
-    var redo = new StateColorAndMaterial(this._main, this._mesh);
+    const redo = new StateColorAndMaterial(this._main, this._mesh);
     this.pushRedoVertices(redo);
     return redo;
   }
 
   pushVertices(iVerts) {
-    var idVertState = this._idVertState;
-    var cArState = this._cArState;
-    var mArState = this._mArState;
+    const idVertState = this._idVertState;
+    const cArState = this._cArState;
+    const mArState = this._mArState;
 
-    var mesh = this._mesh;
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
-    var vertStateFlags = mesh.getVerticesStateFlags();
+    const mesh = this._mesh;
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
+    const vertStateFlags = mesh.getVerticesStateFlags();
 
-    var stateFlag = Utils.STATE_FLAG;
-    var nbVerts = iVerts.length;
-    for (var i = 0; i < nbVerts; ++i) {
-      var id = iVerts[i];
+    const stateFlag = Utils.STATE_FLAG;
+    const nbVerts = iVerts.length;
+    for (let i = 0; i < nbVerts; ++i) {
+      let id = iVerts[i];
       if (vertStateFlags[id] === stateFlag)
         continue;
       vertStateFlags[id] = stateFlag;
@@ -59,20 +59,20 @@ class StateColorAndMaterial {
   }
 
   pushRedoVertices(redoState) {
-    var mesh = redoState._mesh;
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
+    const mesh = redoState._mesh;
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
 
-    var idVertUndoState = this._idVertState;
-    var nbVerts = idVertUndoState.length;
+    const idVertUndoState = this._idVertState;
+    const nbVerts = idVertUndoState.length;
 
-    var cArRedoState = redoState._cArState = new Float32Array(nbVerts * 3);
-    var mArRedoState = redoState._mArState = new Float32Array(nbVerts * 3);
-    var idVertRedoState = redoState._idVertState = new Uint32Array(nbVerts);
-    for (var i = 0; i < nbVerts; ++i) {
-      var id = idVertRedoState[i] = idVertUndoState[i];
+    const cArRedoState = redoState._cArState = new Float32Array(nbVerts * 3);
+    const mArRedoState = redoState._mArState = new Float32Array(nbVerts * 3);
+    const idVertRedoState = redoState._idVertState = new Uint32Array(nbVerts);
+    for (let i = 0; i < nbVerts; ++i) {
+      let id = idVertRedoState[i] = idVertUndoState[i];
       id *= 3;
-      var j = i * 3;
+      const j = i * 3;
       cArRedoState[j] = cAr[id];
       cArRedoState[j + 1] = cAr[id + 1];
       cArRedoState[j + 2] = cAr[id + 2];
@@ -83,17 +83,17 @@ class StateColorAndMaterial {
   }
 
   pullVertices() {
-    var cArState = this._cArState;
-    var mArState = this._mArState;
-    var idVertState = this._idVertState;
-    var nbVerts = idVertState.length;
+    const cArState = this._cArState;
+    const mArState = this._mArState;
+    const idVertState = this._idVertState;
+    const nbVerts = idVertState.length;
 
-    var mesh = this._mesh;
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
-    for (var i = 0; i < nbVerts; ++i) {
-      var id = idVertState[i] * 3;
-      var j = i * 3;
+    const mesh = this._mesh;
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
+    for (let i = 0; i < nbVerts; ++i) {
+      const id = idVertState[i] * 3;
+      const j = i * 3;
       cAr[id] = cArState[j];
       cAr[id + 1] = cArState[j + 1];
       cAr[id + 2] = cArState[j + 2];

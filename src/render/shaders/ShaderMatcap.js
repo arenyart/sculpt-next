@@ -1,13 +1,13 @@
 import TR from '../../gui/GuiTR';
 import ShaderBase from './ShaderBase';
 
-var ShaderMatcap = ShaderBase.getCopy();
+const ShaderMatcap = ShaderBase.getCopy();
 ShaderMatcap.vertexName = ShaderMatcap.fragmentName = 'Matcap';
 
 ShaderMatcap.textures = {};
 
 ShaderMatcap.createTexture = function (gl, img, idMaterial) {
-  var idTex = gl.createTexture();
+  const idTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, idTex);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
   ShaderMatcap.setTextureParameters(gl, img);
@@ -15,7 +15,7 @@ ShaderMatcap.createTexture = function (gl, img, idMaterial) {
   ShaderMatcap.textures[idMaterial] = idTex;
 };
 
-var texPath = 'resources/matcaps/';
+const texPath = 'resources/matcaps/';
 ShaderMatcap.matcaps = [{
   path: texPath + 'matcapFV.jpg',
   name: 'matcap FV' // too lazy to tr
@@ -102,8 +102,8 @@ ShaderMatcap.fragment = [
 ].join('\n');
 
 ShaderMatcap.updateUniforms = function (mesh, main) {
-  var gl = mesh.getGL();
-  var uniforms = this.uniforms;
+  const gl = mesh.getGL();
+  const uniforms = this.uniforms;
 
   gl.activeTexture(gl.TEXTURE0);
   mesh.setTexture0(ShaderMatcap.textures[mesh.getMatcap()]);

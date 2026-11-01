@@ -5,8 +5,8 @@ class Checkbox extends BaseWidget {
   constructor(valOrObject, callbackOrKey) {
     super();
 
-    var value = this._getInitialValue(valOrObject, callbackOrKey);
-    var callback = this._getCheckCallback(valOrObject, callbackOrKey);
+    const value = this._getInitialValue(valOrObject, callbackOrKey);
+    const callback = this._getCheckCallback(valOrObject, callbackOrKey);
     this.domCheckbox = document.createElement('input');
     this.domCheckbox.className = 'gui-input-checkbox';
     this.domCheckbox.type = 'checkbox';

@@ -5,7 +5,7 @@ class Button extends BaseWidget {
   constructor(name, callbackOrObject, key) {
     super();
 
-    var callback = key ? callbackOrObject[key].bind(callbackOrObject) : callbackOrObject;
+    const callback = key ? callbackOrObject[key].bind(callbackOrObject) : callbackOrObject;
 
     this.domButton = document.createElement('button');
     this.domButton.className = 'gui-button';

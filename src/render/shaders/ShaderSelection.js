@@ -1,6 +1,6 @@
 import ShaderBase from './ShaderBase';
 
-var ShaderSelection = ShaderBase.getCopy();
+const ShaderSelection = ShaderBase.getCopy();
 ShaderSelection.vertexName = ShaderSelection.fragmentName = 'ShowSelection';
 
 ShaderSelection.uniforms = {};
@@ -27,7 +27,7 @@ ShaderSelection.fragment = [
 ].join('\n');
 
 ShaderSelection.draw = function (geom, drawCircle, drawSym) {
-  var gl = geom.getGL();
+  const gl = geom.getGL();
   gl.useProgram(this.program);
 
   gl.uniform3fv(this.uniforms.uColor, geom.getColor());

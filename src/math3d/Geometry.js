@@ -1,6 +1,6 @@
 import { vec3 } from 'gl-matrix';
 
-var Geometry = {};
+const Geometry = {};
 
 /** Normalize coordinate mouse between -1 and 1 */
 Geometry.normalizedMouse = function (mouseX, mouseY, width, height) {
@@ -9,41 +9,41 @@ Geometry.normalizedMouse = function (mouseX, mouseY, width, height) {
 
 /** Projection of mouse coordinate on sphere unit */
 Geometry.mouseOnUnitSphere = function (mouseXY) {
-  var mouseX = mouseXY[0];
-  var mouseY = mouseXY[1];
-  var tempZ = 1.0 - mouseX * mouseX - mouseY * mouseY;
-  var mouseZ = tempZ > 0.0 ? Math.sqrt(tempZ) : 0.0;
-  var sourisSphere = [mouseX, mouseY, mouseZ];
+  const mouseX = mouseXY[0];
+  const mouseY = mouseXY[1];
+  const tempZ = 1.0 - mouseX * mouseX - mouseY * mouseY;
+  const mouseZ = tempZ > 0.0 ? Math.sqrt(tempZ) : 0.0;
+  const sourisSphere = [mouseX, mouseY, mouseZ];
   return vec3.normalize(sourisSphere, sourisSphere);
 };
 
 /** Compute intersection between a ray and a triangle. Returne the distance to the triangle if a hit occurs. */
 Geometry.intersectionRayTriangleEdges = (function () {
-  var EPSILON = 1E-15;
+  const EPSILON = 1E-15;
   // hmm we favor false positive just in case...
   // mainly because of the voxel-remesh that can do weird things
   // if the ray casting fail on a border of a triangle 
-  var ONE_PLUS_EPSILON = 1.0 + EPSILON;
-  var ZERO_MINUS_EPSILON = 0.0 - EPSILON;
-  var pvec = [0.0, 0.0, 0.0];
-  var tvec = [0.0, 0.0, 0.0];
-  var qvec = [0.0, 0.0, 0.0];
+  const ONE_PLUS_EPSILON = 1.0 + EPSILON;
+  const ZERO_MINUS_EPSILON = 0.0 - EPSILON;
+  const pvec = [0.0, 0.0, 0.0];
+  const tvec = [0.0, 0.0, 0.0];
+  const qvec = [0.0, 0.0, 0.0];
   return function (orig, dir, edge1, edge2, v1, vertInter) {
     // moller trumbore intersection algorithm
     vec3.cross(pvec, dir, edge2);
-    var det = vec3.dot(edge1, pvec);
+    const det = vec3.dot(edge1, pvec);
     if (det > -EPSILON && det < EPSILON)
       return -1.0;
-    var invDet = 1.0 / det;
+    const invDet = 1.0 / det;
     vec3.sub(tvec, orig, v1);
-    var u = vec3.dot(tvec, pvec) * invDet;
+    const u = vec3.dot(tvec, pvec) * invDet;
     if (u < ZERO_MINUS_EPSILON || u > ONE_PLUS_EPSILON)
       return -1.0;
     vec3.cross(qvec, tvec, edge1);
-    var v = vec3.dot(dir, qvec) * invDet;
+    const v = vec3.dot(dir, qvec) * invDet;
     if (v < ZERO_MINUS_EPSILON || u + v > ONE_PLUS_EPSILON)
       return -1.0;
-    var t = vec3.dot(edge2, qvec) * invDet;
+    const t = vec3.dot(edge2, qvec) * invDet;
     if (t < ZERO_MINUS_EPSILON)
       return -1.0;
     if (vertInter)
@@ -54,8 +54,8 @@ Geometry.intersectionRayTriangleEdges = (function () {
 
 /** Compute intersection between a ray and a triangle. Returne the distance to the triangle if a hit occurs. */
 Geometry.intersectionRayTriangle = (function () {
-  var edge1 = [0.0, 0.0, 0.0];
-  var edge2 = [0.0, 0.0, 0.0];
+  const edge1 = [0.0, 0.0, 0.0];
+  const edge2 = [0.0, 0.0, 0.0];
   return function (orig, dir, v1, v2, v3, vertInter) {
     vec3.sub(edge1, v2, v1);
     vec3.sub(edge2, v3, v1);
@@ -73,18 +73,18 @@ Geometry.intersectionRayTriangle = (function () {
 // 4 | 5 \ 6
 /** Compute distance between a point and a triangle. */
 Geometry.distance2PointTriangleEdges = (function () {
-  var diff = [0.0, 0.0, 0.0];
+  const diff = [0.0, 0.0, 0.0];
   return function (point, edge1, edge2, v1, a00, a01, a11, closest) {
 
     vec3.sub(diff, v1, point);
-    var b0 = vec3.dot(diff, edge1);
-    var b1 = vec3.dot(diff, edge2);
-    var c = vec3.sqrLen(diff);
-    var det = Math.abs(a00 * a11 - a01 * a01);
-    var s = a01 * b1 - a11 * b0;
-    var t = a01 * b0 - a00 * b1;
-    var sqrDistance;
-    var zone = 4;
+    const b0 = vec3.dot(diff, edge1);
+    const b1 = vec3.dot(diff, edge2);
+    const c = vec3.sqrLen(diff);
+    const det = Math.abs(a00 * a11 - a01 * a01);
+    let s = a01 * b1 - a11 * b0;
+    let t = a01 * b0 - a00 * b1;
+    let sqrDistance;
+    let zone = 4;
 
     if (s + t <= det) {
       if (s < 0.0) {
@@ -142,13 +142,13 @@ Geometry.distance2PointTriangleEdges = (function () {
       } else { // region 0
         zone = 0;
         // minimum at interior point
-        var invDet = 1.0 / det;
+        const invDet = 1.0 / det;
         s *= invDet;
         t *= invDet;
         sqrDistance = s * (a00 * s + a01 * t + 2.0 * b0) + t * (a01 * s + a11 * t + 2.0 * b1) + c;
       }
     } else {
-      var tmp0, tmp1, numer, denom;
+      let tmp0, tmp1, numer, denom;
 
       if (s < 0.0) { // region 2
         zone = 2;
@@ -246,34 +246,34 @@ Geometry.distance2PointTriangleEdges = (function () {
 
 /** Compute distance between a point and a triangle. */
 Geometry.distance2PointTriangle = (function () {
-  var edge1 = [0.0, 0.0, 0.0];
-  var edge2 = [0.0, 0.0, 0.0];
+  const edge1 = [0.0, 0.0, 0.0];
+  const edge2 = [0.0, 0.0, 0.0];
   return function (point, v1, v2, v3, closest) {
     vec3.sub(edge1, v2, v1);
     vec3.sub(edge2, v3, v1);
-    var a00 = vec3.sqrLen(edge1);
-    var a01 = vec3.dot(edge1, edge2);
-    var a11 = vec3.sqrLen(edge2);
+    const a00 = vec3.sqrLen(edge1);
+    const a01 = vec3.dot(edge1, edge2);
+    const a11 = vec3.sqrLen(edge2);
     return Geometry.distance2PointTriangleEdges(point, edge1, edge2, v1, a00, a01, a11, closest);
   };
 })();
 
 /** If point is inside the triangle, test the sum of the areas */
 Geometry.pointInsideTriangle = (function () {
-  var vec1 = [0.0, 0.0, 0.0];
-  var vec2 = [0.0, 0.0, 0.0];
-  var vecP1 = [0.0, 0.0, 0.0];
-  var vecP2 = [0.0, 0.0, 0.0];
-  var temp = [0.0, 0.0, 0.0];
+  const vec1 = [0.0, 0.0, 0.0];
+  const vec2 = [0.0, 0.0, 0.0];
+  const vecP1 = [0.0, 0.0, 0.0];
+  const vecP2 = [0.0, 0.0, 0.0];
+  const temp = [0.0, 0.0, 0.0];
   return function (point, v1, v2, v3) {
     vec3.sub(vec1, v1, v2);
     vec3.sub(vec2, v1, v3);
     vec3.sub(vecP1, point, v2);
     vec3.sub(vecP2, point, v3);
-    var total = vec3.len(vec3.cross(temp, vec1, vec2));
-    var area1 = vec3.len(vec3.cross(temp, vec1, vecP1));
-    var area2 = vec3.len(vec3.cross(temp, vec2, vecP2));
-    var area3 = vec3.len(vec3.cross(temp, vecP1, vecP2));
+    const total = vec3.len(vec3.cross(temp, vec1, vec2));
+    const area1 = vec3.len(vec3.cross(temp, vec1, vecP1));
+    const area2 = vec3.len(vec3.cross(temp, vec2, vecP2));
+    const area3 = vec3.len(vec3.cross(temp, vecP1, vecP2));
     return Math.abs(total - (area1 + area2 + area3)) < 1E-20;
   };
 })();
@@ -288,13 +288,13 @@ Geometry.triangleInsideSphere = function (point, radiusSq, v1, v2, v3) {
 
 /** Minimum squared distance to a segment */
 Geometry.distanceSqToSegment = (function () {
-  var pt = [0.0, 0.0, 0.0];
-  var v2v1 = [0.0, 0.0, 0.0];
+  const pt = [0.0, 0.0, 0.0];
+  const v2v1 = [0.0, 0.0, 0.0];
   return function (point, v1, v2) {
     vec3.sub(pt, point, v1);
     vec3.sub(v2v1, v2, v1);
-    var len = vec3.sqrLen(v2v1);
-    var t = vec3.dot(pt, v2v1) / len;
+    const len = vec3.sqrLen(v2v1);
+    const t = vec3.dot(pt, v2v1) / len;
     if (t < 0.0) return vec3.sqrLen(pt);
     if (t > 1.0) return vec3.sqrLen(vec3.sub(pt, point, v2));
 
@@ -307,7 +307,7 @@ Geometry.distanceSqToSegment = (function () {
 
 /** Sign angle between two 2d vectors in radians */
 Geometry.signedAngle2d = function (v1, v2) {
-  var v1x = v1[0],
+  const v1x = v1[0],
     v1y = v1[1],
     v2x = v2[0],
     v2y = v2[1];
@@ -316,7 +316,7 @@ Geometry.signedAngle2d = function (v1, v2) {
 
 /** Distance from a vertex and a plane */
 Geometry.pointPlaneDistance = (function () {
-  var temp = [0.0, 0.0, 0.0];
+  const temp = [0.0, 0.0, 0.0];
   return function (v, ptPlane, nPlane) {
     return vec3.dot(vec3.sub(temp, v, ptPlane), nPlane);
   };
@@ -324,7 +324,7 @@ Geometry.pointPlaneDistance = (function () {
 
 /** Mirror a vertex according to a plane */
 Geometry.mirrorPoint = (function () {
-  var temp = [0.0, 0.0, 0.0];
+  const temp = [0.0, 0.0, 0.0];
   return function (v, ptPlane, nPlane) {
     return vec3.sub(v, v, vec3.scale(temp, nPlane, Geometry.pointPlaneDistance(v, ptPlane, nPlane) * 2.0));
   };
@@ -332,30 +332,30 @@ Geometry.mirrorPoint = (function () {
 
 /** Compute the projection of a vertex on a line */
 Geometry.vertexOnLine = (function () {
-  var ab = [0.0, 0.0, 0.0];
+  const ab = [0.0, 0.0, 0.0];
   return function (vertex, vNear, vFar) {
     vec3.sub(ab, vFar, vNear);
-    var proj = [0.0, 0.0, 0.0];
-    var dot = vec3.dot(ab, vec3.sub(proj, vertex, vNear));
+    const proj = [0.0, 0.0, 0.0];
+    const dot = vec3.dot(ab, vec3.sub(proj, vertex, vNear));
     return vec3.scaleAndAdd(proj, vNear, ab, dot / vec3.sqrLen(ab));
   };
 })();
 
 /** Return the intersection between a ray and a plane */
 Geometry.intersectLinePlane = function (s1, s2, origin, normal, out) {
-  var dist1 = vec3.dot(vec3.sub(out, s1, origin), normal);
-  var dist2 = vec3.dot(vec3.sub(out, s2, origin), normal);
+  const dist1 = vec3.dot(vec3.sub(out, s1, origin), normal);
+  const dist2 = vec3.dot(vec3.sub(out, s2, origin), normal);
   // ray copplanar to triangle
   if (dist1 === dist2)
     return s2;
   // intersection between ray and triangle
-  var val = -dist1 / (dist2 - dist1);
+  const val = -dist1 / (dist2 - dist1);
   return vec3.scaleAndAdd(out, s1, vec3.sub(out, s2, s1), val);
 };
 
 /** Return any perpendicular vector to another (normalized) vector */
 Geometry.getPerpendicularVector = function (vec) {
-  var perp = [0.0, 0.0, 0.0];
+  const perp = [0.0, 0.0, 0.0];
   if (vec[0] === 0.0)
     perp[0] = 1.0;
   else if (vec[1] === 0.0)

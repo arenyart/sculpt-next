@@ -37,7 +37,7 @@ class StateMultiresolution {
   }
 
   undo() {
-    var mul = this._multimesh;
+    const mul = this._multimesh;
     switch (this._type) {
     case StateMultiresolution.SELECTION:
       mul.selectMesh(this._mesh);
@@ -50,8 +50,8 @@ class StateMultiresolution {
       this._mesh.setVerticesMapping(this._vMappingState);
       break;
     case StateMultiresolution.SUBDIVISION:
-    case StateMultiresolution.REVERSION:
-      var nbVerts = this._mesh.getNbVertices();
+    case StateMultiresolution.REVERSION: {
+      const nbVerts = this._mesh.getNbVertices();
       this._mesh.setVertices(new Float32Array(this._vArState));
       this._mesh.setColors(new Float32Array(this._cArState));
       this._mesh.setMaterials(new Float32Array(this._mArState));
@@ -63,13 +63,14 @@ class StateMultiresolution {
       }
       break;
     }
+    }
 
     mul.setSelection(mul.findIndexFromMesh(this._mesh));
     this._main.setMesh(mul);
   }
 
   redo() {
-    var mul = this._multimesh;
+    const mul = this._multimesh;
     switch (this._type) {
     case StateMultiresolution.SELECTION:
       mul.selectMesh(this._mesh);

@@ -1,6 +1,6 @@
 import ShaderBase from './ShaderBase';
 
-var ShaderWireframe = ShaderBase.getCopy();
+const ShaderWireframe = ShaderBase.getCopy();
 ShaderWireframe.vertexName = ShaderWireframe.fragmentName = 'Wireframe';
 
 ShaderWireframe.uniforms = {};
@@ -33,7 +33,7 @@ ShaderWireframe.fragment = [
 
 ShaderWireframe.getOrCreate = ShaderBase.getOrCreate;
 ShaderWireframe.draw = function (mesh /*, main*/ ) {
-  var gl = mesh.getGL();
+  const gl = mesh.getGL();
   gl.useProgram(this.program);
   this.bindAttributes(mesh);
   this.updateUniforms(mesh);
@@ -42,7 +42,7 @@ ShaderWireframe.draw = function (mesh /*, main*/ ) {
   gl.drawElements(gl.LINES, mesh.getRenderNbEdges() * 2, gl.UNSIGNED_INT, 0);
 };
 ShaderWireframe.updateUniforms = function (mesh) {
-  var gl = mesh.getGL();
+  const gl = mesh.getGL();
   gl.uniformMatrix4fv(this.uniforms.uMVP, false, mesh.getMVP());
   gl.uniformMatrix4fv(this.uniforms.uEM, false, mesh.getEditMatrix());
 };

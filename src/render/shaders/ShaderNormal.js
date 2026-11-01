@@ -1,6 +1,6 @@
 import ShaderBase from './ShaderBase';
 
-var ShaderNormal = ShaderBase.getCopy();
+const ShaderNormal = ShaderBase.getCopy();
 ShaderNormal.vertexName = ShaderNormal.fragmentName = 'ShowNormal';
 
 ShaderNormal.uniforms = {};

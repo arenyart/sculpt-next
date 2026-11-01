@@ -42,7 +42,7 @@ class GuiMain {
 
   _updateSidebarsPosition() {
     if (!this.topbar) return;
-    var off = this.topbar.domTopbar.offsetHeight;
+    const off = this.topbar.domTopbar.offsetHeight;
     if (this.leftSidebar)
       this.leftSidebar._setTop(off);
     if (this.rightSidebar)
@@ -51,7 +51,7 @@ class GuiMain {
 
   addLeftSidebar() {
     this.leftSidebar = new Sidebar(this.cbResize_);
-    var domSide = this.leftSidebar.domSidebar;
+    const domSide = this.leftSidebar.domSidebar;
     this.domMain.appendChild(domSide);
     this.domMain.appendChild(this.leftSidebar.domResize);
 
@@ -62,7 +62,7 @@ class GuiMain {
 
   addRightSidebar() {
     this.rightSidebar = new Sidebar(this.cbResize_);
-    var domSide = this.rightSidebar.domSidebar;
+    const domSide = this.rightSidebar.domSidebar;
     this.domMain.appendChild(domSide);
     this.domMain.appendChild(this.rightSidebar.domResize);
 

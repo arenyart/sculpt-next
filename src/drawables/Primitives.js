@@ -2,21 +2,21 @@ import Utils from '../misc/Utils';
 import MeshStatic from '../mesh/meshStatic/MeshStatic';
 import Remesh from '../editing/Remesh';
 
-var Primitives = {};
+const Primitives = {};
 
-var createPlaneArray = function (
+const createPlaneArray = function (
   lx = -0.5, ly = 0.0, lz = -0.5,
   wx = 1.0, wy = 0.0, wz = 0.0,
   hx = 0.0, hy = 0.0, hz = 1.0
 ) {
 
-  var faces = new Float32Array(4);
+  const faces = new Float32Array(4);
   faces[0] = 0;
   faces[1] = 1;
   faces[2] = 2;
   faces[3] = 3;
 
-  var v = new Float32Array(12);
+  const v = new Float32Array(12);
   v[0] = lx;
   v[1] = ly;
   v[2] = lz;
@@ -39,20 +39,20 @@ var createPlaneArray = function (
   };
 };
 
-var createCubeArray = function (side = 1.0) {
-  var v = new Float32Array(24);
+const createCubeArray = function (side = 1.0) {
+  const v = new Float32Array(24);
   v[1] = v[2] = v[4] = v[6] = v[7] = v[9] = v[10] = v[11] = v[14] = v[18] = v[21] = v[23] = -side * 0.5;
   v[0] = v[3] = v[5] = v[8] = v[12] = v[13] = v[15] = v[16] = v[17] = v[19] = v[20] = v[22] = side * 0.5;
 
-  var uv = new Float32Array(28);
+  const uv = new Float32Array(28);
   uv[0] = uv[6] = uv[8] = uv[10] = uv[11] = uv[13] = uv[16] = uv[23] = uv[25] = 0.5;
   uv[1] = uv[3] = 1.0;
   uv[2] = uv[4] = uv[9] = uv[12] = uv[14] = uv[15] = uv[18] = 0.25;
   uv[5] = uv[7] = uv[21] = uv[24] = uv[26] = uv[27] = 0.75;
   uv[17] = uv[19] = uv[20] = uv[22] = 0.0;
 
-  var f = new Uint32Array(24);
-  var ft = new Uint32Array(24);
+  const f = new Uint32Array(24);
+  const ft = new Uint32Array(24);
   f[0] = f[8] = f[21] = ft[0] = 0;
   f[1] = f[11] = f[12] = ft[1] = 1;
   f[2] = f[15] = f[16] = ft[2] = ft[15] = ft[16] = 2;
@@ -76,17 +76,17 @@ var createCubeArray = function (side = 1.0) {
   };
 };
 
-var createCylinderArray = function (
+const createCylinderArray = function (
   radiusTop = 0.5, radiusBottom = 0.5, height = 2.0,
   radSegments = 64, heightSegments = 64, topCap = true, lowCap = true
 ) {
 
-  var isSingularTop = topCap && radiusTop === 0.0;
-  var isSingularBottom = lowCap && radiusBottom === 0.0;
-  var heightHalf = height * 0.5;
+  const isSingularTop = topCap && radiusTop === 0.0;
+  const isSingularBottom = lowCap && radiusBottom === 0.0;
+  const heightHalf = height * 0.5;
 
-  var nbVertices = (heightSegments + 1) * radSegments;
-  var nbFaces = heightSegments * radSegments;
+  let nbVertices = (heightSegments + 1) * radSegments;
+  let nbFaces = heightSegments * radSegments;
   if (topCap) {
     nbVertices += 1;
     nbFaces += radSegments;
@@ -99,20 +99,20 @@ var createCylinderArray = function (
     nbVertices -= radSegments;
     nbFaces -= radSegments;
   }
-  var vAr = new Float32Array(nbVertices * 3);
-  var fAr = new Uint32Array(nbFaces * 4);
+  const vAr = new Float32Array(nbVertices * 3);
+  const fAr = new Uint32Array(nbFaces * 4);
 
-  var id = 0;
-  var k = 0;
-  var i = 0;
-  var j = 0;
-  var startHeight = isSingularTop ? 1 : 0;
-  var endHeight = isSingularBottom ? heightSegments - 1 : heightSegments;
+  let id = 0;
+  let k = 0;
+  let i = 0;
+  let j = 0;
+  const startHeight = isSingularTop ? 1 : 0;
+  const endHeight = isSingularBottom ? heightSegments - 1 : heightSegments;
   for (i = startHeight; i <= endHeight; i++) {
-    var v = i / heightSegments;
-    var radius = v * (radiusBottom - radiusTop) + radiusTop;
+    const v = i / heightSegments;
+    const radius = v * (radiusBottom - radiusTop) + radiusTop;
     for (j = 0; j < radSegments; j++) {
-      var u = Math.PI * 2 * j / radSegments;
+      const u = Math.PI * 2 * j / radSegments;
       k = 3 * id++;
       vAr[k] = radius * Math.sin(u);
       vAr[k + 1] = -v * height + heightHalf;
@@ -122,7 +122,7 @@ var createCylinderArray = function (
 
   id = 0;
   for (j = 0; j < radSegments; j++) {
-    var off = j === radSegments - 1 ? 0 : j + 1;
+    const off = j === radSegments - 1 ? 0 : j + 1;
     for (i = startHeight; i < endHeight; i++) {
       k = 4 * id++;
       fAr[k] = radSegments * i + j;
@@ -132,7 +132,7 @@ var createCylinderArray = function (
     }
   }
 
-  var last;
+  let last;
   if (topCap) {
     last = (lowCap ? vAr.length - 6 : vAr.length - 3) / 3;
     vAr[last * 3 + 1] = heightHalf;
@@ -149,7 +149,7 @@ var createCylinderArray = function (
     last = (vAr.length - 3) / 3;
     vAr[last * 3 + 1] = -heightHalf;
     if (isSingularTop) --i;
-    var end = radSegments * i;
+    const end = radSegments * i;
     for (j = 0; j < radSegments; j++) {
       k = 4 * id++;
       fAr[k] = j === radSegments - 1 ? end : end + j + 1;
@@ -165,27 +165,27 @@ var createCylinderArray = function (
   };
 };
 
-var createTorusArray = function (radiusOut = 0.5, radiusWidth = 0.1, arc = Math.PI * 2, nbRadial = 32, nbTubular = 128) {
-  var isFull = Math.PI * 2 - arc < 1e-2;
+const createTorusArray = function (radiusOut = 0.5, radiusWidth = 0.1, arc = Math.PI * 2, nbRadial = 32, nbTubular = 128) {
+  const isFull = Math.PI * 2 - arc < 1e-2;
 
-  var nbVertices = nbRadial * nbTubular;
-  var nbFaces = nbVertices;
+  let nbVertices = nbRadial * nbTubular;
+  let nbFaces = nbVertices;
   if (!isFull) {
     nbVertices += 2;
     nbFaces += nbRadial;
   }
-  var endTubular = isFull ? nbTubular : nbTubular - 1;
+  const endTubular = isFull ? nbTubular : nbTubular - 1;
 
-  var vAr = new Float32Array(nbVertices * 3);
-  var fAr = new Uint32Array(nbFaces * 4);
-  var id = 0;
-  var k = 0;
-  var i = 0;
-  var j = 0;
+  const vAr = new Float32Array(nbVertices * 3);
+  const fAr = new Uint32Array(nbFaces * 4);
+  let id = 0;
+  let k = 0;
+  let i = 0;
+  let j = 0;
   for (i = 0; i < nbTubular; ++i) {
     for (j = 0; j < nbRadial; ++j) {
-      var u = i / endTubular * arc;
-      var v = j / nbRadial * Math.PI * 2;
+      const u = i / endTubular * arc;
+      const v = j / nbRadial * Math.PI * 2;
       k = 3 * id++;
       vAr[k] = (radiusOut + radiusWidth * Math.cos(v)) * Math.cos(u);
       vAr[k + 1] = radiusWidth * Math.sin(v);
@@ -195,11 +195,11 @@ var createTorusArray = function (radiusOut = 0.5, radiusWidth = 0.1, arc = Math.
 
   id = 0;
   for (i = 0; i < endTubular; ++i) {
-    var offi = i === nbTubular - 1 ? 0 : i + 1;
+    const offi = i === nbTubular - 1 ? 0 : i + 1;
     for (j = 0; j < nbRadial; ++j) {
       k = 4 * id++;
       fAr[k] = nbRadial * i + j;
-      var offj = j === nbRadial - 1 ? 0 : j + 1;
+      const offj = j === nbRadial - 1 ? 0 : j + 1;
       fAr[k + 1] = nbRadial * i + offj;
       fAr[k + 2] = nbRadial * offi + offj;
       fAr[k + 3] = nbRadial * offi + j;
@@ -207,7 +207,7 @@ var createTorusArray = function (radiusOut = 0.5, radiusWidth = 0.1, arc = Math.
   }
 
   if (!isFull) {
-    var last = (vAr.length - 6) / 3;
+    let last = (vAr.length - 6) / 3;
     vAr[last * 3] = radiusOut;
     for (j = 0; j < nbRadial; j++) {
       k = 4 * id++;
@@ -220,7 +220,7 @@ var createTorusArray = function (radiusOut = 0.5, radiusWidth = 0.1, arc = Math.
     ++last;
     vAr[last * 3] = radiusOut * Math.cos(arc);
     vAr[last * 3 + 2] = radiusOut * Math.sin(arc);
-    var end = nbRadial * i;
+    const end = nbRadial * i;
     for (j = 0; j < nbRadial; j++) {
       k = 4 * id++;
       fAr[k] = last;
@@ -236,7 +236,7 @@ var createTorusArray = function (radiusOut = 0.5, radiusWidth = 0.1, arc = Math.
   };
 };
 
-var createGridArray = function (
+const createGridArray = function (
   cx = -0.5, cy = 0.0, cz = -0.5,
   wx = 1.0, wy = 0.0, wz = 0.0,
   hx = 0.0, hy = 0.0, hz = 1.0,
@@ -246,15 +246,15 @@ var createGridArray = function (
   res1 += 2;
   res2 += 2;
 
-  var vAr = new Float32Array((res1 + res2) * 2 * 3);
-  var i = 0;
-  var j = 0;
-  var sx = wx / (res1 - 1);
-  var sy = wy / (res1 - 1);
-  var sz = wz / (res1 - 1);
-  var ux = cx + wx + hx;
-  var uy = cy + wy + hy;
-  var uz = cz + wz + hz;
+  const vAr = new Float32Array((res1 + res2) * 2 * 3);
+  let i = 0;
+  let j = 0;
+  let sx = wx / (res1 - 1);
+  let sy = wy / (res1 - 1);
+  let sz = wz / (res1 - 1);
+  const ux = cx + wx + hx;
+  const uy = cy + wy + hy;
+  const uz = cz + wz + hz;
   for (i = 0; i < res1; ++i) {
     j = i * 6;
     vAr[j] = cx + sx * i;
@@ -283,8 +283,8 @@ var createGridArray = function (
   };
 };
 
-var createMesh = function (gl, arr) {
-  var mesh = new MeshStatic(gl);
+const createMesh = function (gl, arr) {
+  const mesh = new MeshStatic(gl);
   mesh.setVertices(arr.vertices);
   if (arr.faces) mesh.setFaces(arr.faces);
   if (arr.uv && arr.facesUV) mesh.initTexCoordsDataFromOBJData(arr.uv, arr.facesUV);
@@ -294,10 +294,10 @@ var createMesh = function (gl, arr) {
   return mesh;
 };
 
-var slice = Array.prototype.slice;
+const slice = Array.prototype.slice;
 
 Primitives.createGrid = function (gl) {
-  var mesh = createMesh(gl, createGridArray.apply(this, slice.call(arguments, 1)));
+  const mesh = createMesh(gl, createGridArray.apply(this, slice.call(arguments, 1)));
   if (gl) {
     mesh.setMode(gl.LINES);
     mesh.setUseDrawArrays(true);
@@ -323,11 +323,11 @@ Primitives.createPlane = function (gl) {
 };
 
 Primitives.createArrow = function (gl, thick = 0.5, height = 2.0, rConeT = 5.0, rConeH = 0.2, radSegments = 4, heightSegments = 1) {
-  var base = createMesh(null, createCylinderArray(thick, thick, height, radSegments, heightSegments));
-  var cone = createMesh(null, createCylinderArray(0.0, thick * rConeT, height * rConeH, radSegments, heightSegments));
+  const base = createMesh(null, createCylinderArray(thick, thick, height, radSegments, heightSegments));
+  const cone = createMesh(null, createCylinderArray(0.0, thick * rConeT, height * rConeH, radSegments, heightSegments));
   cone.getMatrix()[13] = height * 0.5;
 
-  var arrow = {
+  const arrow = {
     vertices: null,
     faces: null
   };
@@ -336,7 +336,7 @@ Primitives.createArrow = function (gl, thick = 0.5, height = 2.0, rConeT = 5.0, 
 };
 
 Primitives.createLine2D = function (gl, lx = 0.0, ly = 0.0, ux = 0.0, uy = 0.0) {
-  var mesh = createMesh(gl, {
+  const mesh = createMesh(gl, {
     vertices: new Float32Array([lx, ly, 0.0, ux, uy, 0.0])
   });
   if (gl) {

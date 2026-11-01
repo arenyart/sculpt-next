@@ -5,7 +5,7 @@ import getOptionsURL from '../misc/getOptionsURL';
 import GuiSculptingTools from './GuiSculptingTools';
 import getKeyCode from '../misc/KeyCode';
 
-var GuiTools = GuiSculptingTools.tools;
+const GuiTools = GuiSculptingTools.tools;
 
 class GuiSculpting {
 
@@ -35,14 +35,14 @@ class GuiSculpting {
   }
 
   init(guiParent) {
-    var menu = this._menu = guiParent.addMenu(TR('sculptTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('sculptTitle'));
     menu.open();
 
     menu.addTitle(TR('sculptTool'));
 
     // sculpt tool
-    var optTools = [];
-    for (var i = 0, nbTools = Tools.length; i < nbTools; ++i) {
+    const optTools = [];
+    for (let i = 0, nbTools = Tools.length; i < nbTools; ++i) {
       if (Tools[i]) optTools[i] = TR(Tools[i].uiName);
     }
     this._ctrlSculpt = menu.addCombobox(TR('sculptTool'), this._sculptManager.getToolIndex(), this.onChangeTool.bind(this), optTools);
@@ -66,7 +66,7 @@ class GuiSculpting {
   }
 
   addEvents() {
-    var cbLoadAlpha = this.loadAlpha.bind(this);
+    const cbLoadAlpha = this.loadAlpha.bind(this);
     document.getElementById('alphaopen').addEventListener('change', cbLoadAlpha, false);
     this.removeCallback = function () {
       document.getElementById('alphaopen').removeEventListener('change', cbLoadAlpha, false);
@@ -85,7 +85,7 @@ class GuiSculpting {
     if (!this._invertSign)
       return;
     this._invertSign = false;
-    var tool = GuiTools[this.getSelectedTool()];
+    const tool = GuiTools[this.getSelectedTool()];
     if (tool.toggleNegative)
       tool.toggleNegative();
   }
@@ -95,10 +95,10 @@ class GuiSculpting {
     this._sculptManager.setToolIndex(newValue);
     GuiSculptingTools.show(newValue);
 
-    var showContinuous = this._sculptManager.canBeContinuous() === true;
+    const showContinuous = this._sculptManager.canBeContinuous() === true;
     this._ctrlContinuous.setVisibility(showContinuous);
 
-    var showSym = newValue !== Enums.Tools.TRANSFORM;
+    const showSym = newValue !== Enums.Tools.TRANSFORM;
     this._ctrlSymmetry.setVisibility(showSym);
 
     this._ctrlTitleCommon.setVisibility(showContinuous || showSym);
@@ -110,16 +110,16 @@ class GuiSculpting {
     if (event.target.files.length === 0)
       return;
 
-    var file = event.target.files[0];
+    const file = event.target.files[0];
     if (!file.type.match('image.*'))
       return;
 
-    var reader = new FileReader();
-    var main = this._main;
-    var tool = GuiTools[this._sculptManager.getToolIndex()];
+    const reader = new FileReader();
+    const main = this._main;
+    const tool = GuiTools[this._sculptManager.getToolIndex()];
 
     reader.onload = function (evt) {
-      var img = new Image();
+      const img = new Image();
       img.src = evt.target.result;
       img.onload = main.onLoadAlphaImage.bind(main, img, file.name || 'new alpha', tool);
     };
@@ -129,8 +129,8 @@ class GuiSculpting {
   }
 
   addAlphaOptions(opts) {
-    for (var i = 0, nbTools = GuiTools.length; i < nbTools; ++i) {
-      var gTool = GuiTools[i];
+    for (let i = 0, nbTools = GuiTools.length; i < nbTools; ++i) {
+      const gTool = GuiTools[i];
       if (gTool && gTool._ctrlAlpha) gTool._ctrlAlpha.addOptions(opts);
     }
   }
@@ -142,9 +142,9 @@ class GuiSculpting {
   _startModalBrushRadius(x, y) {
     this._refX = x;
     this._refY = y;
-    var cur = GuiTools[this.getSelectedTool()];
+    const cur = GuiTools[this.getSelectedTool()];
     if (cur._ctrlRadius) {
-      var rad = cur._ctrlRadius.getValue();
+      const rad = cur._ctrlRadius.getValue();
       this._refX -= rad;
       this._main.getSculptManager().getSelection().setOffsetX(-rad * this._main.getPixelRatio());
       this._main.renderSelectOverRtt();
@@ -152,7 +152,7 @@ class GuiSculpting {
   }
 
   _checkModifierKey(event) {
-    var selectedTool = this.getSelectedTool();
+    const selectedTool = this.getSelectedTool();
 
     if (this._main._action === Enums.Action.NOTHING) {
       if (event.shiftKey && !event.altKey && !event.ctrlKey) {
@@ -174,7 +174,7 @@ class GuiSculpting {
       // invert sign on alt key
       if (this._invertSign || event.shiftKey) return true;
       this._invertSign = true;
-      var curTool = GuiTools[selectedTool];
+      const curTool = GuiTools[selectedTool];
       if (curTool.toggleNegative)
         curTool.toggleNegative();
       return true;
@@ -189,8 +189,8 @@ class GuiSculpting {
     if (event.handled === true)
       return;
 
-    var main = this._main;
-    var shk = getOptionsURL.getShortKey(getKeyCode(event));
+    const main = this._main;
+    const shk = getOptionsURL.getShortKey(getKeyCode(event));
     event.stopPropagation();
 
     if (!main._focusGui || shk === Enums.KeyAction.RADIUS || shk === Enums.KeyAction.INTENSITY)
@@ -206,7 +206,7 @@ class GuiSculpting {
     if (shk !== undefined && Tools[shk])
       return this._ctrlSculpt.setValue(shk);
 
-    var cur = GuiTools[this.getSelectedTool()];
+    const cur = GuiTools[this.getSelectedTool()];
 
     switch (shk) {
     case Enums.KeyAction.DELETE:
@@ -222,17 +222,18 @@ class GuiSculpting {
     case Enums.KeyAction.NEGATIVE:
       if (cur.toggleNegative) cur.toggleNegative();
       break;
-    case Enums.KeyAction.PICKER:
-      var ctrlPicker = cur._ctrlPicker;
+    case Enums.KeyAction.PICKER: {
+      const ctrlPicker = cur._ctrlPicker;
       if (ctrlPicker && !ctrlPicker.getValue()) ctrlPicker.setValue(true);
       break;
+    }
     default:
       event.handled = false;
     }
   }
 
   onKeyUp(event) {
-    var releaseTool = this._main._action === Enums.Action.NOTHING && this._toolOnRelease !== -1 && !event.ctrlKey && !event.shiftKey;
+    const releaseTool = this._main._action === Enums.Action.NOTHING && this._toolOnRelease !== -1 && !event.ctrlKey && !event.shiftKey;
     if (!event.altKey || releaseTool)
       this.releaseInvertSign();
 
@@ -241,11 +242,11 @@ class GuiSculpting {
       this._toolOnRelease = -1;
     }
 
-    var main = this._main;
+    const main = this._main;
     switch (getOptionsURL.getShortKey(getKeyCode(event))) {
-    case Enums.KeyAction.RADIUS:
+    case Enums.KeyAction.RADIUS: {
       this._modalBrushRadius = main._focusGui = false;
-      var selRadius = this._main.getSculptManager().getSelection();
+      const selRadius = this._main.getSculptManager().getSelection();
       selRadius.setOffsetX(0.0);
       event.pageX = this._lastPageX;
       event.pageY = this._lastPageY;
@@ -253,11 +254,13 @@ class GuiSculpting {
       main.getPicking().intersectionMouseMeshes();
       main.renderSelectOverRtt();
       break;
-    case Enums.KeyAction.PICKER:
-      var cur = GuiTools[this.getSelectedTool()];
-      var ctrlPicker = cur._ctrlPicker;
+    }
+    case Enums.KeyAction.PICKER: {
+      const cur = GuiTools[this.getSelectedTool()];
+      const ctrlPicker = cur._ctrlPicker;
       if (ctrlPicker && ctrlPicker.getValue()) ctrlPicker.setValue(false);
       break;
+    }
     case Enums.KeyAction.INTENSITY:
       this._modalBrushIntensity = main._focusGui = false;
       break;
@@ -276,11 +279,11 @@ class GuiSculpting {
   }
 
   onMouseMove(event) {
-    var wid = GuiTools[this.getSelectedTool()];
+    const wid = GuiTools[this.getSelectedTool()];
 
     if (this._modalBrushRadius && wid._ctrlRadius) {
-      var dx = event.pageX - this._refX;
-      var dy = event.pageY - this._refY;
+      const dx = event.pageX - this._refX;
+      const dy = event.pageY - this._refY;
       wid._ctrlRadius.setValue(Math.sqrt(dx * dx + dy * dy));
       this._main.renderSelectOverRtt();
     }

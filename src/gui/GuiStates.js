@@ -13,11 +13,11 @@ class GuiTablet {
   }
 
   init(guiParent) {
-    var menu = this._menu = guiParent.addMenu(TR('stateTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('stateTitle'));
     menu.addButton(TR('stateUndo'), this, 'onUndo', 'CTRL+Z');
     menu.addButton(TR('stateRedo'), this, 'onRedo', 'CTRL+Y');
     menu.addTitle(TR('stateMaxStack'));
-    var states = this._main.getStateManager();
+    const states = this._main.getStateManager();
     menu.addSlider('', StateManager.STACK_LENGTH, states.setNewMaxStack.bind(states), 3, 50, 1);
   }
 
@@ -46,7 +46,7 @@ class GuiTablet {
     if (!this._main._focusGui)
       event.preventDefault();
 
-    var key = getKeyCode(event);
+    const key = getKeyCode(event);
     if (event.ctrlKey && key === 90) { // z key
       this.onUndo();
       event.handled = true;

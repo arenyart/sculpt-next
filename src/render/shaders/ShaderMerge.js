@@ -2,7 +2,7 @@ import ShaderBase from './ShaderBase';
 import Attribute from '../Attribute';
 import getOptionsURL from '../../misc/getOptionsURL';
 
-var ShaderMerge = ShaderBase.getCopy();
+const ShaderMerge = ShaderBase.getCopy();
 ShaderMerge.vertexName = ShaderMerge.fragmentName = 'Merge';
 
 ShaderMerge.FILMIC = getOptionsURL().filmic; // edited by the gui
@@ -41,7 +41,7 @@ ShaderMerge.fragment = [
 ].join('\n');
 
 ShaderMerge.draw = function (rtt, main) {
-  var gl = rtt.getGL();
+  const gl = rtt.getGL();
   gl.useProgram(this.program);
 
   ShaderMerge.attributes.aVertex.bindToBuffer(rtt.getVertexBuffer());

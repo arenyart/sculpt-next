@@ -10,7 +10,7 @@ class GuiTablet {
 
   init(guiParent) {
     // Pen tablet ui stuffs
-    var menu = this._menu = guiParent.addMenu(TR('pressureTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('pressureTitle'));
 
     menu.addTitle(TR('pressureRadius'));
     menu.addSlider('', Tablet, 'radiusFactor', 0, 1, 0.01);

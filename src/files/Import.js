@@ -3,7 +3,7 @@ import ImportSGL from './ImportSGL';
 import ImportPLY from './ImportPLY';
 import ImportSTL from './ImportSTL';
 
-var Import = {
+const Import = {
   importOBJ: ImportOBJ.importOBJ,
   importSGL: ImportSGL.importSGL,
   importPLY: ImportPLY.importPLY,

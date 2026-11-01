@@ -15,7 +15,7 @@ class Topbar {
   }
 
   _updateViewportPosition(viewport) {
-    var h = this.domTopbar.hidden ? 0 : this.domTopbar.offsetHeight;
+    const h = this.domTopbar.hidden ? 0 : this.domTopbar.offsetHeight;
     viewport.style.top = h + 'px';
     viewport.style.height = (viewport.clientHeight - h) + 'px';
   }
@@ -29,8 +29,8 @@ class Topbar {
   }
 
   addMenu(name) {
-    var menu = new Menu();
-    var li = document.createElement('li');
+    const menu = new Menu();
+    const li = document.createElement('li');
     li.setAttribute('onclick', 'void(0)'); // iOS trick to trigger click on hover
     li.innerHTML = name || '';
     this.domUl.appendChild(li);
@@ -40,9 +40,9 @@ class Topbar {
   }
 
   addExtra() {
-    var cb = this._onChangeColor;
-    var menu = this.addMenu('Extra UI');
-    var ext = this.uiExtra;
+    const cb = this._onChangeColor;
+    const menu = this.addMenu('Extra UI');
+    const ext = this.uiExtra;
     menu.addTitle('Overall');
     ext.overallColor = menu.addColor('', EditStyle._curWidgetColor, cb.bind(this, EditStyle.changeOverallColor));
 

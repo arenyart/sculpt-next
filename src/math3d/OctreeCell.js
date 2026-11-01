@@ -16,26 +16,26 @@ class OctreeCell {
   }
 
   resetNbFaces(nbFaces) {
-    var facesAll = this._iFaces;
+    const facesAll = this._iFaces;
     facesAll.length = nbFaces;
-    for (var i = 0; i < nbFaces; ++i)
+    for (let i = 0; i < nbFaces; ++i)
       facesAll[i] = i;
   }
 
   /** Subdivide octree, aabbSplit must be already set, and aabbLoose will be expanded if it's a leaf  */
   build(mesh) {
-    var i = 0;
+    let i = 0;
 
-    var stack = OctreeCell.STACK;
+    const stack = OctreeCell.STACK;
     stack[0] = this;
-    var curStack = 1;
-    var leaves = [];
+    let curStack = 1;
+    const leaves = [];
     while (curStack > 0) {
-      var cell = stack[--curStack];
-      var nbFaces = cell._iFaces.length;
+      const cell = stack[--curStack];
+      const nbFaces = cell._iFaces.length;
       if (nbFaces > OctreeCell.MAX_FACES && cell._depth < OctreeCell.MAX_DEPTH) {
         cell.constructChildren(mesh);
-        var children = cell._children;
+        const children = cell._children;
         for (i = 0; i < 8; ++i)
           stack[curStack + i] = children[i];
         curStack += 8;
@@ -44,35 +44,35 @@ class OctreeCell {
       }
     }
 
-    var nbLeaves = leaves.length;
+    const nbLeaves = leaves.length;
     for (i = 0; i < nbLeaves; ++i)
       leaves[i].constructLeaf(mesh);
   }
 
   /** Construct the leaf  */
   constructLeaf(mesh) {
-    var iFaces = this._iFaces;
-    var nbFaces = iFaces.length;
-    var bxmin = Infinity;
-    var bymin = Infinity;
-    var bzmin = Infinity;
-    var bxmax = -Infinity;
-    var bymax = -Infinity;
-    var bzmax = -Infinity;
-    var faceBoxes = mesh.getFaceBoxes();
-    var facePosInLeaf = mesh.getFacePosInLeaf();
-    var faceLeaf = mesh.getFaceLeaf();
-    for (var i = 0; i < nbFaces; ++i) {
-      var id = iFaces[i];
+    const iFaces = this._iFaces;
+    const nbFaces = iFaces.length;
+    let bxmin = Infinity;
+    let bymin = Infinity;
+    let bzmin = Infinity;
+    let bxmax = -Infinity;
+    let bymax = -Infinity;
+    let bzmax = -Infinity;
+    const faceBoxes = mesh.getFaceBoxes();
+    const facePosInLeaf = mesh.getFacePosInLeaf();
+    const faceLeaf = mesh.getFaceLeaf();
+    for (let i = 0; i < nbFaces; ++i) {
+      let id = iFaces[i];
       faceLeaf[id] = this;
       facePosInLeaf[id] = i;
       id *= 6;
-      var xmin = faceBoxes[id];
-      var ymin = faceBoxes[id + 1];
-      var zmin = faceBoxes[id + 2];
-      var xmax = faceBoxes[id + 3];
-      var ymax = faceBoxes[id + 4];
-      var zmax = faceBoxes[id + 5];
+      const xmin = faceBoxes[id];
+      const ymin = faceBoxes[id + 1];
+      const zmin = faceBoxes[id + 2];
+      const xmax = faceBoxes[id + 3];
+      const ymax = faceBoxes[id + 4];
+      const zmax = faceBoxes[id + 5];
       if (xmin < bxmin) bxmin = xmin;
       if (xmax > bxmax) bxmax = xmax;
       if (ymin < bymin) bymin = ymin;
@@ -85,46 +85,46 @@ class OctreeCell {
 
   /** Construct sub cells of the octree */
   constructChildren(mesh) {
-    var split = this._aabbSplit;
-    var xmin = split[0];
-    var ymin = split[1];
-    var zmin = split[2];
-    var xmax = split[3];
-    var ymax = split[4];
-    var zmax = split[5];
-    var dX = (xmax - xmin) * 0.5;
-    var dY = (ymax - ymin) * 0.5;
-    var dZ = (zmax - zmin) * 0.5;
-    var xcen = (xmax + xmin) * 0.5;
-    var ycen = (ymax + ymin) * 0.5;
-    var zcen = (zmax + zmin) * 0.5;
+    const split = this._aabbSplit;
+    const xmin = split[0];
+    const ymin = split[1];
+    const zmin = split[2];
+    const xmax = split[3];
+    const ymax = split[4];
+    const zmax = split[5];
+    const dX = (xmax - xmin) * 0.5;
+    const dY = (ymax - ymin) * 0.5;
+    const dZ = (zmax - zmin) * 0.5;
+    const xcen = (xmax + xmin) * 0.5;
+    const ycen = (ymax + ymin) * 0.5;
+    const zcen = (zmax + zmin) * 0.5;
 
-    var child0 = new OctreeCell(this);
-    var child1 = new OctreeCell(this);
-    var child2 = new OctreeCell(this);
-    var child3 = new OctreeCell(this);
-    var child4 = new OctreeCell(this);
-    var child5 = new OctreeCell(this);
-    var child6 = new OctreeCell(this);
-    var child7 = new OctreeCell(this);
+    const child0 = new OctreeCell(this);
+    const child1 = new OctreeCell(this);
+    const child2 = new OctreeCell(this);
+    const child3 = new OctreeCell(this);
+    const child4 = new OctreeCell(this);
+    const child5 = new OctreeCell(this);
+    const child6 = new OctreeCell(this);
+    const child7 = new OctreeCell(this);
 
-    var iFaces0 = child0._iFaces;
-    var iFaces1 = child1._iFaces;
-    var iFaces2 = child2._iFaces;
-    var iFaces3 = child3._iFaces;
-    var iFaces4 = child4._iFaces;
-    var iFaces5 = child5._iFaces;
-    var iFaces6 = child6._iFaces;
-    var iFaces7 = child7._iFaces;
-    var faceCenters = mesh.getFaceCenters();
-    var iFaces = this._iFaces;
-    var nbFaces = iFaces.length;
-    for (var i = 0; i < nbFaces; ++i) {
-      var iFace = iFaces[i];
-      var id = iFace * 3;
-      var cx = faceCenters[id];
-      var cy = faceCenters[id + 1];
-      var cz = faceCenters[id + 2];
+    const iFaces0 = child0._iFaces;
+    const iFaces1 = child1._iFaces;
+    const iFaces2 = child2._iFaces;
+    const iFaces3 = child3._iFaces;
+    const iFaces4 = child4._iFaces;
+    const iFaces5 = child5._iFaces;
+    const iFaces6 = child6._iFaces;
+    const iFaces7 = child7._iFaces;
+    const faceCenters = mesh.getFaceCenters();
+    const iFaces = this._iFaces;
+    const nbFaces = iFaces.length;
+    for (let i = 0; i < nbFaces; ++i) {
+      const iFace = iFaces[i];
+      const id = iFace * 3;
+      const cx = faceCenters[id];
+      const cy = faceCenters[id + 1];
+      const cz = faceCenters[id + 2];
 
       if (cx > xcen) {
         if (cy > ycen) {
@@ -160,7 +160,7 @@ class OctreeCell {
   }
 
   setAabbSplit(xmin, ymin, zmin, xmax, ymax, zmax) {
-    var aabb = this._aabbSplit;
+    const aabb = this._aabbSplit;
     aabb[0] = xmin;
     aabb[1] = ymin;
     aabb[2] = zmin;
@@ -170,7 +170,7 @@ class OctreeCell {
   }
 
   setAabbLoose(xmin, ymin, zmin, xmax, ymax, zmax) {
-    var aabb = this._aabbLoose;
+    const aabb = this._aabbLoose;
     aabb[0] = xmin;
     aabb[1] = ymin;
     aabb[2] = zmin;
@@ -181,39 +181,39 @@ class OctreeCell {
 
   /** Collect faces in cells hit by a ray */
   collectIntersectRay(vNear, eyeDir, collectFaces, leavesHit) {
-    var vx = vNear[0];
-    var vy = vNear[1];
-    var vz = vNear[2];
-    var irx = 1.0 / eyeDir[0];
-    var iry = 1.0 / eyeDir[1];
-    var irz = 1.0 / eyeDir[2];
-    var acc = 0;
+    const vx = vNear[0];
+    const vy = vNear[1];
+    const vz = vNear[2];
+    const irx = 1.0 / eyeDir[0];
+    const iry = 1.0 / eyeDir[1];
+    const irz = 1.0 / eyeDir[2];
+    let acc = 0;
 
-    var stack = OctreeCell.STACK;
+    const stack = OctreeCell.STACK;
     stack[0] = this;
-    var curStack = 1;
+    let curStack = 1;
     while (curStack > 0) {
-      var cell = stack[--curStack];
-      var loose = cell._aabbLoose;
-      var t1 = (loose[0] - vx) * irx;
-      var t2 = (loose[3] - vx) * irx;
-      var t3 = (loose[1] - vy) * iry;
-      var t4 = (loose[4] - vy) * iry;
-      var t5 = (loose[2] - vz) * irz;
-      var t6 = (loose[5] - vz) * irz;
-      var tmin = Math.max(Math.min(t1, t2), Math.min(t3, t4), Math.min(t5, t6));
-      var tmax = Math.min(Math.max(t1, t2), Math.max(t3, t4), Math.max(t5, t6));
+      const cell = stack[--curStack];
+      const loose = cell._aabbLoose;
+      const t1 = (loose[0] - vx) * irx;
+      const t2 = (loose[3] - vx) * irx;
+      const t3 = (loose[1] - vy) * iry;
+      const t4 = (loose[4] - vy) * iry;
+      const t5 = (loose[2] - vz) * irz;
+      const t6 = (loose[5] - vz) * irz;
+      const tmin = Math.max(Math.min(t1, t2), Math.min(t3, t4), Math.min(t5, t6));
+      const tmax = Math.min(Math.max(t1, t2), Math.max(t3, t4), Math.max(t5, t6));
       if (tmax < 0 || tmin > tmax) // no intersection
         continue;
 
-      var children = cell._children;
+      const children = cell._children;
       if (children.length === 8) {
-        for (var i = 0; i < 8; ++i)
+        for (let i = 0; i < 8; ++i)
           stack[curStack + i] = children[i];
         curStack += 8;
       } else {
         if (leavesHit) leavesHit.push(cell);
-        var iFaces = cell._iFaces;
+        const iFaces = cell._iFaces;
         collectFaces.set(iFaces, acc);
         acc += iFaces.length;
       }
@@ -223,20 +223,20 @@ class OctreeCell {
 
   /** Collect faces inside a sphere */
   collectIntersectSphere(vert, radiusSquared, collectFaces, leavesHit) {
-    var vx = vert[0];
-    var vy = vert[1];
-    var vz = vert[2];
-    var acc = 0;
+    const vx = vert[0];
+    const vy = vert[1];
+    const vz = vert[2];
+    let acc = 0;
 
-    var stack = OctreeCell.STACK;
+    const stack = OctreeCell.STACK;
     stack[0] = this;
-    var curStack = 1;
+    let curStack = 1;
     while (curStack > 0) {
-      var cell = stack[--curStack];
-      var loose = cell._aabbLoose;
-      var dx = 0.0;
-      var dy = 0.0;
-      var dz = 0.0;
+      const cell = stack[--curStack];
+      const loose = cell._aabbLoose;
+      let dx = 0.0;
+      let dy = 0.0;
+      let dz = 0.0;
 
       if (loose[0] > vx) dx = loose[0] - vx;
       else if (loose[3] < vx) dx = loose[3] - vx;
@@ -253,14 +253,14 @@ class OctreeCell {
       if ((dx * dx + dy * dy + dz * dz) > radiusSquared) // no intersection
         continue;
 
-      var children = cell._children;
+      const children = cell._children;
       if (children.length === 8) {
-        for (var i = 0; i < 8; ++i)
+        for (let i = 0; i < 8; ++i)
           stack[curStack + i] = children[i];
         curStack += 8;
       } else {
         if (leavesHit) leavesHit.push(cell);
-        var iFaces = cell._iFaces;
+        const iFaces = cell._iFaces;
         collectFaces.set(iFaces, acc);
         acc += iFaces.length;
       }
@@ -270,12 +270,12 @@ class OctreeCell {
 
   /** Add a face in the octree, subdivide the cell if necessary */
   addFace(faceId, bxmin, bymin, bzmin, bxmax, bymax, bzmax, cx, cy, cz) {
-    var stack = OctreeCell.STACK;
+    const stack = OctreeCell.STACK;
     stack[0] = this;
-    var curStack = 1;
+    let curStack = 1;
     while (curStack > 0) {
-      var cell = stack[--curStack];
-      var split = cell._aabbSplit;
+      const cell = stack[--curStack];
+      const split = cell._aabbSplit;
       if (cx <= split[0]) continue;
       if (cy <= split[1]) continue;
       if (cz <= split[2]) continue;
@@ -283,7 +283,7 @@ class OctreeCell {
       if (cy > split[4]) continue;
       if (cz > split[5]) continue;
 
-      var loose = cell._aabbLoose;
+      const loose = cell._aabbLoose;
       // expands cell aabb loose with aabb face
       if (bxmin < loose[0]) loose[0] = bxmin;
       if (bymin < loose[1]) loose[1] = bymin;
@@ -291,10 +291,10 @@ class OctreeCell {
       if (bxmax > loose[3]) loose[3] = bxmax;
       if (bymax > loose[4]) loose[4] = bymax;
       if (bzmax > loose[5]) loose[5] = bzmax;
-      var children = cell._children;
+      const children = cell._children;
 
       if (children.length === 8) {
-        for (var i = 0; i < 8; ++i)
+        for (let i = 0; i < 8; ++i)
           stack[curStack + i] = children[i];
         curStack += 8;
       } else {
@@ -306,18 +306,18 @@ class OctreeCell {
 
   /** Cut leaves if needed */
   pruneIfPossible() {
-    var cell = this;
+    let cell = this;
     while (cell._parent) {
-      var parent = cell._parent;
+      const parent = cell._parent;
 
-      var children = parent._children;
+      const children = parent._children;
       // means that the current cell has already pruned
       if (children.length === 0)
         return;
 
       // check if we can prune
-      for (var i = 0; i < 8; ++i) {
-        var child = children[i];
+      for (let i = 0; i < 8; ++i) {
+        const child = children[i];
         if (child._iFaces.length > 0 || child._children.length === 8) {
           return;
         }
@@ -330,10 +330,10 @@ class OctreeCell {
 
   /** Expand aabb loose */
   expandsAabbLoose(bxmin, bymin, bzmin, bxmax, bymax, bzmax) {
-    var parent = this;
+    let parent = this;
     while (parent) {
-      var pLoose = parent._aabbLoose;
-      var proceed = false;
+      const pLoose = parent._aabbLoose;
+      let proceed = false;
       if (bxmin < pLoose[0]) {
         pLoose[0] = bxmin;
         proceed = true;
@@ -368,9 +368,9 @@ OctreeCell.FLAG = 0;
 OctreeCell.MAX_DEPTH = 8;
 OctreeCell.MAX_FACES = 100; // maximum faces per cell
 (function () {
-  var nb = 1 + 7 * OctreeCell.MAX_DEPTH;
-  var stack = OctreeCell.STACK = new Array(nb);
-  for (var i = 0; i < nb; ++i)
+  const nb = 1 + 7 * OctreeCell.MAX_DEPTH;
+  const stack = OctreeCell.STACK = new Array(nb);
+  for (let i = 0; i < nb; ++i)
     stack[i] = null;
 })();
 

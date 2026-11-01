@@ -10,8 +10,8 @@ import french from './tr/french';
 import german from './tr/german';
 import italian from './tr/italian';
 
-var GuiTR = function (key) {
-  var str = GuiTR.languages[GuiTR.select][key] || GuiTR.languages.english[key];
+const GuiTR = function (key) {
+  const str = GuiTR.languages[GuiTR.select][key] || GuiTR.languages.english[key];
   if (typeof str === 'string')
     return str;
   if (typeof str === 'function')
@@ -34,7 +34,7 @@ GuiTR.languages = {
 };
 
 GuiTR.select = 'english';
-var language = window.navigator.language;
+let language = window.navigator.language;
 if (language) language = language.slice(0, 2);
 if (language === 'ja') GuiTR.select = '日本語';
 else if (language === 'zh') GuiTR.select = '中文';

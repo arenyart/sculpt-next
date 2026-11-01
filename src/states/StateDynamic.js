@@ -29,7 +29,7 @@ class StateDynamic {
   undo() {
     this.pullVertices();
     this.pullFaces();
-    var mesh = this._mesh;
+    const mesh = this._mesh;
     // mesh.getVerticesRingFace().length = this._nbVerticesState;
     // mesh.getVerticesRingVert().length = this._nbVerticesState;
     mesh.setNbVertices(this._nbVerticesState);
@@ -51,32 +51,32 @@ class StateDynamic {
   }
 
   createRedo() {
-    var redo = new StateDynamic(this._main, this._mesh);
+    const redo = new StateDynamic(this._main, this._mesh);
     this.pushRedoVertices(redo);
     this.pushRedoFaces(redo);
     return redo;
   }
 
   pushVertices(iVerts) {
-    var idVertState = this._idVertState;
-    var fRingState = this._fRingState;
-    var vRingState = this._vRingState;
-    var vArState = this._vArState;
-    var cArState = this._cArState;
-    var mArState = this._mArState;
+    const idVertState = this._idVertState;
+    const fRingState = this._fRingState;
+    const vRingState = this._vRingState;
+    const vArState = this._vArState;
+    const cArState = this._cArState;
+    const mArState = this._mArState;
 
-    var mesh = this._mesh;
-    var fRing = mesh.getVerticesRingFace();
-    var vRing = mesh.getVerticesRingVert();
-    var vAr = mesh.getVertices();
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
-    var vStateFlags = mesh.getVerticesStateFlags();
+    const mesh = this._mesh;
+    const fRing = mesh.getVerticesRingFace();
+    const vRing = mesh.getVerticesRingVert();
+    const vAr = mesh.getVertices();
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
+    const vStateFlags = mesh.getVerticesStateFlags();
 
-    var stateFlag = Utils.STATE_FLAG;
-    var nbVerts = iVerts.length;
-    for (var i = 0; i < nbVerts; ++i) {
-      var id = iVerts[i];
+    const stateFlag = Utils.STATE_FLAG;
+    const nbVerts = iVerts.length;
+    for (let i = 0; i < nbVerts; ++i) {
+      let id = iVerts[i];
       if (vStateFlags[id] === stateFlag)
         continue;
       vStateFlags[id] = stateFlag;
@@ -91,17 +91,17 @@ class StateDynamic {
   }
 
   pushFaces(iFaces) {
-    var idFaceState = this._idFaceState;
-    var fArState = this._fArState;
+    const idFaceState = this._idFaceState;
+    const fArState = this._fArState;
 
-    var mesh = this._mesh;
-    var fAr = mesh.getFaces();
-    var fStateFlags = mesh.getFacesStateFlags();
+    const mesh = this._mesh;
+    const fAr = mesh.getFaces();
+    const fStateFlags = mesh.getFacesStateFlags();
 
-    var stateFlag = Utils.STATE_FLAG;
-    var nbFaces = iFaces.length;
-    for (var i = 0; i < nbFaces; ++i) {
-      var id = iFaces[i];
+    const stateFlag = Utils.STATE_FLAG;
+    const nbFaces = iFaces.length;
+    for (let i = 0; i < nbFaces; ++i) {
+      let id = iFaces[i];
       if (fStateFlags[id] === stateFlag)
         continue;
       fStateFlags[id] = stateFlag;
@@ -112,22 +112,22 @@ class StateDynamic {
   }
 
   pushRedoVertices(redoState) {
-    var mesh = redoState._mesh;
-    var nbMeshVertices = mesh.getNbVertices();
-    var fRing = mesh.getVerticesRingFace();
-    var vRing = mesh.getVerticesRingVert();
-    var vAr = mesh.getVertices();
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
+    const mesh = redoState._mesh;
+    const nbMeshVertices = mesh.getNbVertices();
+    const fRing = mesh.getVerticesRingFace();
+    const vRing = mesh.getVerticesRingVert();
+    const vAr = mesh.getVertices();
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
 
-    var i = 0;
-    var id = 0;
-    var acc = 0;
-    var idVertUndoState = this._idVertState;
-    var nbVerts = idVertUndoState.length;
-    var nbVerticesState = this._nbVerticesState;
-    var nbMin = Math.min(nbVerticesState, nbMeshVertices);
-    var idVertRedoState = new Uint32Array(Utils.getMemory(nbMeshVertices * 4), 0, nbMeshVertices);
+    let i = 0;
+    let id = 0;
+    let acc = 0;
+    const idVertUndoState = this._idVertState;
+    let nbVerts = idVertUndoState.length;
+    const nbVerticesState = this._nbVerticesState;
+    const nbMin = Math.min(nbVerticesState, nbMeshVertices);
+    let idVertRedoState = new Uint32Array(Utils.getMemory(nbMeshVertices * 4), 0, nbMeshVertices);
     for (i = 0; i < nbVerts; ++i) {
       id = idVertUndoState[i];
       if (id < nbMin)
@@ -139,17 +139,17 @@ class StateDynamic {
 
     nbVerts = acc;
     idVertRedoState = redoState._idVertState = new Uint32Array(idVertRedoState.subarray(0, nbVerts));
-    var fRingRedoState = redoState._fRingState = new Array(nbVerts);
-    var vRingRedoState = redoState._vRingState = new Array(nbVerts);
-    var vArRedoState = redoState._vArState = new Float32Array(nbVerts * 3);
-    var cArRedoState = redoState._cArState = new Float32Array(nbVerts * 3);
-    var mArRedoState = redoState._mArState = new Float32Array(nbVerts * 3);
+    const fRingRedoState = redoState._fRingState = new Array(nbVerts);
+    const vRingRedoState = redoState._vRingState = new Array(nbVerts);
+    const vArRedoState = redoState._vArState = new Float32Array(nbVerts * 3);
+    const cArRedoState = redoState._cArState = new Float32Array(nbVerts * 3);
+    const mArRedoState = redoState._mArState = new Float32Array(nbVerts * 3);
     for (i = 0; i < nbVerts; ++i) {
       id = idVertRedoState[i];
       fRingRedoState[i] = fRing[id].slice();
       vRingRedoState[i] = vRing[id].slice();
       id *= 3;
-      var j = i * 3;
+      const j = i * 3;
       vArRedoState[j] = vAr[id];
       vArRedoState[j + 1] = vAr[id + 1];
       vArRedoState[j + 2] = vAr[id + 2];
@@ -163,18 +163,18 @@ class StateDynamic {
   }
 
   pushRedoFaces(redoState) {
-    var mesh = redoState._mesh;
-    var nbMeshFaces = mesh.getNbFaces();
-    var fAr = mesh.getFaces();
+    const mesh = redoState._mesh;
+    const nbMeshFaces = mesh.getNbFaces();
+    const fAr = mesh.getFaces();
 
-    var i = 0;
-    var id = 0;
-    var acc = 0;
-    var idFaceUndoState = this._idFaceState;
-    var nbFaces = idFaceUndoState.length;
-    var nbFacesState = this._nbFacesState;
-    var nbMin = Math.min(nbFacesState, nbMeshFaces);
-    var idFaceRedoState = new Uint32Array(Utils.getMemory(nbMeshFaces * 4), 0, nbMeshFaces);
+    let i = 0;
+    let id = 0;
+    let acc = 0;
+    const idFaceUndoState = this._idFaceState;
+    let nbFaces = idFaceUndoState.length;
+    const nbFacesState = this._nbFacesState;
+    const nbMin = Math.min(nbFacesState, nbMeshFaces);
+    let idFaceRedoState = new Uint32Array(Utils.getMemory(nbMeshFaces * 4), 0, nbMeshFaces);
     for (i = 0; i < nbFaces; ++i) {
       id = idFaceUndoState[i];
       if (id < nbMin)
@@ -186,11 +186,11 @@ class StateDynamic {
 
     nbFaces = acc;
     idFaceRedoState = redoState._idFaceState = new Uint32Array(idFaceRedoState.subarray(0, nbFaces));
-    var fArRedoState = redoState._fArState = new Int32Array(nbFaces * 4);
+    const fArRedoState = redoState._fArState = new Int32Array(nbFaces * 4);
     for (i = 0; i < nbFaces; ++i) {
       id = idFaceRedoState[i];
       id *= 4;
-      var j = i * 4;
+      const j = i * 4;
       fArRedoState[j] = fAr[id];
       fArRedoState[j + 1] = fAr[id + 1];
       fArRedoState[j + 2] = fAr[id + 2];
@@ -199,29 +199,29 @@ class StateDynamic {
   }
 
   pullVertices() {
-    var nbMeshVertices = this._nbVerticesState;
-    var fRingState = this._fRingState;
-    var vRingState = this._vRingState;
-    var vArState = this._vArState;
-    var cArState = this._cArState;
-    var mArState = this._mArState;
-    var idVertState = this._idVertState;
-    var nbVerts = idVertState.length;
+    const nbMeshVertices = this._nbVerticesState;
+    const fRingState = this._fRingState;
+    const vRingState = this._vRingState;
+    const vArState = this._vArState;
+    const cArState = this._cArState;
+    const mArState = this._mArState;
+    const idVertState = this._idVertState;
+    const nbVerts = idVertState.length;
 
-    var mesh = this._mesh;
-    var fRing = mesh.getVerticesRingFace();
-    var vRing = mesh.getVerticesRingVert();
-    var vAr = mesh.getVertices();
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
-    for (var i = 0; i < nbVerts; ++i) {
-      var id = idVertState[i];
+    const mesh = this._mesh;
+    const fRing = mesh.getVerticesRingFace();
+    const vRing = mesh.getVerticesRingVert();
+    const vAr = mesh.getVertices();
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
+    for (let i = 0; i < nbVerts; ++i) {
+      let id = idVertState[i];
       if (id >= nbMeshVertices)
         continue;
       fRing[id] = fRingState[i].slice();
       vRing[id] = vRingState[i].slice();
       id *= 3;
-      var j = i * 3;
+      const j = i * 3;
       vAr[id] = vArState[j];
       vAr[id + 1] = vArState[j + 1];
       vAr[id + 2] = vArState[j + 2];
@@ -235,19 +235,19 @@ class StateDynamic {
   }
 
   pullFaces() {
-    var nbMeshFaces = this._nbFacesState;
-    var fArState = this._fArState;
-    var idFaceState = this._idFaceState;
-    var nbFaces = idFaceState.length;
+    const nbMeshFaces = this._nbFacesState;
+    const fArState = this._fArState;
+    const idFaceState = this._idFaceState;
+    const nbFaces = idFaceState.length;
 
-    var mesh = this._mesh;
-    var fAr = mesh.getFaces();
-    for (var i = 0; i < nbFaces; ++i) {
-      var id = idFaceState[i];
+    const mesh = this._mesh;
+    const fAr = mesh.getFaces();
+    for (let i = 0; i < nbFaces; ++i) {
+      let id = idFaceState[i];
       if (id >= nbMeshFaces)
         continue;
       id *= 4;
-      var j = i * 4;
+      const j = i * 4;
       fAr[id] = fArState[j];
       fAr[id + 1] = fArState[j + 1];
       fAr[id + 2] = fArState[j + 2];

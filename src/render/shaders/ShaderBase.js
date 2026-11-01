@@ -5,7 +5,7 @@ import Attribute from '../Attribute';
 import colorSpaceGLSL from './glsl/colorSpace.glsl?raw';
 import curvatureGLSL from './glsl/curvature.glsl?raw';
 
-var ShaderBase = {};
+const ShaderBase = {};
 ShaderBase.vertexName = 'VertexName';
 ShaderBase.fragmentName = 'FragmentName';
 
@@ -62,15 +62,15 @@ ShaderBase.strings.fragColorFunction = [
   '}'
 ].join('\n');
 
-var processShader = function (str) {
+const processShader = function (str) {
   // move extension enable/require to the top of file
-  var extensions = '';
-  var matches = str.match(/^\s*(#extension).*/gm);
+  let extensions = '';
+  const matches = str.match(/^\s*(#extension).*/gm);
   if (matches) {
-    var extMap = {};
+    const extMap = {};
 
-    for (var i = 0, nb = matches.length; i < nb; ++i) {
-      var ext = matches[i].slice(matches[i].indexOf('#extension'));
+    for (let i = 0, nb = matches.length; i < nb; ++i) {
+      const ext = matches[i].slice(matches[i].indexOf('#extension'));
       str = str.replace(matches[i], '');
       if (extMap[ext])
         continue;
@@ -79,13 +79,13 @@ var processShader = function (str) {
     }
   }
 
-  var version = '';
+  let version = '';
   if (str.indexOf('#version') === -1) {
     version += '#version 100\n';
   }
 
-  var precision = '';
-  var regPrecision = /precision\s+(high|low|medium)p\s+float/;
+  let precision = '';
+  const regPrecision = /precision\s+(high|low|medium)p\s+float/;
   if (!regPrecision.test(str)) {
     precision += '#ifdef GL_FRAGMENT_PRECISION_HIGH\n  precision highp float;\n#else\n  precision mediump float;\n#endif\n';
   }
@@ -98,27 +98,27 @@ ShaderBase.getOrCreate = function (gl) {
   if (this.program)
     return this;
 
-  var vname = '\n#define SHADER_NAME ' + this.vertexName + '\n';
-  var fname = '\n#define SHADER_NAME ' + this.fragmentName + '\n';
+  const vname = '\n#define SHADER_NAME ' + this.vertexName + '\n';
+  const fname = '\n#define SHADER_NAME ' + this.fragmentName + '\n';
 
-  var vShader = gl.createShader(gl.VERTEX_SHADER);
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vShader, processShader(this.vertex + vname));
   gl.compileShader(vShader);
 
-  var fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fShader, processShader(this.fragment + fname));
   gl.compileShader(fShader);
 
-  var program = this.program = gl.createProgram();
+  const program = this.program = gl.createProgram();
 
   gl.attachShader(program, vShader);
   gl.attachShader(program, fShader);
   gl.linkProgram(program);
   gl.useProgram(program);
 
-  var logV = gl.getShaderInfoLog(vShader);
-  var logF = gl.getShaderInfoLog(fShader);
-  var logP = gl.getProgramInfoLog(program);
+  const logV = gl.getShaderInfoLog(vShader);
+  const logF = gl.getShaderInfoLog(fShader);
+  const logP = gl.getProgramInfoLog(program);
   if (logV) console.warn(this.vertexName + ' (vertex)\n' + logV);
   if (logF) console.warn(this.fragmentName + ' (fragment)\n' + logF);
   if (logP) console.warn(this.fragmentName + ' (program)\n' + logP);
@@ -135,24 +135,24 @@ ShaderBase.getOrCreate = function (gl) {
 };
 
 ShaderBase.initUniforms = function (gl) {
-  var program = this.program;
-  var unifNames = this.uniformNames;
-  var unifs = this.uniforms;
-  for (var i = 0, l = unifNames.length; i < l; ++i) {
-    var name = unifNames[i];
+  const program = this.program;
+  const unifNames = this.uniformNames;
+  const unifs = this.uniforms;
+  for (let i = 0, l = unifNames.length; i < l; ++i) {
+    const name = unifNames[i];
     unifs[name] = gl.getUniformLocation(program, name);
   }
 };
 
 ShaderBase.updateUniforms = (function () {
-  var tmp = [0.0, 0.0, 0.0];
+  const tmp = [0.0, 0.0, 0.0];
   return function (mesh, main) {
-    var gl = mesh.getGL();
+    const gl = mesh.getGL();
 
-    var darken = ShaderBase.darkenUnselected && main.getIndexSelectMesh(mesh) < 0;
-    var useSym = ShaderBase.showSymmetryLine && (mesh.getID() === main.getMesh().getID()) && main.getSculptManager().getSymmetry();
+    const darken = ShaderBase.darkenUnselected && main.getIndexSelectMesh(mesh) < 0;
+    const useSym = ShaderBase.showSymmetryLine && (mesh.getID() === main.getMesh().getID()) && main.getSculptManager().getSymmetry();
 
-    var uniforms = this.uniforms;
+    const uniforms = this.uniforms;
 
     gl.uniformMatrix4fv(uniforms.uEM, false, mesh.getEditMatrix());
     gl.uniformMatrix3fv(uniforms.uEN, false, mesh.getEN());
@@ -168,13 +168,13 @@ ShaderBase.updateUniforms = (function () {
     gl.uniform1f(uniforms.uAlpha, mesh.getOpacity());
 
     gl.uniform1f(uniforms.uCurvature, mesh.getCurvature());
-    var cam = main.getCamera();
+    const cam = main.getCamera();
     gl.uniform1f(uniforms.uFov, cam.isOrthographic() ? -Math.abs(cam._trans[2]) * 25.0 : cam.getFov());
   };
 })();
 
 ShaderBase.draw = function (mesh, main) {
-  var gl = mesh.getGL();
+  const gl = mesh.getGL();
   gl.useProgram(this.program);
   this.bindAttributes(mesh);
   this.updateUniforms(mesh, main);
@@ -182,7 +182,7 @@ ShaderBase.draw = function (mesh, main) {
 };
 
 ShaderBase.drawBuffer = function (mesh) {
-  var gl = mesh.getGL();
+  const gl = mesh.getGL();
   if (mesh.isUsingDrawArrays()) {
     gl.drawArrays(mesh.getMode(), 0, mesh.getCount());
   } else {
@@ -233,15 +233,15 @@ ShaderBase.getOrCreateTexture0 = function (gl, texPath, main) {
   if (this.texture0 !== undefined)
     return this.texture0;
   this.texture0 = null; // trigger loading
-  var tex = new Image();
+  const tex = new Image();
   tex.src = texPath;
   tex.onload = this.onLoadTexture0.bind(this, gl, tex, main);
   return false;
 };
 
 ShaderBase.initAttributes = function (gl) {
-  var program = this.program;
-  var attrs = this.attributes;
+  const program = this.program;
+  const attrs = this.attributes;
   attrs.aVertex = new Attribute(gl, program, 'aVertex', 3, gl.FLOAT);
   attrs.aNormal = new Attribute(gl, program, 'aNormal', 3, gl.FLOAT);
   attrs.aColor = new Attribute(gl, program, 'aColor', 3, gl.FLOAT);
@@ -249,8 +249,8 @@ ShaderBase.initAttributes = function (gl) {
 };
 
 ShaderBase.bindAttributes = function (mesh) {
-  var attrs = this.attributes;
-  var active = this.activeAttributes;
+  const attrs = this.attributes;
+  const active = this.activeAttributes;
   if (active.vertex) attrs.aVertex.bindToBuffer(mesh.getVertexBuffer());
   if (active.normal) attrs.aNormal.bindToBuffer(mesh.getNormalBuffer());
   if (active.color) attrs.aColor.bindToBuffer(mesh.getColorBuffer());
@@ -258,8 +258,8 @@ ShaderBase.bindAttributes = function (mesh) {
 };
 
 ShaderBase.unbindAttributes = function () {
-  var attrs = this.attributes;
-  var active = this.activeAttributes;
+  const attrs = this.attributes;
+  const active = this.activeAttributes;
   if (active.vertex) attrs.aVertex.unbind();
   if (active.normal) attrs.aNormal.unbind();
   if (active.color) attrs.aColor.unbind();
@@ -267,9 +267,9 @@ ShaderBase.unbindAttributes = function () {
 };
 
 ShaderBase.getCopy = function () {
-  var keys = Object.keys(ShaderBase);
-  var obj = {};
-  for (var i = 0, nb = keys.length; i < nb; ++i)
+  const keys = Object.keys(ShaderBase);
+  const obj = {};
+  for (let i = 0, nb = keys.length; i < nb; ++i)
     obj[keys[i]] = this[keys[i]];
   obj.program = null;
   return obj;

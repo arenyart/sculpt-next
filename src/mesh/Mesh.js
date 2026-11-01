@@ -20,8 +20,8 @@ mesh.init(); // compute octree/topo/UV, etc...
 mesh.initRender(); // only if gl has been provided
 */
 
-var DEF_ROUGHNESS = 0.18; // 0.18;
-var DEF_METALNESS = 0.08; // 0.08;
+const DEF_ROUGHNESS = 0.18; // 0.18;
+const DEF_METALNESS = 0.08; // 0.08;
 
 class Mesh {
 
@@ -35,8 +35,8 @@ class Mesh {
 
   static sortFunction(meshA, meshB) {
     // render transparent (back to front) after opaque (front to back) ones
-    var aTr = meshA.isTransparent();
-    var bTr = meshB.isTransparent();
+    const aTr = meshA.isTransparent();
+    const bTr = meshB.isTransparent();
     if (aTr && !bTr) return 1;
     if (!aTr && bTr) return -1;
     return (meshB.getDepth() - meshA.getDepth()) * (aTr && bTr ? 1.0 : -1.0);
@@ -319,7 +319,7 @@ class Mesh {
   }
 
   getScale2() {
-    var m = this._transformData._matrix;
+    const m = this._transformData._matrix;
     return m[0] * m[0] + m[4] * m[4] + m[8] * m[8];
   }
 
@@ -328,9 +328,9 @@ class Mesh {
   }
 
   getSymmetryOrigin() {
-    var orig = vec3.create();
-    var tdata = this._transformData;
-    var offset = tdata._symmetryOffset * this.computeLocalRadius();
+    const orig = vec3.create();
+    const tdata = this._transformData;
+    const offset = tdata._symmetryOffset * this.computeLocalRadius();
     return vec3.scaleAndAdd(orig, tdata._center, tdata._symmetryNormal, offset);
   }
 
@@ -395,12 +395,12 @@ class Mesh {
   }
 
   allocateArrays() {
-    var nbVertices = this.getNbVertices();
+    const nbVertices = this.getNbVertices();
 
     if (this.hasUV()) {
-      var nbTexCoords = this._meshData._texCoordsST.length / 2;
+      const nbTexCoords = this._meshData._texCoordsST.length / 2;
 
-      var tmp = new Float32Array(nbTexCoords * 3);
+      let tmp = new Float32Array(nbTexCoords * 3);
       tmp.set(this._meshData._verticesXYZ);
       this._meshData._verticesXYZ = tmp;
 
@@ -428,7 +428,7 @@ class Mesh {
     this._meshData._vertStateFlags = new Int32Array(nbVertices);
     this._meshData._vertProxy = new Float32Array(nbVertices * 3);
 
-    var nbFaces = this.getNbFaces();
+    const nbFaces = this.getNbFaces();
     this._meshData._faceEdges = new Uint32Array(nbFaces * 4);
     this._meshData._facesToTriangles = new Uint32Array(nbFaces);
     this._meshData._faceBoxes = new Float32Array(nbFaces * 6);
@@ -437,26 +437,26 @@ class Mesh {
     this._meshData._facesTagFlags = new Int32Array(nbFaces);
 
     this._meshData._facePosInLeaf = new Uint32Array(nbFaces);
-    var faceLeaf = this._meshData._faceLeaf;
+    const faceLeaf = this._meshData._faceLeaf;
     faceLeaf.length = nbFaces;
-    for (var i = 0; i < nbFaces; ++i)
+    for (let i = 0; i < nbFaces; ++i)
       faceLeaf[i] = null;
   }
 
   /** Init color and material array */
   initColorsAndMaterials() {
-    var nbVertices = this.getNbVertices();
-    var i = 0;
-    var len = nbVertices * 3;
+    const nbVertices = this.getNbVertices();
+    let i = 0;
+    const len = nbVertices * 3;
     if (!this._meshData._colorsRGB || this._meshData._colorsRGB.length !== len) {
-      var cAr = this._meshData._colorsRGB = new Float32Array(len);
+      const cAr = this._meshData._colorsRGB = new Float32Array(len);
       for (i = 0; i < len; ++i)
         cAr[i] = 1.0;
     }
     if (!this._meshData._materialsPBR || this._meshData._materialsPBR.length !== len) {
-      var mAr = this._meshData._materialsPBR = new Float32Array(len);
+      const mAr = this._meshData._materialsPBR = new Float32Array(len);
       for (i = 0; i < nbVertices; ++i) {
-        var j = i * 3;
+        const j = i * 3;
         mAr[j] = DEF_ROUGHNESS;
         mAr[j + 1] = DEF_METALNESS;
         mAr[j + 2] = 1.0;
@@ -466,39 +466,39 @@ class Mesh {
 
   /** Computes faces ring around vertices */
   initFaceRings() {
-    var fAr = this.getFaces();
-    var nbVertices = this.getNbVertices();
-    var nbFaces = this.getNbFaces();
-    var i = 0;
-    var id = 0;
-    var countRing = new Uint32Array(nbVertices);
+    const fAr = this.getFaces();
+    const nbVertices = this.getNbVertices();
+    const nbFaces = this.getNbFaces();
+    let i = 0;
+    let id = 0;
+    const countRing = new Uint32Array(nbVertices);
     for (i = 0; i < nbFaces; ++i) {
       id = i * 4;
       countRing[fAr[id]]++;
       countRing[fAr[id + 1]]++;
       countRing[fAr[id + 2]]++;
-      var i4 = fAr[id + 3];
+      const i4 = fAr[id + 3];
       if (i4 !== Utils.TRI_INDEX)
         countRing[i4]++;
     }
 
-    var ringFace = this.getVerticesRingFaceStartCount();
-    var acc = 0;
+    const ringFace = this.getVerticesRingFaceStartCount();
+    let acc = 0;
     for (i = 0; i < nbVertices; ++i) {
-      var count = countRing[i];
+      const count = countRing[i];
       ringFace[i * 2] = acc;
       ringFace[i * 2 + 1] = count;
       acc += count;
     }
 
-    var vrf = new Uint32Array(Utils.getMemory(4 * nbFaces * 6), 0, nbFaces * 6);
+    const vrf = new Uint32Array(Utils.getMemory(4 * nbFaces * 6), 0, nbFaces * 6);
     acc = 0;
     for (i = 0; i < nbFaces; ++i) {
       id = i * 4;
-      var iv1 = fAr[id];
-      var iv2 = fAr[id + 1];
-      var iv3 = fAr[id + 2];
-      var iv4 = fAr[id + 3];
+      const iv1 = fAr[id];
+      const iv2 = fAr[id + 1];
+      const iv3 = fAr[id + 2];
+      const iv4 = fAr[id + 3];
       vrf[ringFace[iv1 * 2] + (--countRing[iv1])] = i;
       vrf[ringFace[iv2 * 2] + (--countRing[iv2])] = i;
       vrf[ringFace[iv3 * 2] + (--countRing[iv3])] = i;
@@ -513,17 +513,17 @@ class Mesh {
 
   /** Update a group of vertices' normal */
   updateVerticesNormal(iVerts) {
-    var vrfStartCount = this.getVerticesRingFaceStartCount();
-    var vertRingFace = this.getVerticesRingFace();
-    var ringFaces = vertRingFace instanceof Array ? vertRingFace : null;
-    var nAr = this.getNormals();
-    var faceNormals = this.getFaceNormals();
+    const vrfStartCount = this.getVerticesRingFaceStartCount();
+    let vertRingFace = this.getVerticesRingFace();
+    const ringFaces = vertRingFace instanceof Array ? vertRingFace : null;
+    const nAr = this.getNormals();
+    const faceNormals = this.getFaceNormals();
 
-    var full = iVerts === undefined;
-    var nbVerts = full ? this.getNbVertices() : iVerts.length;
-    for (var i = 0; i < nbVerts; ++i) {
-      var ind = full ? i : iVerts[i];
-      var start, end;
+    const full = iVerts === undefined;
+    const nbVerts = full ? this.getNbVertices() : iVerts.length;
+    for (let i = 0; i < nbVerts; ++i) {
+      let ind = full ? i : iVerts[i];
+      let start, end;
       if (ringFaces) {
         vertRingFace = ringFaces[ind];
         start = 0;
@@ -532,16 +532,16 @@ class Mesh {
         start = vrfStartCount[ind * 2];
         end = start + vrfStartCount[ind * 2 + 1];
       }
-      var nx = 0.0;
-      var ny = 0.0;
-      var nz = 0.0;
-      for (var j = start; j < end; ++j) {
-        var id = vertRingFace[j] * 3;
+      let nx = 0.0;
+      let ny = 0.0;
+      let nz = 0.0;
+      for (let j = start; j < end; ++j) {
+        const id = vertRingFace[j] * 3;
         nx += faceNormals[id];
         ny += faceNormals[id + 1];
         nz += faceNormals[id + 2];
       }
-      var len = end - start;
+      let len = end - start;
       if (len !== 0.0) len = 1.0 / len;
       ind *= 3;
       nAr[ind] = nx * len;
@@ -552,27 +552,27 @@ class Mesh {
 
   /** Computes vertex ring around vertices */
   initVertexRings() {
-    var vrvStartCount = this.getVerticesRingVertStartCount();
-    var vertRingVert = this._meshData._vertRingVert = new Uint32Array(this.getNbEdges() * 2);
-    var vrfStartCount = this.getVerticesRingFaceStartCount();
-    var vertRingFace = this.getVerticesRingFace();
-    var vertTagFlags = this.getVerticesTagFlags();
-    var vertOnEdge = this.getVerticesOnEdge();
-    var fAr = this.getFaces();
-    var vrvStart = 0;
+    const vrvStartCount = this.getVerticesRingVertStartCount();
+    const vertRingVert = this._meshData._vertRingVert = new Uint32Array(this.getNbEdges() * 2);
+    const vrfStartCount = this.getVerticesRingFaceStartCount();
+    const vertRingFace = this.getVerticesRingFace();
+    const vertTagFlags = this.getVerticesTagFlags();
+    const vertOnEdge = this.getVerticesOnEdge();
+    const fAr = this.getFaces();
+    let vrvStart = 0;
 
-    for (var i = 0, l = this.getNbVertices(); i < l; ++i) {
-      var tagFlag = ++Utils.TAG_FLAG;
-      var vrfStart = vrfStartCount[i * 2];
-      var vrfEnd = vrfStart + vrfStartCount[i * 2 + 1];
-      var vrvCount = 0;
+    for (let i = 0, l = this.getNbVertices(); i < l; ++i) {
+      const tagFlag = ++Utils.TAG_FLAG;
+      const vrfStart = vrfStartCount[i * 2];
+      const vrfEnd = vrfStart + vrfStartCount[i * 2 + 1];
+      let vrvCount = 0;
 
-      for (var j = vrfStart; j < vrfEnd; ++j) {
-        var ind = vertRingFace[j] * 4;
-        var iVer1 = fAr[ind];
-        var iVer2 = fAr[ind + 1];
-        var iVer3 = fAr[ind + 2];
-        var iVer4 = fAr[ind + 3];
+      for (let j = vrfStart; j < vrfEnd; ++j) {
+        const ind = vertRingFace[j] * 4;
+        let iVer1 = fAr[ind];
+        let iVer2 = fAr[ind + 1];
+        const iVer3 = fAr[ind + 2];
+        const iVer4 = fAr[ind + 3];
 
         if (iVer1 === i) iVer1 = iVer4 !== Utils.TRI_INDEX ? iVer4 : iVer3;
         else if (iVer2 === i || iVer4 === i) iVer2 = iVer3;
@@ -599,27 +599,27 @@ class Mesh {
 
   /** Get more vertices (n-ring) */
   expandsVertices(iVerts, nRing) {
-    var tagFlag = ++Utils.TAG_FLAG;
-    var nbVerts = iVerts.length;
-    var vrvStartCount = this.getVerticesRingVertStartCount();
-    var vertRingVert = this.getVerticesRingVert();
-    var ringVerts = vertRingVert instanceof Array ? vertRingVert : null;
-    var vertTagFlags = this.getVerticesTagFlags();
-    var acc = nbVerts;
-    var nbVertices = this.getNbVertices();
-    var iVertsExpanded = new Uint32Array(Utils.getMemory(4 * nbVertices), 0, nbVertices);
+    const tagFlag = ++Utils.TAG_FLAG;
+    let nbVerts = iVerts.length;
+    const vrvStartCount = this.getVerticesRingVertStartCount();
+    let vertRingVert = this.getVerticesRingVert();
+    const ringVerts = vertRingVert instanceof Array ? vertRingVert : null;
+    const vertTagFlags = this.getVerticesTagFlags();
+    let acc = nbVerts;
+    const nbVertices = this.getNbVertices();
+    const iVertsExpanded = new Uint32Array(Utils.getMemory(4 * nbVertices), 0, nbVertices);
     iVertsExpanded.set(iVerts);
 
-    var i = 0;
+    let i = 0;
     for (i = 0; i < nbVerts; ++i)
       vertTagFlags[iVertsExpanded[i]] = tagFlag;
 
-    var iBegin = 0;
+    let iBegin = 0;
     while (nRing) {
       --nRing;
       for (i = iBegin; i < nbVerts; ++i) {
-        var idVert = iVertsExpanded[i];
-        var start, end;
+        const idVert = iVertsExpanded[i];
+        let start, end;
         if (ringVerts) {
           vertRingVert = ringVerts[idVert];
           start = 0;
@@ -629,8 +629,8 @@ class Mesh {
           end = start + vrvStartCount[idVert * 2 + 1];
         }
 
-        for (var j = start; j < end; ++j) {
-          var id = vertRingVert[j];
+        for (let j = start; j < end; ++j) {
+          const id = vertRingVert[j];
           if (vertTagFlags[id] === tagFlag)
             continue;
 
@@ -647,19 +647,19 @@ class Mesh {
 
   /** Return all the vertices linked to a group of faces */
   getVerticesFromFaces(iFaces) {
-    var tagFlag = ++Utils.TAG_FLAG;
-    var nbFaces = iFaces.length;
-    var vertTagFlags = this.getVerticesTagFlags();
-    var fAr = this.getFaces();
-    var acc = 0;
-    var verts = new Uint32Array(Utils.getMemory(4 * iFaces.length * 4), 0, iFaces.length * 4);
+    const tagFlag = ++Utils.TAG_FLAG;
+    const nbFaces = iFaces.length;
+    const vertTagFlags = this.getVerticesTagFlags();
+    const fAr = this.getFaces();
+    let acc = 0;
+    const verts = new Uint32Array(Utils.getMemory(4 * iFaces.length * 4), 0, iFaces.length * 4);
 
-    for (var i = 0; i < nbFaces; ++i) {
-      var ind = iFaces[i] * 4;
-      var iVer1 = fAr[ind];
-      var iVer2 = fAr[ind + 1];
-      var iVer3 = fAr[ind + 2];
-      var iVer4 = fAr[ind + 3];
+    for (let i = 0; i < nbFaces; ++i) {
+      const ind = iFaces[i] * 4;
+      const iVer1 = fAr[ind];
+      const iVer2 = fAr[ind + 1];
+      const iVer3 = fAr[ind + 2];
+      const iVer4 = fAr[ind + 3];
       if (vertTagFlags[iVer1] !== tagFlag) {
         vertTagFlags[iVer1] = tagFlag;
         verts[acc++] = iVer1;
@@ -683,60 +683,60 @@ class Mesh {
 
   /** Update a group of faces normal and aabb */
   updateFacesAabbAndNormal(iFaces) {
-    var faceNormals = this.getFaceNormals();
-    var faceBoxes = this.getFaceBoxes();
-    var faceCenters = this.getFaceCenters();
-    var vAr = this.getVertices();
-    var fAr = this.getFaces();
+    const faceNormals = this.getFaceNormals();
+    const faceBoxes = this.getFaceBoxes();
+    const faceCenters = this.getFaceCenters();
+    const vAr = this.getVertices();
+    const fAr = this.getFaces();
 
-    var full = iFaces === undefined;
-    var nbFaces = full ? this.getNbFaces() : iFaces.length;
-    for (var i = 0; i < nbFaces; ++i) {
-      var ind = full ? i : iFaces[i];
-      var idTri = ind * 3;
-      var idFace = ind * 4;
-      var idBox = ind * 6;
-      var ind1 = fAr[idFace] * 3;
-      var ind2 = fAr[idFace + 1] * 3;
-      var ind3 = fAr[idFace + 2] * 3;
-      var ind4 = fAr[idFace + 3];
-      var isQuad = ind4 !== Utils.TRI_INDEX;
+    const full = iFaces === undefined;
+    const nbFaces = full ? this.getNbFaces() : iFaces.length;
+    for (let i = 0; i < nbFaces; ++i) {
+      const ind = full ? i : iFaces[i];
+      const idTri = ind * 3;
+      const idFace = ind * 4;
+      const idBox = ind * 6;
+      const ind1 = fAr[idFace] * 3;
+      const ind2 = fAr[idFace + 1] * 3;
+      const ind3 = fAr[idFace + 2] * 3;
+      let ind4 = fAr[idFace + 3];
+      const isQuad = ind4 !== Utils.TRI_INDEX;
       if (isQuad) ind4 *= 3;
 
-      var v1x = vAr[ind1];
-      var v1y = vAr[ind1 + 1];
-      var v1z = vAr[ind1 + 2];
-      var v2x = vAr[ind2];
-      var v2y = vAr[ind2 + 1];
-      var v2z = vAr[ind2 + 2];
-      var v3x = vAr[ind3];
-      var v3y = vAr[ind3 + 1];
-      var v3z = vAr[ind3 + 2];
+      const v1x = vAr[ind1];
+      const v1y = vAr[ind1 + 1];
+      const v1z = vAr[ind1 + 2];
+      const v2x = vAr[ind2];
+      const v2y = vAr[ind2 + 1];
+      const v2z = vAr[ind2 + 2];
+      const v3x = vAr[ind3];
+      const v3y = vAr[ind3 + 1];
+      const v3z = vAr[ind3 + 2];
 
       // compute normals
-      var ax = v2x - v1x;
-      var ay = v2y - v1y;
-      var az = v2z - v1z;
-      var bx = v3x - v1x;
-      var by = v3y - v1y;
-      var bz = v3z - v1z;
-      var crx = ay * bz - az * by;
-      var cry = az * bx - ax * bz;
-      var crz = ax * by - ay * bx;
+      let ax = v2x - v1x;
+      let ay = v2y - v1y;
+      let az = v2z - v1z;
+      const bx = v3x - v1x;
+      const by = v3y - v1y;
+      const bz = v3z - v1z;
+      let crx = ay * bz - az * by;
+      let cry = az * bx - ax * bz;
+      let crz = ax * by - ay * bx;
 
       // compute boxes
       // for code readability of course
-      var xmin = v1x < v2x ? v1x < v3x ? v1x : v3x : v2x < v3x ? v2x : v3x;
-      var xmax = v1x > v2x ? v1x > v3x ? v1x : v3x : v2x > v3x ? v2x : v3x;
-      var ymin = v1y < v2y ? v1y < v3y ? v1y : v3y : v2y < v3y ? v2y : v3y;
-      var ymax = v1y > v2y ? v1y > v3y ? v1y : v3y : v2y > v3y ? v2y : v3y;
-      var zmin = v1z < v2z ? v1z < v3z ? v1z : v3z : v2z < v3z ? v2z : v3z;
-      var zmax = v1z > v2z ? v1z > v3z ? v1z : v3z : v2z > v3z ? v2z : v3z;
+      let xmin = v1x < v2x ? v1x < v3x ? v1x : v3x : v2x < v3x ? v2x : v3x;
+      let xmax = v1x > v2x ? v1x > v3x ? v1x : v3x : v2x > v3x ? v2x : v3x;
+      let ymin = v1y < v2y ? v1y < v3y ? v1y : v3y : v2y < v3y ? v2y : v3y;
+      let ymax = v1y > v2y ? v1y > v3y ? v1y : v3y : v2y > v3y ? v2y : v3y;
+      let zmin = v1z < v2z ? v1z < v3z ? v1z : v3z : v2z < v3z ? v2z : v3z;
+      let zmax = v1z > v2z ? v1z > v3z ? v1z : v3z : v2z > v3z ? v2z : v3z;
 
       if (isQuad) {
-        var v4x = vAr[ind4];
-        var v4y = vAr[ind4 + 1];
-        var v4z = vAr[ind4 + 2];
+        const v4x = vAr[ind4];
+        const v4y = vAr[ind4 + 1];
+        const v4z = vAr[ind4 + 2];
         if (v4x < xmin) xmin = v4x;
         if (v4x > xmax) xmax = v4x;
         if (v4y < ymin) ymin = v4y;
@@ -771,31 +771,31 @@ class Mesh {
 
   /** Get more faces (n-ring) */
   expandsFaces(iFaces, nRing) {
-    var tagFlag = ++Utils.TAG_FLAG;
-    var nbFaces = iFaces.length;
-    var vrfStartCount = this.getVerticesRingFaceStartCount();
-    var vertRingFace = this.getVerticesRingFace();
-    var ringFaces = vertRingFace instanceof Array ? vertRingFace : null;
-    var ftf = this.getFacesTagFlags();
-    var fAr = this.getFaces();
-    var acc = nbFaces;
-    var iFacesExpanded = new Uint32Array(Utils.getMemory(4 * this.getNbFaces()), 0, this.getNbFaces());
+    const tagFlag = ++Utils.TAG_FLAG;
+    let nbFaces = iFaces.length;
+    const vrfStartCount = this.getVerticesRingFaceStartCount();
+    let vertRingFace = this.getVerticesRingFace();
+    const ringFaces = vertRingFace instanceof Array ? vertRingFace : null;
+    const ftf = this.getFacesTagFlags();
+    const fAr = this.getFaces();
+    let acc = nbFaces;
+    const iFacesExpanded = new Uint32Array(Utils.getMemory(4 * this.getNbFaces()), 0, this.getNbFaces());
     iFacesExpanded.set(iFaces);
-    var i = 0;
+    let i = 0;
     for (i = 0; i < nbFaces; ++i)
       ftf[iFacesExpanded[i]] = tagFlag;
-    var iBegin = 0;
+    let iBegin = 0;
     while (nRing) {
       --nRing;
       for (i = iBegin; i < nbFaces; ++i) {
-        var ind = iFacesExpanded[i] * 4;
+        const ind = iFacesExpanded[i] * 4;
 
-        for (var j = 0; j < 4; ++j) {
-          var idv = fAr[ind + j];
+        for (let j = 0; j < 4; ++j) {
+          const idv = fAr[ind + j];
           if (idv === Utils.TRI_INDEX)
             continue;
 
-          var start, end;
+          let start, end;
           if (ringFaces) {
             vertRingFace = ringFaces[idv];
             start = 0;
@@ -804,8 +804,8 @@ class Mesh {
             start = vrfStartCount[idv * 2];
             end = start + vrfStartCount[idv * 2 + 1];
           }
-          for (var k = start; k < end; ++k) {
-            var id = vertRingFace[k];
+          for (let k = start; k < end; ++k) {
+            const id = vertRingFace[k];
             if (ftf[id] === tagFlag)
               continue;
             ftf[id] = tagFlag;
@@ -821,17 +821,17 @@ class Mesh {
 
   /** Return all the faces linked to a group of vertices */
   getFacesFromVertices(iVerts) {
-    var tagFlag = ++Utils.TAG_FLAG;
-    var nbVerts = iVerts.length;
-    var vrfStartCount = this.getVerticesRingFaceStartCount();
-    var vertRingFace = this.getVerticesRingFace();
-    var ringFaces = vertRingFace instanceof Array ? vertRingFace : null;
-    var ftf = this.getFacesTagFlags();
-    var acc = 0;
-    var iFaces = new Uint32Array(Utils.getMemory(4 * this.getNbFaces()), 0, this.getNbFaces());
-    for (var i = 0; i < nbVerts; ++i) {
-      var idVert = iVerts[i];
-      var start, end;
+    const tagFlag = ++Utils.TAG_FLAG;
+    const nbVerts = iVerts.length;
+    const vrfStartCount = this.getVerticesRingFaceStartCount();
+    let vertRingFace = this.getVerticesRingFace();
+    const ringFaces = vertRingFace instanceof Array ? vertRingFace : null;
+    const ftf = this.getFacesTagFlags();
+    let acc = 0;
+    const iFaces = new Uint32Array(Utils.getMemory(4 * this.getNbFaces()), 0, this.getNbFaces());
+    for (let i = 0; i < nbVerts; ++i) {
+      const idVert = iVerts[i];
+      let start, end;
       if (ringFaces) {
         vertRingFace = ringFaces[idVert];
         start = 0;
@@ -840,8 +840,8 @@ class Mesh {
         start = vrfStartCount[idVert * 2];
         end = start + vrfStartCount[idVert * 2 + 1];
       }
-      for (var j = start; j < end; ++j) {
-        var iFace = vertRingFace[j];
+      for (let j = start; j < end; ++j) {
+        const iFace = vertRingFace[j];
         if (ftf[iFace] !== tagFlag) {
           ftf[iFace] = tagFlag;
           iFaces[acc++] = iFace;
@@ -860,18 +860,18 @@ class Mesh {
 
   /** Computes triangles from faces */
   computeTrianglesFromFaces(faces) {
-    var nbFaces = this.getNbFaces();
-    var facesToTris = this.getFacesToTriangles();
-    var iAr = new Uint32Array(Utils.getMemory(4 * nbFaces * 6), 0, nbFaces * 6);
-    var acc = 0;
-    for (var i = 0; i < nbFaces; ++i) {
+    const nbFaces = this.getNbFaces();
+    const facesToTris = this.getFacesToTriangles();
+    const iAr = new Uint32Array(Utils.getMemory(4 * nbFaces * 6), 0, nbFaces * 6);
+    let acc = 0;
+    for (let i = 0; i < nbFaces; ++i) {
       facesToTris[i] = acc;
-      var iFace = i * 4;
-      var iv1 = faces[iFace];
-      var iv2 = faces[iFace + 1];
-      var iv3 = faces[iFace + 2];
-      var iv4 = faces[iFace + 3];
-      var iTri = acc * 3;
+      const iFace = i * 4;
+      const iv1 = faces[iFace];
+      const iv2 = faces[iFace + 1];
+      const iv3 = faces[iFace + 2];
+      const iv4 = faces[iFace + 3];
+      let iTri = acc * 3;
       iAr[iTri] = iv1;
       iAr[iTri + 1] = iv2;
       iAr[iTri + 2] = iv3;
@@ -888,24 +888,24 @@ class Mesh {
   }
 
   initEdges() {
-    var fAr = this.getFaces();
-    var feAr = this.getFaceEdges();
-    var nbEdges = 0;
-    var vertEdgeTemp = new Uint32Array(this.getNbVertices());
-    var vrfStartCount = this.getVerticesRingFaceStartCount();
-    var vertRingFace = this.getVerticesRingFace();
-    for (var i = 0, nbVerts = this.getNbVertices(); i < nbVerts; ++i) {
-      var start = vrfStartCount[i * 2];
-      var end = start + vrfStartCount[i * 2 + 1];
-      var compTest = nbEdges;
-      for (var j = start; j < end; ++j) {
-        var id = vertRingFace[j] * 4;
-        var iv1 = fAr[id];
-        var iv2 = fAr[id + 1];
-        var iv3 = fAr[id + 2];
-        var iv4 = fAr[id + 3];
-        var t = 0;
-        var idEdge = 0;
+    const fAr = this.getFaces();
+    const feAr = this.getFaceEdges();
+    let nbEdges = 0;
+    const vertEdgeTemp = new Uint32Array(this.getNbVertices());
+    const vrfStartCount = this.getVerticesRingFaceStartCount();
+    const vertRingFace = this.getVerticesRingFace();
+    for (let i = 0, nbVerts = this.getNbVertices(); i < nbVerts; ++i) {
+      const start = vrfStartCount[i * 2];
+      const end = start + vrfStartCount[i * 2 + 1];
+      const compTest = nbEdges;
+      for (let j = start; j < end; ++j) {
+        const id = vertRingFace[j] * 4;
+        const iv1 = fAr[id];
+        const iv2 = fAr[id + 1];
+        const iv3 = fAr[id + 2];
+        const iv4 = fAr[id + 3];
+        let t = 0;
+        let idEdge = 0;
         if (iv4 === Utils.TRI_INDEX) {
           if (i > iv1) {
             t = vertEdgeTemp[iv1];
@@ -982,13 +982,13 @@ class Mesh {
         }
       }
     }
-    var eAr = this._meshData._edges = new Uint8ClampedArray(nbEdges);
-    for (var k = 0, nbFaces = this.getNbFaces(); k < nbFaces; ++k) {
-      var idf = k * 4;
+    const eAr = this._meshData._edges = new Uint8ClampedArray(nbEdges);
+    for (let k = 0, nbFaces = this.getNbFaces(); k < nbFaces; ++k) {
+      const idf = k * 4;
       eAr[feAr[idf]]++;
       eAr[feAr[idf + 1]]++;
       eAr[feAr[idf + 2]]++;
-      var i4 = feAr[idf + 3];
+      const i4 = feAr[idf + 3];
       if (i4 !== Utils.TRI_INDEX)
         eAr[i4]++;
     }
@@ -996,9 +996,9 @@ class Mesh {
 
   /** Return wireframe array (or compute it if not up to date) */
   getWireframe() {
-    var nbEdges = this.getNbEdges();
-    var cdw;
-    var useDrawArrays = this.isUsingDrawArrays();
+    const nbEdges = this.getNbEdges();
+    let cdw;
+    const useDrawArrays = this.isUsingDrawArrays();
     if (useDrawArrays) {
       if (this._meshData._drawArraysWireframe && this._meshData._drawArraysWireframe.length === nbEdges * 2) {
         return this._meshData._drawArraysWireframe;
@@ -1011,23 +1011,23 @@ class Mesh {
       cdw = this._meshData._drawElementsWireframe = new Uint32Array(nbEdges * 2);
     }
 
-    var fAr = this.getFaces();
-    var feAr = this.getFaceEdges();
-    var nbFaces = this.getNbFaces();
-    var facesToTris = this.getFacesToTriangles();
+    const fAr = this.getFaces();
+    const feAr = this.getFaceEdges();
+    const nbFaces = this.getNbFaces();
+    const facesToTris = this.getFacesToTriangles();
 
-    var nbLines = 0;
-    var tagEdges = new Uint8Array(nbEdges);
+    let nbLines = 0;
+    const tagEdges = new Uint8Array(nbEdges);
 
-    for (var i = 0; i < nbFaces; ++i) {
-      var id = i * 4;
+    for (let i = 0; i < nbFaces; ++i) {
+      const id = i * 4;
 
-      var iv1, iv2, iv3;
-      var iv4 = fAr[id + 3];
-      var isQuad = iv4 !== Utils.TRI_INDEX;
+      let iv1, iv2, iv3;
+      let iv4 = fAr[id + 3];
+      const isQuad = iv4 !== Utils.TRI_INDEX;
 
       if (useDrawArrays) {
-        var idTri = facesToTris[i] * 3;
+        const idTri = facesToTris[i] * 3;
         iv1 = idTri;
         iv2 = idTri + 1;
         iv3 = idTri + 2;
@@ -1038,10 +1038,10 @@ class Mesh {
         iv3 = fAr[id + 2];
       }
 
-      var ide1 = feAr[id];
-      var ide2 = feAr[id + 1];
-      var ide3 = feAr[id + 2];
-      var ide4 = feAr[id + 3];
+      const ide1 = feAr[id];
+      const ide2 = feAr[id + 1];
+      const ide3 = feAr[id + 2];
+      const ide4 = feAr[id + 3];
 
       if (tagEdges[ide1] === 0) {
         tagEdges[ide1] = 1;
@@ -1075,36 +1075,36 @@ class Mesh {
     if (!this.isUsingTexCoords() || !this.hasUV())
       return;
 
-    var vAr = this.getVertices();
-    var cAr = this.getColors();
-    var mAr = this.getMaterials();
-    var nAr = this.getNormals();
-    var startCount = this.getVerticesDuplicateStartCount();
+    const vAr = this.getVertices();
+    const cAr = this.getColors();
+    const mAr = this.getMaterials();
+    const nAr = this.getNormals();
+    const startCount = this.getVerticesDuplicateStartCount();
 
-    var full = iVerts === undefined;
-    var nbVerts = full ? this.getNbVertices() : iVerts.length;
-    for (var i = 0; i < nbVerts; ++i) {
-      var ind = full ? i : iVerts[i];
-      var start = startCount[ind * 2];
+    const full = iVerts === undefined;
+    const nbVerts = full ? this.getNbVertices() : iVerts.length;
+    for (let i = 0; i < nbVerts; ++i) {
+      const ind = full ? i : iVerts[i];
+      const start = startCount[ind * 2];
       if (start === 0)
         continue;
 
-      var end = start + startCount[ind * 2 + 1];
-      var idOrig = ind * 3;
-      var vx = vAr[idOrig];
-      var vy = vAr[idOrig + 1];
-      var vz = vAr[idOrig + 2];
-      var nx = nAr[idOrig];
-      var ny = nAr[idOrig + 1];
-      var nz = nAr[idOrig + 2];
-      var cx = cAr[idOrig];
-      var cy = cAr[idOrig + 1];
-      var cz = cAr[idOrig + 2];
-      var mx = mAr[idOrig];
-      var my = mAr[idOrig + 1];
-      var mz = mAr[idOrig + 2];
-      for (var j = start; j < end; ++j) {
-        var idDup = j * 3;
+      const end = start + startCount[ind * 2 + 1];
+      const idOrig = ind * 3;
+      const vx = vAr[idOrig];
+      const vy = vAr[idOrig + 1];
+      const vz = vAr[idOrig + 2];
+      const nx = nAr[idOrig];
+      const ny = nAr[idOrig + 1];
+      const nz = nAr[idOrig + 2];
+      const cx = cAr[idOrig];
+      const cy = cAr[idOrig + 1];
+      const cz = cAr[idOrig + 2];
+      const mx = mAr[idOrig];
+      const my = mAr[idOrig + 1];
+      const mz = mAr[idOrig + 2];
+      for (let j = start; j < end; ++j) {
+        const idDup = j * 3;
         vAr[idDup] = vx;
         vAr[idDup + 1] = vy;
         vAr[idDup + 2] = vz;
@@ -1125,28 +1125,28 @@ class Mesh {
     if (!this.isUsingTexCoords() || !this.hasUV())
       return;
 
-    var cAr = this.getColors();
-    var mAr = this.getMaterials();
-    var startCount = this.getVerticesDuplicateStartCount();
+    const cAr = this.getColors();
+    const mAr = this.getMaterials();
+    const startCount = this.getVerticesDuplicateStartCount();
 
-    var full = iVerts === undefined;
-    var nbVerts = full ? this.getNbVertices() : iVerts.length;
-    for (var i = 0; i < nbVerts; ++i) {
-      var ind = full ? i : iVerts[i];
-      var start = startCount[ind * 2];
+    const full = iVerts === undefined;
+    const nbVerts = full ? this.getNbVertices() : iVerts.length;
+    for (let i = 0; i < nbVerts; ++i) {
+      const ind = full ? i : iVerts[i];
+      const start = startCount[ind * 2];
       if (start === 0)
         continue;
 
-      var end = start + startCount[ind * 2 + 1];
-      var idOrig = ind * 3;
-      var cx = cAr[idOrig];
-      var cy = cAr[idOrig + 1];
-      var cz = cAr[idOrig + 2];
-      var mx = mAr[idOrig];
-      var my = mAr[idOrig + 1];
-      var mz = mAr[idOrig + 2];
-      for (var j = start; j < end; ++j) {
-        var idDup = j * 3;
+      const end = start + startCount[ind * 2 + 1];
+      const idOrig = ind * 3;
+      const cx = cAr[idOrig];
+      const cy = cAr[idOrig + 1];
+      const cz = cAr[idOrig + 2];
+      const mx = mAr[idOrig];
+      const my = mAr[idOrig + 1];
+      const mz = mAr[idOrig + 2];
+      for (let j = start; j < end; ++j) {
+        const idDup = j * 3;
         cAr[idDup] = cx;
         cAr[idDup + 1] = cy;
         cAr[idDup + 2] = cz;
@@ -1158,38 +1158,38 @@ class Mesh {
   }
 
   initTexCoordsDataFromOBJData(uvAr, uvfArOrig) {
-    var fAr = this.getFaces();
-    var len = fAr.length;
+    const fAr = this.getFaces();
+    let len = fAr.length;
 
-    if (len != uvfArOrig.length) return;
-    var nbUV = uvAr.length / 2;
+    if (len !== uvfArOrig.length) return;
+    const nbUV = uvAr.length / 2;
 
     // fix integrity (bug with sgl export??)
+    let i = 0;
     for (i = 0; i < len; ++i) {
       if (uvfArOrig[i] >= nbUV) {
         uvfArOrig[i] = fAr[i];
       }
     }
 
-    var nbVertices = this.getNbVertices();
-    var i = 0;
-    var j = 0;
-    var iv = 0;
-    var tag = 0;
+    const nbVertices = this.getNbVertices();
+    let j = 0;
+    let iv = 0;
+    let tag = 0;
 
     // detect duplicates vertices because of tex coords
-    var tagV = new Int32Array(nbVertices);
+    const tagV = new Int32Array(nbVertices);
     // vertex without uv might receive random values...
-    var tArTemp = new Float32Array(Utils.getMemory(nbVertices * 4 * 2), 0, nbVertices * 2);
-    var dup = [];
-    var acc = 0;
-    var nbDuplicates = 0;
+    const tArTemp = new Float32Array(Utils.getMemory(nbVertices * 4 * 2), 0, nbVertices * 2);
+    const dup = [];
+    let acc = 0;
+    let nbDuplicates = 0;
     for (i = 0; i < len; ++i) {
       iv = fAr[i];
       if (iv === Utils.TRI_INDEX)
         continue;
 
-      var uv = uvfArOrig[i];
+      const uv = uvfArOrig[i];
       tag = tagV[iv];
       if (tag === (uv + 1))
         continue;
@@ -1209,8 +1209,8 @@ class Mesh {
         continue;
       }
       // check if we need to insert a new duplicate
-      var dupArray = dup[-tag - 1];
-      var nbDup = dupArray.length;
+      const dupArray = dup[-tag - 1];
+      const nbDup = dupArray.length;
       for (j = 0; j < nbDup; ++j) {
         if (dupArray[j] === uv)
           break;
@@ -1223,31 +1223,31 @@ class Mesh {
     }
 
     // order the duplicates vertices (and tex coords)
-    var tAr = new Float32Array((nbVertices + nbDuplicates) * 2);
+    const tAr = new Float32Array((nbVertices + nbDuplicates) * 2);
     tAr.set(tArTemp);
-    var startCount = this._meshData._duplicateStartCount = new Uint32Array(nbVertices * 2);
+    const startCount = this._meshData._duplicateStartCount = new Uint32Array(nbVertices * 2);
     acc = 0;
     for (i = 0; i < nbVertices; ++i) {
       tag = tagV[i];
       if (tag >= 0)
         continue;
 
-      var dAr = dup[-tag - 1];
-      var nbDu = dAr.length;
-      var start = nbVertices + acc;
+      const dAr = dup[-tag - 1];
+      const nbDu = dAr.length;
+      const start = nbVertices + acc;
       startCount[i * 2] = start;
       startCount[i * 2 + 1] = nbDu;
       acc += nbDu;
       for (j = 0; j < nbDu; ++j) {
-        var idUv = dAr[j] * 2;
-        var idUvCoord = (start + j) * 2;
+        const idUv = dAr[j] * 2;
+        const idUvCoord = (start + j) * 2;
         tAr[idUvCoord] = uvAr[idUv];
         tAr[idUvCoord + 1] = uvAr[idUv + 1];
       }
     }
 
     // create faces that uses duplicates vertices (with textures coordinates)
-    var uvfAr = new Uint32Array(fAr);
+    const uvfAr = new Uint32Array(fAr);
     len = fAr.length;
     for (i = 0; i < len; ++i) {
       iv = uvfAr[i];
@@ -1258,9 +1258,9 @@ class Mesh {
       if (tag > 0)
         continue;
 
-      var idtex = uvfArOrig[i];
-      var dArray = dup[-tag - 1];
-      var nbEl = dArray.length;
+      const idtex = uvfArOrig[i];
+      const dArray = dup[-tag - 1];
+      const nbEl = dArray.length;
       for (j = 0; j < nbEl; ++j) {
         if (idtex === dArray[j]) {
           uvfAr[i] = startCount[iv * 2] + j;
@@ -1286,21 +1286,21 @@ class Mesh {
     if (!this.isUsingDrawArrays())
       return;
 
-    var vAr = this.getVertices();
-    var nAr = this.getNormals();
-    var cAr = this.getColors();
-    var mAr = this.getMaterials();
+    const vAr = this.getVertices();
+    const nAr = this.getNormals();
+    const cAr = this.getColors();
+    const mAr = this.getMaterials();
 
-    var fAr = this.getFaces();
+    const fAr = this.getFaces();
 
-    var nbTriangles = this.getNbTriangles();
-    var facesToTris = this.hasOnlyTriangles() ? null : this.getFacesToTriangles();
+    const nbTriangles = this.getNbTriangles();
+    const facesToTris = this.hasOnlyTriangles() ? null : this.getFacesToTriangles();
 
-    var full = iFaces === undefined;
-    var cdv = this._meshData._DAverticesXYZ;
-    var cdn = this._meshData._DAnormalsXYZ;
-    var cdc = this._meshData._DAcolorsRGB;
-    var cdm = this._meshData._DAmaterialsPBR;
+    const full = iFaces === undefined;
+    let cdv = this._meshData._DAverticesXYZ;
+    let cdn = this._meshData._DAnormalsXYZ;
+    let cdc = this._meshData._DAcolorsRGB;
+    let cdm = this._meshData._DAmaterialsPBR;
 
     if (!cdv || cdv.length < nbTriangles * 9) {
       cdv = this._meshData._DAverticesXYZ = new Float32Array(nbTriangles * 9);
@@ -1309,16 +1309,16 @@ class Mesh {
       cdm = this._meshData._DAmaterialsPBR = new Float32Array(nbTriangles * 9);
     }
 
-    var nbFaces = full ? this.getNbFaces() : iFaces.length;
-    for (var i = 0; i < nbFaces; ++i) {
-      var idFace = full ? i : iFaces[i];
-      var ftt = facesToTris ? facesToTris[idFace] : idFace;
-      var vId = ftt * 9;
+    const nbFaces = full ? this.getNbFaces() : iFaces.length;
+    for (let i = 0; i < nbFaces; ++i) {
+      let idFace = full ? i : iFaces[i];
+      const ftt = facesToTris ? facesToTris[idFace] : idFace;
+      let vId = ftt * 9;
 
       idFace *= 4;
-      var id1 = fAr[idFace] * 3;
-      var id2 = fAr[idFace + 1] * 3;
-      var id3 = fAr[idFace + 2] * 3;
+      const id1 = fAr[idFace] * 3;
+      const id2 = fAr[idFace + 1] * 3;
+      const id3 = fAr[idFace + 2] * 3;
 
       // coordinates
       cdv[vId] = vAr[id1];
@@ -1364,7 +1364,7 @@ class Mesh {
       cdn[vId + 7] = nAr[id3 + 1];
       cdn[vId + 8] = nAr[id3 + 2];
 
-      var id4 = fAr[idFace + 3];
+      let id4 = fAr[idFace + 3];
       if (id4 === Utils.TRI_INDEX)
         continue;
       id4 *= 3;
@@ -1421,27 +1421,27 @@ class Mesh {
 
   /** Updates the UV array data for drawArrays */
   updateDrawArraysTexCoord(iFaces) {
-    var nbTriangles = this.getNbTriangles();
-    var facesToTris = this.getFacesToTriangles();
+    const nbTriangles = this.getNbTriangles();
+    const facesToTris = this.getFacesToTriangles();
 
-    var full = iFaces === undefined;
-    var cdt = this._meshData._DAtexCoordsST;
+    const full = iFaces === undefined;
+    let cdt = this._meshData._DAtexCoordsST;
     if (!cdt || cdt.length !== nbTriangles * 6)
       cdt = this._meshData._DAtexCoordsST = new Float32Array(nbTriangles * 6);
 
-    var tAr = this.getTexCoords();
-    var fArUV = this.getFacesTexCoord();
+    const tAr = this.getTexCoords();
+    const fArUV = this.getFacesTexCoord();
 
-    var nbFaces = full ? this.getNbFaces() : iFaces.length;
-    for (var i = 0; i < nbFaces; ++i) {
-      var idFace = full ? i : iFaces[i];
-      var ftt = facesToTris[idFace];
-      var vIduv = ftt * 6;
+    const nbFaces = full ? this.getNbFaces() : iFaces.length;
+    for (let i = 0; i < nbFaces; ++i) {
+      let idFace = full ? i : iFaces[i];
+      const ftt = facesToTris[idFace];
+      let vIduv = ftt * 6;
 
       idFace *= 4;
-      var id1uv = fArUV[idFace] * 2;
-      var id2uv = fArUV[idFace + 1] * 2;
-      var id3uv = fArUV[idFace + 2] * 2;
+      const id1uv = fArUV[idFace] * 2;
+      const id2uv = fArUV[idFace + 1] * 2;
+      const id3uv = fArUV[idFace + 2] * 2;
 
       cdt[vIduv] = tAr[id1uv];
       cdt[vIduv + 1] = tAr[id1uv + 1];
@@ -1450,7 +1450,7 @@ class Mesh {
       cdt[vIduv + 4] = tAr[id3uv];
       cdt[vIduv + 5] = tAr[id3uv + 1];
 
-      var id4uv = fArUV[idFace + 3];
+      let id4uv = fArUV[idFace + 3];
       if (id4uv === Utils.TRI_INDEX)
         continue;
       id4uv *= 3;
@@ -1469,7 +1469,7 @@ class Mesh {
   // TRANSFORM DATA
   /////////////////
   updateCenter() {
-    var box = this.getLocalBound();
+    const box = this.getLocalBound();
     vec3.set(this._transformData._center, (box[0] + box[3]) * 0.5, (box[1] + box[4]) * 0.5, (box[2] + box[5]) * 0.5);
   }
 
@@ -1479,25 +1479,25 @@ class Mesh {
     mat4.mul(this._transformData._lastComputedMV, camera.getView(), this._transformData._matrix);
     mat3.normalFromMat4(this._transformData._lastComputedN, this._transformData._lastComputedMV);
     mat4.mul(this._transformData._lastComputedMVP, camera.getProjection(), this._transformData._lastComputedMV);
-    var cen = this._transformData._center;
-    var m = this._transformData._lastComputedMVP;
+    const cen = this._transformData._center;
+    const m = this._transformData._lastComputedMVP;
     this._transformData._lastComputedDepth = m[2] * cen[0] + m[6] * cen[1] + m[10] * cen[2] + m[14];
   }
 
   computeLocalRadius() {
-    var box = this.getLocalBound();
+    const box = this.getLocalBound();
     return 0.5 * vec3.dist([box[0], box[1], box[2]], [box[3], box[4], box[5]]);
   }
 
   normalizeSize() {
-    var scale = Utils.SCALE / (2.0 * this.computeLocalRadius());
+    const scale = Utils.SCALE / (2.0 * this.computeLocalRadius());
     mat4.scale(this._transformData._matrix, this._transformData._matrix, [scale, scale, scale]);
   }
 
   computeWorldBound() {
-    var worldb = this._meshData._worldBound;
-    var localb = this.getLocalBound();
-    var mat = this.getMatrix();
+    const worldb = this._meshData._worldBound;
+    const localb = this.getLocalBound();
+    const mat = this.getMatrix();
 
     // trans
     worldb[0] = worldb[3] = mat[12];
@@ -1505,14 +1505,14 @@ class Mesh {
     worldb[2] = worldb[5] = mat[14];
 
     // rotate per component
-    for (var i = 0; i < 3; ++i) {
-      var i4 = i * 4;
-      var mini = localb[i];
-      var maxi = localb[i + 3];
-      for (var j = 0; j < 3; ++j) {
-        var cm = mat[i4 + j];
-        var a = cm * maxi;
-        var b = cm * mini;
+    for (let i = 0; i < 3; ++i) {
+      const i4 = i * 4;
+      const mini = localb[i];
+      const maxi = localb[i + 3];
+      for (let j = 0; j < 3; ++j) {
+        const cm = mat[i4 + j];
+        const a = cm * maxi;
+        const b = cm * mini;
         if (a < b) {
           worldb[j] += a;
           worldb[j + 3] += b;
@@ -1532,15 +1532,15 @@ class Mesh {
 
   /** Return faces intersected by a ray */
   intersectRay(vNear, eyeDir, collectLeaves) {
-    var nbFaces = this.getNbFaces();
-    var collectFaces = new Uint32Array(Utils.getMemory(nbFaces * 4), 0, nbFaces);
+    const nbFaces = this.getNbFaces();
+    const collectFaces = new Uint32Array(Utils.getMemory(nbFaces * 4), 0, nbFaces);
     return this._meshData._octree.collectIntersectRay(vNear, eyeDir, collectFaces, collectLeaves ? this._meshData._leavesToUpdate : undefined);
   }
 
   /** Return faces inside a sphere */
   intersectSphere(vert, radiusSquared, collectLeaves) {
-    var nbFaces = this.getNbFaces();
-    var collectFaces = new Uint32Array(Utils.getMemory(nbFaces * 4), 0, nbFaces);
+    const nbFaces = this.getNbFaces();
+    const collectFaces = new Uint32Array(Utils.getMemory(nbFaces * 4), 0, nbFaces);
     return this._meshData._octree.collectIntersectSphere(vert, radiusSquared, collectFaces, collectLeaves ? this._meshData._leavesToUpdate : undefined);
   }
 
@@ -1558,19 +1558,19 @@ class Mesh {
   }
 
   computeAabb() {
-    var nbVertices = this.getNbVertices();
-    var vAr = this.getVertices();
-    var xmin = Infinity;
-    var ymin = Infinity;
-    var zmin = Infinity;
-    var xmax = -Infinity;
-    var ymax = -Infinity;
-    var zmax = -Infinity;
-    for (var i = 0; i < nbVertices; ++i) {
-      var j = i * 3;
-      var vx = vAr[j];
-      var vy = vAr[j + 1];
-      var vz = vAr[j + 2];
+    const nbVertices = this.getNbVertices();
+    const vAr = this.getVertices();
+    let xmin = Infinity;
+    let ymin = Infinity;
+    let zmin = Infinity;
+    let xmax = -Infinity;
+    let ymax = -Infinity;
+    let zmax = -Infinity;
+    for (let i = 0; i < nbVertices; ++i) {
+      const j = i * 3;
+      const vx = vAr[j];
+      const vy = vAr[j + 1];
+      const vz = vAr[j + 2];
       if (vx < xmin) xmin = vx;
       if (vx > xmax) xmax = vx;
       if (vy < ymin) ymin = vy;
@@ -1583,20 +1583,20 @@ class Mesh {
 
   /** Compute the octree */
   computeOctree() {
-    var abRoot = this.computeAabb();
-    var xmin = abRoot[0];
-    var ymin = abRoot[1];
-    var zmin = abRoot[2];
-    var xmax = abRoot[3];
-    var ymax = abRoot[4];
-    var zmax = abRoot[5];
-    var dx = xmax - xmin;
-    var dy = ymax - ymin;
-    var dz = zmax - zmin;
+    const abRoot = this.computeAabb();
+    let xmin = abRoot[0];
+    let ymin = abRoot[1];
+    let zmin = abRoot[2];
+    let xmax = abRoot[3];
+    let ymax = abRoot[4];
+    let zmax = abRoot[5];
+    const dx = xmax - xmin;
+    const dy = ymax - ymin;
+    const dz = zmax - zmin;
 
     // add minimal thickness
-    var offset = Math.sqrt(dx * dx + dy * dy + dz * dz) * 0.2;
-    var eps = 1e-16;
+    const offset = Math.sqrt(dx * dx + dy * dy + dz * dz) * 0.2;
+    const eps = 1e-16;
     if (xmax - xmin < eps) {
       xmin -= offset;
       xmax += offset;
@@ -1611,18 +1611,18 @@ class Mesh {
     }
 
     // root octree bigger than minimum aabb... (to avoid too many octree rebuild)
-    var dfx = dx * 0.3;
-    var dfy = dy * 0.3;
-    var dfz = dz * 0.3;
-    var xmin2 = xmin - dfx;
-    var xmax2 = xmax + dfx;
-    var ymin2 = ymin - dfy;
-    var ymax2 = ymax + dfy;
-    var zmin2 = zmin - dfz;
-    var zmax2 = zmax + dfz;
+    const dfx = dx * 0.3;
+    const dfy = dy * 0.3;
+    const dfz = dz * 0.3;
+    const xmin2 = xmin - dfx;
+    const xmax2 = xmax + dfx;
+    const ymin2 = ymin - dfy;
+    const ymax2 = ymax + dfy;
+    const zmin2 = zmin - dfz;
+    const zmax2 = zmax + dfz;
 
     // octree construction
-    var octree = this._meshData._octree = new OctreeCell();
+    const octree = this._meshData._octree = new OctreeCell();
     octree.resetNbFaces(this.getNbFaces());
     octree.setAabbLoose(xmin, ymin, zmin, xmax, ymax, zmax);
     octree.setAabbSplit(xmin2, ymin2, zmin2, xmax2, ymax2, zmax2);
@@ -1630,32 +1630,32 @@ class Mesh {
   }
 
   updateOctreeRemove(iFaces) {
-    var faceCenters = this.getFaceCenters();
-    var fboxes = this.getFaceBoxes();
-    var facePosInLeaf = this._meshData._facePosInLeaf;
-    var faceLeaf = this._meshData._faceLeaf;
-    var nbFaces = iFaces.length;
-    var acc = 0;
-    var facesToMove = new Uint32Array(Utils.getMemory(4 * nbFaces), 0, nbFaces);
+    const faceCenters = this.getFaceCenters();
+    const fboxes = this.getFaceBoxes();
+    const facePosInLeaf = this._meshData._facePosInLeaf;
+    const faceLeaf = this._meshData._faceLeaf;
+    const nbFaces = iFaces.length;
+    let acc = 0;
+    const facesToMove = new Uint32Array(Utils.getMemory(4 * nbFaces), 0, nbFaces);
     // recompute position inside the octree
-    for (var i = 0; i < nbFaces; ++i) {
-      var idFace = iFaces[i];
-      var idb = idFace * 6;
-      var idCen = idFace * 3;
-      var leaf = faceLeaf[idFace];
-      var ab = leaf._aabbSplit;
+    for (let i = 0; i < nbFaces; ++i) {
+      const idFace = iFaces[i];
+      const idb = idFace * 6;
+      const idCen = idFace * 3;
+      const leaf = faceLeaf[idFace];
+      const ab = leaf._aabbSplit;
 
-      var vx = faceCenters[idCen];
-      var vy = faceCenters[idCen + 1];
-      var vz = faceCenters[idCen + 2];
+      const vx = faceCenters[idCen];
+      const vy = faceCenters[idCen + 1];
+      const vz = faceCenters[idCen + 2];
 
       if (vx <= ab[0] || vy <= ab[1] || vz <= ab[2] || vx > ab[3] || vy > ab[4] || vz > ab[5]) {
         // a face center has moved from its cell
         facesToMove[acc++] = iFaces[i];
-        var facesInLeaf = leaf._iFaces;
+        const facesInLeaf = leaf._iFaces;
         if (facesInLeaf.length > 0) { // remove faces from octree cell
-          var iFaceLast = facesInLeaf[facesInLeaf.length - 1];
-          var iPos = facePosInLeaf[idFace];
+          const iFaceLast = facesInLeaf[facesInLeaf.length - 1];
+          const iPos = facePosInLeaf[idFace];
           facesInLeaf[iPos] = iFaceLast;
           facePosInLeaf[iFaceLast] = iPos;
           facesInLeaf.pop();
@@ -1668,30 +1668,30 @@ class Mesh {
   }
 
   updateOctreeAdd(facesToMove) {
-    var fc = this.getFaceCenters();
-    var fb = this.getFaceBoxes();
-    var facePosInLeaf = this._meshData._facePosInLeaf;
-    var faceLeaf = this._meshData._faceLeaf;
-    var nbFacesToMove = facesToMove.length;
+    const fc = this.getFaceCenters();
+    const fb = this.getFaceBoxes();
+    const facePosInLeaf = this._meshData._facePosInLeaf;
+    const faceLeaf = this._meshData._faceLeaf;
+    const nbFacesToMove = facesToMove.length;
 
-    var root = this._meshData._octree;
-    var rootSplit = root._aabbSplit;
-    var xmin = rootSplit[0];
-    var ymin = rootSplit[1];
-    var zmin = rootSplit[2];
-    var xmax = rootSplit[3];
-    var ymax = rootSplit[4];
-    var zmax = rootSplit[5];
+    const root = this._meshData._octree;
+    const rootSplit = root._aabbSplit;
+    const xmin = rootSplit[0];
+    const ymin = rootSplit[1];
+    const zmin = rootSplit[2];
+    const xmax = rootSplit[3];
+    const ymax = rootSplit[4];
+    const zmax = rootSplit[5];
 
-    for (var i = 0; i < nbFacesToMove; ++i) { // add face to the octree
-      var idFace = facesToMove[i];
-      var idb = idFace * 6;
-      var ibux = fb[idb];
-      var ibuy = fb[idb + 1];
-      var ibuz = fb[idb + 2];
-      var iblx = fb[idb + 3];
-      var ibly = fb[idb + 4];
-      var iblz = fb[idb + 5];
+    for (let i = 0; i < nbFacesToMove; ++i) { // add face to the octree
+      const idFace = facesToMove[i];
+      const idb = idFace * 6;
+      const ibux = fb[idb];
+      const ibuy = fb[idb + 1];
+      const ibuz = fb[idb + 2];
+      const iblx = fb[idb + 3];
+      const ibly = fb[idb + 4];
+      const iblz = fb[idb + 5];
 
       if (ibux > xmax || iblx < xmin || ibuy > ymax || ibly < ymin || ibuz > zmax || iblz < zmin) {
         // a face is outside the root node, we reconstruct the whole octree, slow... but rare
@@ -1700,13 +1700,13 @@ class Mesh {
         break;
       }
 
-      var idc = idFace * 3;
-      var newleaf = root.addFace(idFace, ibux, ibuy, ibuz, iblx, ibly, iblz, fc[idc], fc[idc + 1], fc[idc + 2]);
+      const idc = idFace * 3;
+      const newleaf = root.addFace(idFace, ibux, ibuy, ibuz, iblx, ibly, iblz, fc[idc], fc[idc + 1], fc[idc + 2]);
       if (newleaf) {
         facePosInLeaf[idFace] = newleaf._iFaces.length - 1;
         faceLeaf[idFace] = newleaf;
       } else { // failed to insert face in octree, re-insert it back
-        var facesInLeaf = faceLeaf[idFace]._iFaces;
+        const facesInLeaf = faceLeaf[idFace]._iFaces;
         facePosInLeaf[idFace] = facesInLeaf.length;
         facesInLeaf.push(facesToMove[i]);
       }
@@ -1716,11 +1716,11 @@ class Mesh {
   /** balance octree (cut empty leaves or go deeper if needed) */
   balanceOctree() {
     ++OctreeCell.FLAG;
-    var leavesToUpdate = this._meshData._leavesToUpdate;
-    var nbLeaves = leavesToUpdate.length;
+    const leavesToUpdate = this._meshData._leavesToUpdate;
+    const nbLeaves = leavesToUpdate.length;
 
-    for (var i = 0; i < nbLeaves; ++i) {
-      var leaf = leavesToUpdate[i];
+    for (let i = 0; i < nbLeaves; ++i) {
+      const leaf = leavesToUpdate[i];
       if (leaf._flag === OctreeCell.FLAG)
         continue;
 
@@ -1792,7 +1792,7 @@ class Mesh {
   }
 
   getCount() {
-    var gl = this.getGL();
+    const gl = this.getGL();
     if (this.getMode() === gl.TRIANGLES) return this.getNbTriangles() * 3;
     if (this.getMode() === gl.LINES) return this.getNbVertices();
     return 0;
@@ -1875,7 +1875,7 @@ class Mesh {
   }
 
   isUsingTexCoords() {
-    var shaderType = this._renderData._shaderType;
+    const shaderType = this._renderData._shaderType;
     return shaderType === Enums.Shader.UV || shaderType === Enums.Shader.PAINTUV;
   }
 
@@ -1888,7 +1888,7 @@ class Mesh {
   }
 
   setShaderType(shaderName) {
-    var hasUV = this.hasUV();
+    const hasUV = this.hasUV();
     if (shaderName === Enums.Shader.UV && !hasUV) {
       if (this._renderData._shaderType !== Enums.Shader.UV)
         return;
@@ -1935,35 +1935,35 @@ class Mesh {
   }
 
   updateVertexBuffer() {
-    var vertices = this.isUsingDrawArrays() ? this.getVerticesDrawArrays() : this.getVertices();
+    const vertices = this.isUsingDrawArrays() ? this.getVerticesDrawArrays() : this.getVertices();
     this.getVertexBuffer().update(vertices, this.getRenderNbVertices() * 3);
   }
 
   updateNormalBuffer() {
-    var normals = this.isUsingDrawArrays() ? this.getNormalsDrawArrays() : this.getNormals();
+    const normals = this.isUsingDrawArrays() ? this.getNormalsDrawArrays() : this.getNormals();
     this.getNormalBuffer().update(normals, this.getRenderNbVertices() * 3);
   }
 
   updateColorBuffer() {
-    var colors = this.isUsingDrawArrays() ? this.getColorsDrawArrays() : this.getColors();
+    const colors = this.isUsingDrawArrays() ? this.getColorsDrawArrays() : this.getColors();
     this.getColorBuffer().update(colors, this.getRenderNbVertices() * 3);
   }
 
   updateMaterialBuffer() {
-    var materials = this.isUsingDrawArrays() ? this.getMaterialsDrawArrays() : this.getMaterials();
+    const materials = this.isUsingDrawArrays() ? this.getMaterialsDrawArrays() : this.getMaterials();
     this.getMaterialBuffer().update(materials, this.getRenderNbVertices() * 3);
   }
 
   updateTexCoordBuffer() {
     if (this.isUsingTexCoords()) {
-      var texCoords = this.isUsingDrawArrays() ? this.getTexCoordsDrawArrays() : this.getTexCoords();
+      const texCoords = this.isUsingDrawArrays() ? this.getTexCoordsDrawArrays() : this.getTexCoords();
       this.getTexCoordBuffer().update(texCoords, this.getRenderNbVertices() * 2);
     }
   }
 
   updateIndexBuffer() {
     if (!this.isUsingDrawArrays()) {
-      var triangles = this.isUsingTexCoords() ? this.getTrianglesTexCoord() : this.getTriangles();
+      const triangles = this.isUsingTexCoords() ? this.getTrianglesTexCoord() : this.getTriangles();
       this.getIndexBuffer().update(triangles, this.getNbTriangles() * 3);
     }
   }
@@ -2053,22 +2053,22 @@ class Mesh {
   }
 
   computeCacheScore() {
-    var fAr = this.getFaces();
-    var nbFaces = this.getNbFaces();
+    const fAr = this.getFaces();
+    const nbFaces = this.getNbFaces();
 
-    var sizeCache = 32;
-    var cache = [];
+    const sizeCache = 32;
+    const cache = [];
     cache.length = sizeCache;
 
-    var cacheMiss = 0;
-    var k = 0;
-    for (var i = 0; i < nbFaces; ++i) {
-      var id = i * 3;
-      var nbPoly = fAr[id + 3] !== Utils.TRI_INDEX ? 4 : 3;
+    let cacheMiss = 0;
+    let k = 0;
+    for (let i = 0; i < nbFaces; ++i) {
+      const id = i * 3;
+      const nbPoly = fAr[id + 3] !== Utils.TRI_INDEX ? 4 : 3;
       // check in cache
-      for (var j = 0; j < nbPoly; ++j) {
+      for (let j = 0; j < nbPoly; ++j) {
 
-        var idFace = fAr[id + j];
+        const idFace = fAr[id + j];
         // check in cache
         for (k = 0; k < sizeCache; ++k) {
           if (cache[k] === undefined) {
@@ -2098,32 +2098,32 @@ class Mesh {
     // post transform optimization (index buffer re-index), it implements tipsy
     // http://gfx.cs.princeton.edu/pubs/Sander_2007_%3ETR/tipsy.pdf
 
-    var i = 0;
-    var cacheSize = 32;
-    var hasUV = this.hasUV();
-    var fAr = this.getFaces();
-    var fArUV = hasUV ? this.getFacesTexCoord() : fAr;
+    let i = 0;
+    const cacheSize = 32;
+    const hasUV = this.hasUV();
+    const fAr = this.getFaces();
+    const fArUV = hasUV ? this.getFacesTexCoord() : fAr;
 
-    var nbFaces = this.getNbFaces();
-    var nbUniqueVertices = this.getNbVertices();
-    var nbVertices = hasUV ? this.getNbTexCoords() : nbUniqueVertices;
+    const nbFaces = this.getNbFaces();
+    const nbUniqueVertices = this.getNbVertices();
+    const nbVertices = hasUV ? this.getNbTexCoords() : nbUniqueVertices;
 
-    var dupUV = this.getVerticesDuplicateStartCount();
-    var mapToUnique = new Uint32Array(nbVertices - nbUniqueVertices);
+    const dupUV = this.getVerticesDuplicateStartCount();
+    const mapToUnique = new Uint32Array(nbVertices - nbUniqueVertices);
     if (hasUV) {
       for (i = 0; i < nbVertices; ++i) {
-        var dupStart = dupUV[i * 2];
-        var dupEnd = dupStart + dupUV[i * 2 + 1];
-        for (var j = dupStart; j < dupEnd; ++j) {
+        const dupStart = dupUV[i * 2];
+        const dupEnd = dupStart + dupUV[i * 2 + 1];
+        for (let j = dupStart; j < dupEnd; ++j) {
           mapToUnique[j - nbUniqueVertices] = i;
         }
       }
     }
 
-    var fringsStartCount = this.getVerticesRingFaceStartCount();
-    var frings = this.getVerticesRingFace();
+    const fringsStartCount = this.getVerticesRingFaceStartCount();
+    const frings = this.getVerticesRingFace();
 
-    var livesTriangles = new Int32Array(nbVertices);
+    const livesTriangles = new Int32Array(nbVertices);
     for (i = 0; i < nbUniqueVertices; ++i) {
       livesTriangles[i] = fringsStartCount[i * 2 + 1];
     }
@@ -2132,39 +2132,39 @@ class Mesh {
       livesTriangles[i] = fringsStartCount[mapToUnique[i - nbUniqueVertices] * 2 + 1];
     }
 
-    var vTimeStamp = new Uint32Array(nbVertices);
-    var timeStamp = cacheSize + 1;
-    var cursor = 0;
+    const vTimeStamp = new Uint32Array(nbVertices);
+    let timeStamp = cacheSize + 1;
+    let cursor = 0;
 
-    var deadEndStack = new Uint32Array(Utils.getMemory(4 * nbFaces * 4), 0, nbFaces * 4);
-    var deadEndCount = 0;
-    var emittedFaces = new Uint8Array(nbFaces);
+    const deadEndStack = new Uint32Array(Utils.getMemory(4 * nbFaces * 4), 0, nbFaces * 4);
+    let deadEndCount = 0;
+    const emittedFaces = new Uint8Array(nbFaces);
 
-    var fArUVNew = new Uint32Array(nbFaces * 4);
-    var fArNew = hasUV ? new Uint32Array(nbFaces * 4) : fArUVNew;
-    var fcount = 0;
+    const fArUVNew = new Uint32Array(nbFaces * 4);
+    const fArNew = hasUV ? new Uint32Array(nbFaces * 4) : fArUVNew;
+    let fcount = 0;
 
-    var fanningVertex = 0;
+    let fanningVertex = 0;
     while (fanningVertex >= 0) {
 
-      var ringCandidates = [];
+      const ringCandidates = [];
 
-      var idRing = fanningVertex >= nbUniqueVertices ? mapToUnique[fanningVertex - nbUniqueVertices] : fanningVertex;
-      var start = fringsStartCount[idRing * 2];
-      var end = start + fringsStartCount[idRing * 2 + 1];
+      const idRing = fanningVertex >= nbUniqueVertices ? mapToUnique[fanningVertex - nbUniqueVertices] : fanningVertex;
+      const start = fringsStartCount[idRing * 2];
+      const end = start + fringsStartCount[idRing * 2 + 1];
 
       for (i = start; i < end; ++i) {
-        var idFace = frings[i];
+        const idFace = frings[i];
         if (emittedFaces[idFace]) continue;
         emittedFaces[idFace] = 1;
 
-        var idf = idFace * 4;
+        const idf = idFace * 4;
 
-        var idv1 = deadEndStack[deadEndCount++] = fArUVNew[fcount++] = fArUV[idf];
-        var idv2 = deadEndStack[deadEndCount++] = fArUVNew[fcount++] = fArUV[idf + 1];
-        var idv3 = deadEndStack[deadEndCount++] = fArUVNew[fcount++] = fArUV[idf + 2];
-        var idv4 = fArUVNew[fcount++] = fArUV[idf + 3];
-        var isQuad = idv4 !== Utils.TRI_INDEX;
+        const idv1 = deadEndStack[deadEndCount++] = fArUVNew[fcount++] = fArUV[idf];
+        const idv2 = deadEndStack[deadEndCount++] = fArUVNew[fcount++] = fArUV[idf + 1];
+        const idv3 = deadEndStack[deadEndCount++] = fArUVNew[fcount++] = fArUV[idf + 2];
+        const idv4 = fArUVNew[fcount++] = fArUV[idf + 3];
+        const isQuad = idv4 !== Utils.TRI_INDEX;
 
         if (hasUV) {
           fArNew[fcount - 4] = fAr[idf];
@@ -2194,15 +2194,15 @@ class Mesh {
 
       // get emitted next vertex
       fanningVertex = -1;
-      var bestPriority = -1;
-      var nbCandidates = ringCandidates.length;
+      let bestPriority = -1;
+      const nbCandidates = ringCandidates.length;
       for (i = 0; i < nbCandidates; ++i) {
-        var idc = ringCandidates[i];
-        var liveCount = livesTriangles[idc];
+        const idc = ringCandidates[i];
+        const liveCount = livesTriangles[idc];
         if (liveCount <= 0) continue;
 
-        var priority = 0;
-        var posCache = timeStamp - vTimeStamp[idc];
+        let priority = 0;
+        const posCache = timeStamp - vTimeStamp[idc];
         if (posCache + 2 * liveCount <= cacheSize) {
           priority = posCache;
         }
@@ -2216,7 +2216,7 @@ class Mesh {
       if (fanningVertex !== -1) continue;
 
       while (deadEndCount > 0) {
-        var vEnd = deadEndStack[--deadEndCount];
+        const vEnd = deadEndStack[--deadEndCount];
         if (livesTriangles[vEnd] > 0) {
           fanningVertex = vEnd;
           break;
@@ -2243,29 +2243,29 @@ class Mesh {
     // pre transform optimization (not as important as post transform though)
     // it also removes unused vertices
 
-    var vArOld = this.getVertices();
-    var cArOld = this.getColors();
-    var mArOld = this.getMaterials();
-    var nbVertices = this.getNbVertices();
+    const vArOld = this.getVertices();
+    const cArOld = this.getColors();
+    const mArOld = this.getMaterials();
+    const nbVertices = this.getNbVertices();
 
-    var fAr = this.getFaces();
-    var fArCount = this.getNbFaces() * 4;
+    const fAr = this.getFaces();
+    const fArCount = this.getNbFaces() * 4;
 
-    var vArNew = new Float32Array(nbVertices * 3);
-    var cArNew = new Float32Array(nbVertices * 3);
-    var mArNew = new Float32Array(nbVertices * 3);
+    const vArNew = new Float32Array(nbVertices * 3);
+    const cArNew = new Float32Array(nbVertices * 3);
+    const mArNew = new Float32Array(nbVertices * 3);
 
-    var idvPos = new Uint32Array(nbVertices);
-    var acc = 0;
-    var i = 0;
+    const idvPos = new Uint32Array(nbVertices);
+    let acc = 0;
+    let i = 0;
     for (i = 0; i < fArCount; ++i) {
-      var iv = fAr[i];
+      const iv = fAr[i];
       if (iv === Utils.TRI_INDEX) continue;
 
-      var tag = idvPos[iv] - 1;
+      let tag = idvPos[iv] - 1;
       if (tag === -1) {
-        var idNew = acc * 3;
-        var idOld = iv * 3;
+        const idNew = acc * 3;
+        const idOld = iv * 3;
         vArNew[idNew] = vArOld[idOld];
         vArNew[idNew + 1] = vArOld[idOld + 1];
         vArNew[idNew + 2] = vArOld[idOld + 2];
@@ -2285,33 +2285,33 @@ class Mesh {
       fAr[i] = tag;
     }
 
-    var nbUnusedVertex = nbVertices - acc;
+    const nbUnusedVertex = nbVertices - acc;
     if (nbUnusedVertex > 0)
       this.setNbVertices(acc);
 
     // Only the unique "positoned" vertices are pre transform, because sculptgl 
     // requires the duplicate vertices to be after the uniques positioned vertices
     if (this.hasUV()) {
-      var fArUV = this.getFacesTexCoord();
+      const fArUV = this.getFacesTexCoord();
       // remap unique vertex i
       for (i = 0; i < fArCount; ++i) {
-        var iduv = fArUV[i];
+        const iduv = fArUV[i];
         if (iduv < nbVertices) fArUV[i] = idvPos[iduv] - 1;
         else if (iduv !== Utils.TRI_INDEX) fArUV[i] -= nbUnusedVertex;
       }
 
-      var nbUV = this.getNbTexCoords();
-      var nbUVNew = this.getNbTexCoords() - nbUnusedVertex;
+      const nbUV = this.getNbTexCoords();
+      const nbUVNew = this.getNbTexCoords() - nbUnusedVertex;
 
-      var tAr = this.getTexCoords();
-      var tArNew = new Float32Array(nbUVNew * 2);
-      var dupUVNew = new Uint32Array(acc * 2);
-      var dupUV = this.getVerticesDuplicateStartCount();
+      const tAr = this.getTexCoords();
+      const tArNew = new Float32Array(nbUVNew * 2);
+      const dupUVNew = new Uint32Array(acc * 2);
+      const dupUV = this.getVerticesDuplicateStartCount();
 
       for (i = 0; i < nbVertices; ++i) {
-        var i2 = i * 2;
-        var start = dupUV[i2];
-        var newiv = (idvPos[i] - 1) * 2;
+        const i2 = i * 2;
+        const start = dupUV[i2];
+        const newiv = (idvPos[i] - 1) * 2;
         if (newiv < 0) continue;
 
         if (start > 0) {
@@ -2324,8 +2324,8 @@ class Mesh {
       }
 
       for (i = nbVertices; i < nbUV; ++i) {
-        var ivd = i * 2;
-        var ivdnew = (i - nbUnusedVertex) * 2;
+        const ivd = i * 2;
+        const ivdnew = (i - nbUnusedVertex) * 2;
         tArNew[ivdnew] = tAr[ivd];
         tArNew[ivdnew + 1] = tAr[ivd + 1];
       }

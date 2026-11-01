@@ -5,7 +5,7 @@ class MenuButton extends BaseWidget {
   constructor(callbackOrObject, shortcutOrKey, shortcut) {
     super();
 
-    var callback = callbackOrObject;
+    let callback = callbackOrObject;
     if (callback && typeof callback !== 'function') callback = callbackOrObject[shortcutOrKey].bind(callbackOrObject);
     else shortcut = shortcutOrKey;
 

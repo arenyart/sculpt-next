@@ -12,7 +12,7 @@ class Attribute {
   }
 
   bindToBuffer(buffer) {
-    var gl = this._gl;
+    const gl = this._gl;
     buffer.bind();
     gl.enableVertexAttribArray(this._location);
     gl.vertexAttribPointer(this._location, this._size, this._type, false, 0, 0);

@@ -13,7 +13,7 @@ import Masking from './Masking';
 import LocalScale from './LocalScale';
 import Transform from './Transform';
 
-var Tools = [];
+const Tools = [];
 
 Tools[Enums.Tools.BRUSH] = Brush;
 Tools[Enums.Tools.INFLATE] = Inflate;

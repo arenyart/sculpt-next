@@ -15,8 +15,8 @@ class Crease extends SculptBase {
   }
 
   stroke(picking) {
-    var iVertsInRadius = picking.getPickedVertices();
-    var intensity = this._intensity * Tablet.getPressureIntensity();
+    let iVertsInRadius = picking.getPickedVertices();
+    const intensity = this._intensity * Tablet.getPressureIntensity();
 
     this.updateProxy(iVertsInRadius);
     // undo-redo
@@ -30,42 +30,42 @@ class Crease extends SculptBase {
     picking.setIdAlpha(this._idAlpha);
     this.crease(iVertsInRadius, picking.getPickedNormal(), picking.getIntersectionPoint(), picking.getLocalRadius2(), intensity, picking);
 
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
     mesh.updateGeometry(mesh.getFacesFromVertices(iVertsInRadius), iVertsInRadius);
   }
 
   /** Pinch+brush-like sculpt */
   crease(iVertsInRadius, aNormal, center, radiusSquared, intensity, picking) {
-    var mesh = this.getMesh();
-    var vAr = mesh.getVertices();
-    var mAr = mesh.getMaterials();
-    var vProxy = mesh.getVerticesProxy();
-    var radius = Math.sqrt(radiusSquared);
-    var cx = center[0];
-    var cy = center[1];
-    var cz = center[2];
-    var anx = aNormal[0];
-    var any = aNormal[1];
-    var anz = aNormal[2];
-    var deformIntensity = intensity * 0.07;
-    var brushFactor = deformIntensity * radius;
+    const mesh = this.getMesh();
+    const vAr = mesh.getVertices();
+    const mAr = mesh.getMaterials();
+    const vProxy = mesh.getVerticesProxy();
+    const radius = Math.sqrt(radiusSquared);
+    const cx = center[0];
+    const cy = center[1];
+    const cz = center[2];
+    const anx = aNormal[0];
+    const any = aNormal[1];
+    const anz = aNormal[2];
+    const deformIntensity = intensity * 0.07;
+    let brushFactor = deformIntensity * radius;
     if (this._negative)
       brushFactor = -brushFactor;
-    for (var i = 0, l = iVertsInRadius.length; i < l; ++i) {
-      var ind = iVertsInRadius[i] * 3;
-      var dx = cx - vProxy[ind];
-      var dy = cy - vProxy[ind + 1];
-      var dz = cz - vProxy[ind + 2];
-      var dist = Math.sqrt(dx * dx + dy * dy + dz * dz) / radius;
+    for (let i = 0, l = iVertsInRadius.length; i < l; ++i) {
+      const ind = iVertsInRadius[i] * 3;
+      const dx = cx - vProxy[ind];
+      const dy = cy - vProxy[ind + 1];
+      const dz = cz - vProxy[ind + 2];
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) / radius;
       if (dist >= 1.0)
         continue;
-      var vx = vAr[ind];
-      var vy = vAr[ind + 1];
-      var vz = vAr[ind + 2];
-      var fallOff = dist * dist;
+      const vx = vAr[ind];
+      const vy = vAr[ind + 1];
+      const vz = vAr[ind + 2];
+      let fallOff = dist * dist;
       fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
       fallOff *= mAr[ind + 2] * picking.getAlpha(vx, vy, vz);
-      var brushModifier = Math.pow(fallOff, 5) * brushFactor;
+      const brushModifier = Math.pow(fallOff, 5) * brushFactor;
       fallOff *= deformIntensity;
       vAr[ind] = vx + dx * fallOff + anx * brushModifier;
       vAr[ind + 1] = vy + dy * fallOff + any * brushModifier;

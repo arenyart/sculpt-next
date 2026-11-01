@@ -8,10 +8,10 @@ class Folder extends BaseContainer {
     this.domUl = document.createElement('ul');
     this.domUl.setAttribute('opened', true);
 
-    var domTitle = document.createElement('label');
+    const domTitle = document.createElement('label');
     domTitle.innerHTML = name || '';
 
-    domTitle.addEventListener('mousedown', this._onMouseDown.bind(this));
+    domTitle.addEventListener('pointerdown', this._onMouseDown.bind(this));
 
     this.domUl.appendChild(domTitle);
     this.isOpen = true;

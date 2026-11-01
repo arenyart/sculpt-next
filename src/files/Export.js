@@ -5,7 +5,7 @@ import ExportSTL from './ExportSTL';
 import ExportSketchfab from './ExportSketchfab';
 import ExportMaterialise from './ExportMaterialise';
 
-var Export = {};
+const Export = {};
 Export.exportOBJ = ExportOBJ.exportOBJ;
 Export.exportSGL = ExportSGL.exportSGL;
 Export.exportAsciiPLY = ExportPLY.exportAsciiPLY;

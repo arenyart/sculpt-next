@@ -11,9 +11,9 @@ class Sidebar {
 
     this.isDragging = false;
     this.mouseX = 0;
-    this.domResize.addEventListener('mousedown', this._onMouseDown.bind(this));
-    window.addEventListener('mousemove', this._onMouseMove.bind(this));
-    window.addEventListener('mouseup', this._onMouseUp.bind(this));
+    this.domResize.addEventListener('pointerdown', this._onMouseDown.bind(this));
+    window.addEventListener('pointermove', this._onMouseMove.bind(this));
+    window.addEventListener('pointerup', this._onMouseUp.bind(this));
 
     this.callbackResize = callbackResize;
     this.isOnTheRight = false;
@@ -35,12 +35,13 @@ class Sidebar {
   }
 
   _onMouseDown(ev) {
+    this.domResize.setPointerCapture(ev.pointerId);
     this.isDragging = true;
     this.mouseX = ev.clientX;
   }
 
   _updateViewportPosition(viewport) {
-    var w = this.domSidebar.hidden ? 0 : this.domSidebar.offsetWidth;
+    const w = this.domSidebar.hidden ? 0 : this.domSidebar.offsetWidth;
     if (this.isOnTheRight) {
       viewport.style.width = (viewport.clientWidth - w) + 'px';
     } else {
@@ -51,12 +52,12 @@ class Sidebar {
 
   _onMouseMove(ev) {
     if (this.isDragging === false) return;
-    var mouseX = ev.clientX;
-    var delta = mouseX - this.mouseX;
+    const mouseX = ev.clientX;
+    let delta = mouseX - this.mouseX;
     if (this.isOnTheRight) delta = -delta;
-    var widthBar = Math.max(50, this.domSidebar.offsetWidth + delta);
+    const widthBar = Math.max(50, this.domSidebar.offsetWidth + delta);
 
-    var val = widthBar + 'px';
+    const val = widthBar + 'px';
     this.domSidebar.style.width = val;
     if (this.isOnTheRight) this.domResize.style.right = this.domSidebar.offsetWidth + 'px';
     else this.domResize.style.left = val;
@@ -70,7 +71,7 @@ class Sidebar {
   }
 
   addMenu(name) {
-    var folder = new Folder(name);
+    const folder = new Folder(name);
     this.domSidebar.appendChild(folder.domUl);
     return folder;
   }

@@ -1,15 +1,15 @@
 import GuiUtils from './GuiUtils';
 
-var EditStyle = {};
+const EditStyle = {};
 
 EditStyle.refRules = {};
 
-var yaguiSheet;
-var findSheet = function () {
+let yaguiSheet;
+const findSheet = function () {
   if (yaguiSheet) return yaguiSheet;
-  var sheets = document.styleSheets;
-  for (var i = 0, nb = sheets.length; i < nb; ++i) {
-    var href = sheets[i].href;
+  const sheets = document.styleSheets;
+  for (let i = 0, nb = sheets.length; i < nb; ++i) {
+    const href = sheets[i].href;
     if (href && href.indexOf('yagui.css') !== -1) {
       yaguiSheet = sheets[i];
       return yaguiSheet;
@@ -18,15 +18,15 @@ var findSheet = function () {
   return;
 };
 
-var editStyle = function (selector, key, value) {
-  var sheet = findSheet();
+const editStyle = function (selector, key, value) {
+  const sheet = findSheet();
   if (!sheet)
     return;
-  var rules = sheet.cssRules || sheet.rules;
-  var rule = EditStyle.refRules[selector];
+  const rules = sheet.cssRules || sheet.rules;
+  let rule = EditStyle.refRules[selector];
   if (!rule) {
-    var i = 0;
-    var len = rules.length;
+    let i = 0;
+    const len = rules.length;
     for (i = 0; i < len; ++i) {
       if (rules[i].selectorText === selector) break;
     }
@@ -38,7 +38,7 @@ var editStyle = function (selector, key, value) {
 };
 
 EditStyle.changeWidgetsColor = function (color) {
-  var str = GuiUtils.getStrColor(color);
+  const str = GuiUtils.getStrColor(color);
   // button
   editStyle('.gui-button', 'background', str);
   // select
@@ -49,7 +49,7 @@ EditStyle.changeWidgetsColor = function (color) {
 };
 
 EditStyle.changeDisplayBoorder = function (bool) {
-  var str = bool ? '1px solid #000' : '0';
+  const str = bool ? '1px solid #000' : '0';
   editStyle('.gui-button', 'border', str);
   // select
   editStyle('.gui-select', 'border', str);
@@ -71,14 +71,14 @@ EditStyle.changeBackgroundColor = function (color) {
   // side bar
   editStyle('.gui-sidebar', 'background', GuiUtils.getStrColor(color));
   // top bar
-  var colTop = GuiUtils.getStrColor(GuiUtils.getColorMult(color, 0.5));
+  const colTop = GuiUtils.getStrColor(GuiUtils.getColorMult(color, 0.5));
   editStyle('.gui-topbar', 'background', colTop);
   editStyle('.gui-topbar ul > li > ul', 'background', colTop);
   EditStyle._curBackgroundColor = color;
 };
 
 EditStyle.changeTextColor = function (color) {
-  var strColor = GuiUtils.getStrColor(color);
+  const strColor = GuiUtils.getStrColor(color);
   editStyle('*', 'color', strColor);
   editStyle('.gui-sidebar > ul > label', 'color', strColor);
   EditStyle._curTextColor = color;
@@ -86,12 +86,12 @@ EditStyle.changeTextColor = function (color) {
 
 EditStyle.changeOverallColor = function (color) {
   EditStyle.changeWidgetsColor(color);
-  var bgCol = GuiUtils.getColorMult(color, 0.5);
+  const bgCol = GuiUtils.getColorMult(color, 0.5);
   bgCol.length = 3;
   EditStyle.changeBackgroundColor(bgCol);
 
-  var texCol = GuiUtils.getColorAdd(color, 0.5);
-  for (var i = 0; i < 3; ++i) texCol[i] = Math.min(0.8, texCol[i]);
+  const texCol = GuiUtils.getColorAdd(color, 0.5);
+  for (let i = 0; i < 3; ++i) texCol[i] = Math.min(0.8, texCol[i]);
   EditStyle.changeTextColor(texCol);
 
   EditStyle._curWidgetColor = color;

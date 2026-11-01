@@ -49,9 +49,9 @@ class Gui {
 
     this._guiMain = new yagui.GuiMain(this._main.getViewport(), this._main.onCanvasResize.bind(this._main));
 
-    var ctrls = this._ctrls;
+    const ctrls = this._ctrls;
     ctrls.length = 0;
-    var idc = 0;
+    let idc = 0;
 
     // Initialize the topbar
     this._topbar = this._guiMain.addTopbar();
@@ -73,7 +73,7 @@ class Gui {
     ctrls[idc++] = this._ctrlSculpting = new GuiSculpting(this._sidebar, this);
 
     // gui extra
-    var extra = this._topbar.addExtra();
+    const extra = this._topbar.addExtra();
     // Extra : Настройка интерфейса
     extra.addTitle(TR('contour'));
     extra.addColor(TR('contourColor'), ShaderContour.color, this.onContourColor.bind(this));
@@ -90,7 +90,7 @@ class Gui {
   }
 
   getNotification(notifName) {
-    var notif = this._notifications[notifName];
+    let notif = this._notifications[notifName];
     if (!notif) {
       notif = this._topbar.addMenu();
       notif.isVisible = function () {
@@ -121,7 +121,7 @@ class Gui {
   }
 
   initPrint(guiParent) {
-    var menu = guiParent.addMenu('Print it!');
+    const menu = guiParent.addMenu('Print it!');
     menu.addButton('Go to Materialise!', this, 'exportMaterialise');
   }
 
@@ -136,13 +136,13 @@ class Gui {
   }
 
   _export(notifName) {
-    var mesh = this._main.getMesh();
+    const mesh = this._main.getMesh();
     if (!mesh) return;
 
-    var notif = this.getNotification(notifName);
+    const notif = this.getNotification(notifName);
     if (!notif) return;
 
-    var fName = 'export' + notifName.charAt(0).toUpperCase() + notifName.slice(1);
+    const fName = 'export' + notifName.charAt(0).toUpperCase() + notifName.slice(1);
     this._xhrs[notifName] = Export[fName](this._main, notif);
   }
 
@@ -160,7 +160,7 @@ class Gui {
   }
 
   addAboutButton() {
-    var ctrlAbout = this._topbar.addMenu();
+    const ctrlAbout = this._topbar.addMenu();
     ctrlAbout.domContainer.innerHTML = TR('about');
     ctrlAbout.domContainer.addEventListener('mousedown', function () {
       window.open('http://stephaneginier.com', '_blank');
@@ -208,8 +208,8 @@ class Gui {
   }
 
   callFunc(func, event) {
-    for (var i = 0, ctrls = this._ctrls, nb = ctrls.length; i < nb; ++i) {
-      var ct = ctrls[i];
+    for (let i = 0, ctrls = this._ctrls, nb = ctrls.length; i < nb; ++i) {
+      const ct = ctrls[i];
       if (ct && ct[func])
         ct[func](event);
     }

@@ -1,7 +1,7 @@
 import ShaderBase from './ShaderBase';
 import Attribute from '../Attribute';
 
-var ShaderBlur = ShaderBase.getCopy();
+const ShaderBlur = ShaderBase.getCopy();
 ShaderBlur.vertexName = ShaderBlur.fragmentName = 'Blur';
 
 ShaderBlur.INPUT_TEXTURE = null;
@@ -44,7 +44,7 @@ ShaderBlur.fragment = [
 ].join('\n');
 
 ShaderBlur.draw = function (rtt) {
-  var gl = rtt.getGL();
+  const gl = rtt.getGL();
   gl.useProgram(this.program);
 
   ShaderBlur.attributes.aVertex.bindToBuffer(rtt.getVertexBuffer());

@@ -23,7 +23,7 @@ class GuiFiles {
   }
 
   init(guiParent) {
-    var menu = this._menu = guiParent.addMenu(TR('fileTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('fileTitle'));
 
     // import
     menu.addTitle(TR('fileImportTitle'));
@@ -62,18 +62,18 @@ class GuiFiles {
 
   _getExportMeshes() {
     if (this._exportAll) return this._main.getMeshes();
-    var selected = this._main.getSelectedMeshes();
+    const selected = this._main.getSelectedMeshes();
     return selected.length ? selected : undefined;
   }
 
   _extractTexture(gl, width, height) {
-    var canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
 
-    var pixels = new Uint8Array(4 * width * height);
+    const pixels = new Uint8Array(4 * width * height);
 
-    var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     if (status !== gl.FRAMEBUFFER_COMPLETE) {
       console.error('FRAMEBUFFER not complete');
       return canvas;
@@ -84,8 +84,8 @@ class GuiFiles {
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
     // copy pixels to canvas pixels (inverted image)
-    var ctx = canvas.getContext('2d');
-    var imageData = ctx.getImageData(0, 0, width, height);
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, width, height);
     imageData.data.set(pixels);
     ctx.putImageData(imageData, 0, 0);
 
@@ -110,7 +110,7 @@ class GuiFiles {
   }
 
   _saveTexture(filename) {
-    var mesh = this._main.getMesh();
+    const mesh = this._main.getMesh();
     if (!mesh) {
       return;
     }
@@ -120,15 +120,15 @@ class GuiFiles {
       return;
     }
 
-    var gl = mesh.getGL();
+    const gl = mesh.getGL();
 
-    var width = this._texSize;
-    var height = this._texSize;
+    const width = this._texSize;
+    const height = this._texSize;
 
-    var tmpShaderType = mesh.getShaderType();
+    const tmpShaderType = mesh.getShaderType();
     mesh.setShaderType(Enums.Shader.PAINTUV);
 
-    var rttPaint = this._getRttPaint(gl);
+    const rttPaint = this._getRttPaint(gl);
     rttPaint.onResize(width, height);
     gl.bindFramebuffer(gl.FRAMEBUFFER, rttPaint.getFramebuffer());
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -140,7 +140,7 @@ class GuiFiles {
 
     this._blurImage(gl, width, height);
 
-    var canvas = this._extractTexture(gl, width, height);
+    const canvas = this._extractTexture(gl, width, height);
     canvas.toBlob((blob) => FileUtils.saveAs(blob, filename + '.png'));
 
     // reset viewport size
@@ -148,7 +148,7 @@ class GuiFiles {
   }
 
   _blurImage(gl, width, height) {
-    var rttBlur = this._getRttBlur(gl);
+    const rttBlur = this._getRttBlur(gl);
     rttBlur.onResize(width, height);
     gl.bindFramebuffer(gl.FRAMEBUFFER, rttBlur.getFramebuffer());
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -172,25 +172,25 @@ class GuiFiles {
   }
 
   saveFileAsSGL() {
-    var meshes = this._getExportMeshes();
+    const meshes = this._getExportMeshes();
     if (!meshes) return;
     this._save(Export.exportSGL(meshes, this._main), 'yourMesh.sgl');
   }
 
   saveFileAsOBJ() {
-    var meshes = this._getExportMeshes();
+    const meshes = this._getExportMeshes();
     if (!meshes) return;
     this._save(Export.exportOBJ(meshes, this._objColorZbrush, this._objColorAppended), 'yourMesh.obj');
   }
 
   saveFileAsPLY() {
-    var meshes = this._getExportMeshes();
+    const meshes = this._getExportMeshes();
     if (!meshes) return;
     this._save(Export.exportBinaryPLY(meshes), 'yourMesh.ply');
   }
 
   saveFileAsSTL() {
-    var meshes = this._getExportMeshes();
+    const meshes = this._getExportMeshes();
     if (!meshes) return;
     this._save(Export.exportBinarySTL(meshes), 'yourMesh.stl');
   }
@@ -211,7 +211,7 @@ class GuiFiles {
     if (!this._main._focusGui)
       event.preventDefault();
 
-    var key = getKeyCode(event);
+    const key = getKeyCode(event);
     if (event.ctrlKey && event.altKey && key === 78) { // N
       this._main.clearScene();
       event.handled = true;

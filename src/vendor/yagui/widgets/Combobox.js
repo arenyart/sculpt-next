@@ -5,8 +5,8 @@ class Combobox extends BaseWidget {
   constructor(valOrObject, callbackOrKey, options) {
     super();
 
-    var value = this._getInitialValue(valOrObject, callbackOrKey);
-    var callback = this._getCheckCallback(valOrObject, callbackOrKey);
+    let value = this._getInitialValue(valOrObject, callbackOrKey);
+    const callback = this._getCheckCallback(valOrObject, callbackOrKey);
     options = options || {};
     value = value !== undefined ? value : options[0];
 
@@ -30,9 +30,9 @@ class Combobox extends BaseWidget {
   }
 
   addOptions(options) {
-    var keys = Object.keys(options);
-    for (var i = 0; i < keys.length; ++i) {
-      var opt = document.createElement('option');
+    const keys = Object.keys(options);
+    for (let i = 0; i < keys.length; ++i) {
+      const opt = document.createElement('option');
       opt.innerHTML = options[keys[i]];
       opt.value = keys[i];
       this.domSelect.appendChild(opt);

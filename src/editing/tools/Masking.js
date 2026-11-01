@@ -27,7 +27,7 @@ class Masking extends SculptBase {
   }
 
   updateMeshBuffers() {
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
     if (mesh.isDynamic)
       mesh.updateBuffers();
     else
@@ -45,42 +45,42 @@ class Masking extends SculptBase {
 
   /** Paint color vertices */
   paint(iVerts, center, radiusSquared, intensity, hardness, picking) {
-    var mesh = this.getMesh();
-    var vAr = mesh.getVertices();
-    var mAr = mesh.getMaterials();
-    var radius = Math.sqrt(radiusSquared);
-    var cx = center[0];
-    var cy = center[1];
-    var cz = center[2];
-    var softness = 2 * (1 - hardness);
-    var maskIntensity = this._negative ? -intensity : intensity;
-    for (var i = 0, l = iVerts.length; i < l; ++i) {
-      var ind = iVerts[i] * 3;
-      var vx = vAr[ind];
-      var vy = vAr[ind + 1];
-      var vz = vAr[ind + 2];
-      var dx = vx - cx;
-      var dy = vy - cy;
-      var dz = vz - cz;
-      var dist = Math.sqrt(dx * dx + dy * dy + dz * dz) / radius;
+    const mesh = this.getMesh();
+    const vAr = mesh.getVertices();
+    const mAr = mesh.getMaterials();
+    const radius = Math.sqrt(radiusSquared);
+    const cx = center[0];
+    const cy = center[1];
+    const cz = center[2];
+    const softness = 2 * (1 - hardness);
+    const maskIntensity = this._negative ? -intensity : intensity;
+    for (let i = 0, l = iVerts.length; i < l; ++i) {
+      const ind = iVerts[i] * 3;
+      const vx = vAr[ind];
+      const vy = vAr[ind + 1];
+      const vz = vAr[ind + 2];
+      const dx = vx - cx;
+      const dy = vy - cy;
+      const dz = vz - cz;
+      let dist = Math.sqrt(dx * dx + dy * dy + dz * dz) / radius;
       if (dist > 1) dist = 1.0;
 
-      var fallOff = Math.pow(1.0 - dist, softness);
+      let fallOff = Math.pow(1.0 - dist, softness);
       fallOff *= maskIntensity * picking.getAlpha(vx, vy, vz);
       mAr[ind + 2] = Math.min(Math.max(mAr[ind + 2] + fallOff, 0.0), 1.0);
     }
   }
 
   updateAndRenderMask() {
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
     mesh.updateDuplicateColorsAndMaterials();
     mesh.updateDrawArrays();
     this.updateRender();
   }
 
   blur() {
-    var mesh = this.getMesh();
-    var iVerts = this.getMaskedVertices();
+    const mesh = this.getMesh();
+    let iVerts = this.getMaskedVertices();
     if (iVerts.length === 0)
       return;
     iVerts = mesh.expandsVertices(iVerts, 1);
@@ -88,84 +88,84 @@ class Masking extends SculptBase {
     this.pushState();
     this._main.getStateManager().pushVertices(iVerts);
 
-    var mAr = mesh.getMaterials();
-    var nbVerts = iVerts.length;
-    var smoothVerts = new Float32Array(nbVerts * 3);
+    const mAr = mesh.getMaterials();
+    const nbVerts = iVerts.length;
+    const smoothVerts = new Float32Array(nbVerts * 3);
     this.laplacianSmooth(iVerts, smoothVerts, mAr);
-    for (var i = 0; i < nbVerts; ++i)
+    for (let i = 0; i < nbVerts; ++i)
       mAr[iVerts[i] * 3 + 2] = smoothVerts[i * 3 + 2];
     this.updateAndRenderMask();
   }
 
   sharpen() {
-    var mesh = this.getMesh();
-    var iVerts = this.getMaskedVertices();
+    const mesh = this.getMesh();
+    const iVerts = this.getMaskedVertices();
     if (iVerts.length === 0)
       return;
 
     this.pushState();
     this._main.getStateManager().pushVertices(iVerts);
 
-    var mAr = mesh.getMaterials();
-    var nbVerts = iVerts.length;
-    for (var i = 0; i < nbVerts; ++i) {
-      var idm = iVerts[i] * 3 + 2;
-      var val = mAr[idm];
+    const mAr = mesh.getMaterials();
+    const nbVerts = iVerts.length;
+    for (let i = 0; i < nbVerts; ++i) {
+      const idm = iVerts[i] * 3 + 2;
+      const val = mAr[idm];
       mAr[idm] = val > 0.5 ? Math.min(val + 0.1, 1.0) : Math.max(val - 1.0, 0.0);
     }
     this.updateAndRenderMask();
   }
 
   clear() {
-    var mesh = this.getMesh();
-    var iVerts = this.getMaskedVertices();
+    const mesh = this.getMesh();
+    const iVerts = this.getMaskedVertices();
     if (iVerts.length === 0)
       return;
 
     this.pushState();
     this._main.getStateManager().pushVertices(iVerts);
 
-    var mAr = mesh.getMaterials();
-    for (var i = 0, nb = iVerts.length; i < nb; ++i)
+    const mAr = mesh.getMaterials();
+    for (let i = 0, nb = iVerts.length; i < nb; ++i)
       mAr[iVerts[i] * 3 + 2] = 1.0;
 
     this.updateAndRenderMask();
   }
 
   invert(isState, meshState) {
-    var mesh = meshState;
+    let mesh = meshState;
     if (!mesh) mesh = this.getMesh();
     if (!isState)
       this._main.getStateManager().pushStateCustom(this.invert.bind(this, true, mesh));
 
-    var mAr = mesh.getMaterials();
-    for (var i = 0, nb = mesh.getNbVertices(); i < nb; ++i)
+    const mAr = mesh.getMaterials();
+    for (let i = 0, nb = mesh.getNbVertices(); i < nb; ++i)
       mAr[i * 3 + 2] = 1.0 - mAr[i * 3 + 2];
 
     this.updateAndRenderMask();
   }
 
   remapAndMirrorIndices(fAr, nbFaces, iVerts) {
-    var nbVertices = this.getMesh().getNbVertices();
-    var iTag = new Uint32Array(Utils.getMemory(nbVertices * 4), 0, nbVertices);
-    var i = 0;
-    var j = 0;
-    var nbVerts = iVerts.length;
+    const nbVertices = this.getMesh().getNbVertices();
+    const iTag = new Uint32Array(Utils.getMemory(nbVertices * 4), 0, nbVertices);
+    let i = 0;
+    let j = 0;
+    const nbVerts = iVerts.length;
     for (i = 0; i < nbVerts; ++i)
       iTag[iVerts[i]] = i;
 
-    var endFaces = nbFaces * 2;
+    const endFaces = nbFaces * 2;
     for (i = 0; i < endFaces; ++i) {
       j = i * 4;
-      var offset = i < nbFaces ? 0 : nbVerts;
+      const offset = i < nbFaces ? 0 : nbVerts;
       fAr[j] = iTag[fAr[j]] + offset;
       fAr[j + 1] = iTag[fAr[j + 1]] + offset;
       fAr[j + 2] = iTag[fAr[j + 2]] + offset;
-      var id4 = fAr[j + 3];
+      const id4 = fAr[j + 3];
       if (id4 !== Utils.TRI_INDEX) fAr[j + 3] = iTag[id4] + offset;
     }
 
-    var end = fAr.length / 4;
+    const end = fAr.length / 4;
     for (i = endFaces; i < end; ++i) {
       j = i * 4;
       fAr[j] = iTag[fAr[j]];
@@ -176,40 +176,40 @@ class Masking extends SculptBase {
   }
 
   invertFaces(fAr) {
-    for (var i = 0, nb = fAr.length / 4; i < nb; ++i) {
-      var id = i * 4;
-      var temp = fAr[id];
+    for (let i = 0, nb = fAr.length / 4; i < nb; ++i) {
+      const id = i * 4;
+      const temp = fAr[id];
       fAr[id] = fAr[id + 2];
       fAr[id + 2] = temp;
     }
   }
 
   extractFaces(iFaces, iVerts, maskClamp) {
-    var mesh = this.getMesh();
-    var fAr = mesh.getFaces();
-    var mAr = mesh.getMaterials();
-    var eAr = mesh.getVerticesOnEdge();
+    const mesh = this.getMesh();
+    const fAr = mesh.getFaces();
+    const mAr = mesh.getMaterials();
+    const eAr = mesh.getVerticesOnEdge();
 
-    var noThick = this._thickness === 0;
+    const noThick = this._thickness === 0;
 
-    var nbFaces = iFaces.length;
-    var nbNewFaces = new Uint32Array(Utils.getMemory(nbFaces * 4 * 4 * 3), 0, nbFaces * 4 * 3);
-    var offsetFLink = noThick ? nbFaces : nbFaces * 2;
-    for (var i = 0; i < nbFaces; ++i) {
-      var idf = i * 4;
-      var idOld = iFaces[i] * 4;
-      var iv1 = nbNewFaces[idf] = fAr[idOld];
-      var iv2 = nbNewFaces[idf + 1] = fAr[idOld + 1];
-      var iv3 = nbNewFaces[idf + 2] = fAr[idOld + 2];
-      var iv4 = nbNewFaces[idf + 3] = fAr[idOld + 3];
+    const nbFaces = iFaces.length;
+    const nbNewFaces = new Uint32Array(Utils.getMemory(nbFaces * 4 * 4 * 3), 0, nbFaces * 4 * 3);
+    let offsetFLink = noThick ? nbFaces : nbFaces * 2;
+    for (let i = 0; i < nbFaces; ++i) {
+      let idf = i * 4;
+      const idOld = iFaces[i] * 4;
+      const iv1 = nbNewFaces[idf] = fAr[idOld];
+      const iv2 = nbNewFaces[idf + 1] = fAr[idOld + 1];
+      const iv3 = nbNewFaces[idf + 2] = fAr[idOld + 2];
+      const iv4 = nbNewFaces[idf + 3] = fAr[idOld + 3];
       if (noThick)
         continue;
-      var isQuad = iv4 !== Utils.TRI_INDEX;
+      const isQuad = iv4 !== Utils.TRI_INDEX;
 
-      var b1 = mAr[iv1 * 3 + 2] >= maskClamp || eAr[iv1] >= 1;
-      var b2 = mAr[iv2 * 3 + 2] >= maskClamp || eAr[iv2] >= 1;
-      var b3 = mAr[iv3 * 3 + 2] >= maskClamp || eAr[iv3] >= 1;
-      var b4 = isQuad ? mAr[iv4 * 3 + 2] >= maskClamp || eAr[iv4] >= 1 : false;
+      const b1 = mAr[iv1 * 3 + 2] >= maskClamp || eAr[iv1] >= 1;
+      const b2 = mAr[iv2 * 3 + 2] >= maskClamp || eAr[iv2] >= 1;
+      const b3 = mAr[iv3 * 3 + 2] >= maskClamp || eAr[iv3] >= 1;
+      const b4 = isQuad ? mAr[iv4 * 3 + 2] >= maskClamp || eAr[iv4] >= 1 : false;
 
       // create opposite face (layer), invert clockwise
       // quad =>
@@ -260,7 +260,7 @@ class Masking extends SculptBase {
       }
     }
 
-    var fArNew = new Uint32Array(nbNewFaces.subarray(0, offsetFLink * 4));
+    const fArNew = new Uint32Array(nbNewFaces.subarray(0, offsetFLink * 4));
     this.remapAndMirrorIndices(fArNew, nbFaces, iVerts);
     if (this._thickness > 0)
       this.invertFaces(fArNew);
@@ -268,23 +268,23 @@ class Masking extends SculptBase {
   }
 
   extractVertices(iVerts) {
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
 
-    var vAr = mesh.getVertices();
-    var nAr = mesh.getNormals();
-    var mat = mesh.getMatrix();
-    var nMat = mat3.normalFromMat4(mat3.create(), mat);
-    var nbVerts = iVerts.length;
-    var vArNew = new Float32Array(nbVerts * 2 * 3);
-    var vTemp = [0.0, 0.0, 0.0];
-    var nTemp = [0.0, 0.0, 0.0];
-    var vOffset = nbVerts * 3;
-    var thick = this._thickness;
-    var eps = 0.01;
+    const vAr = mesh.getVertices();
+    const nAr = mesh.getNormals();
+    const mat = mesh.getMatrix();
+    const nMat = mat3.normalFromMat4(mat3.create(), mat);
+    const nbVerts = iVerts.length;
+    const vArNew = new Float32Array(nbVerts * 2 * 3);
+    const vTemp = [0.0, 0.0, 0.0];
+    const nTemp = [0.0, 0.0, 0.0];
+    const vOffset = nbVerts * 3;
+    const thick = this._thickness;
+    let eps = 0.01;
     if (thick < 0) eps = -eps;
-    for (var i = 0; i < nbVerts; ++i) {
-      var idv = i * 3;
-      var idvOld = iVerts[i] * 3;
+    for (let i = 0; i < nbVerts; ++i) {
+      let idv = i * 3;
+      const idvOld = iVerts[i] * 3;
       vTemp[0] = vAr[idvOld];
       vTemp[1] = vAr[idvOld + 1];
       vTemp[2] = vAr[idvOld + 2];
@@ -310,12 +310,12 @@ class Masking extends SculptBase {
   }
 
   smoothBorder(mesh, iFaces) {
-    var startBridge = iFaces.length * 2;
-    var fBridge = new Uint32Array(mesh.getNbFaces() - startBridge);
-    for (var i = 0, nbBridge = fBridge.length; i < nbBridge; ++i)
+    const startBridge = iFaces.length * 2;
+    const fBridge = new Uint32Array(mesh.getNbFaces() - startBridge);
+    for (let i = 0, nbBridge = fBridge.length; i < nbBridge; ++i)
       fBridge[i] = startBridge + i;
-    var vBridge = mesh.expandsVertices(mesh.getVerticesFromFaces(fBridge), 1);
-    var smo = new Smooth();
+    const vBridge = mesh.expandsVertices(mesh.getVerticesFromFaces(fBridge), 1);
+    const smo = new Smooth();
     smo.setToolMesh(mesh);
     smo.smooth(vBridge, 1.0);
     smo.smooth(vBridge, 1.0);
@@ -323,19 +323,19 @@ class Masking extends SculptBase {
   }
 
   extract() {
-    var mesh = this.getMesh();
-    var maskClamp = 0.5;
+    const mesh = this.getMesh();
+    const maskClamp = 0.5;
 
-    var iVerts = this.filterMaskedVertices(-Infinity, maskClamp);
+    let iVerts = this.filterMaskedVertices(-Infinity, maskClamp);
     if (iVerts.length === 0)
       return;
-    var iFaces = mesh.getFacesFromVertices(iVerts);
+    const iFaces = mesh.getFacesFromVertices(iVerts);
     iVerts = mesh.getVerticesFromFaces(iFaces);
 
-    var fArNew = this.extractFaces(iFaces, iVerts, maskClamp);
-    var vArNew = this.extractVertices(iVerts);
+    const fArNew = this.extractFaces(iFaces, iVerts, maskClamp);
+    const vArNew = this.extractVertices(iVerts);
 
-    var newMesh = new MeshStatic(mesh.getGL());
+    const newMesh = new MeshStatic(mesh.getGL());
     newMesh.setVertices(vArNew);
     newMesh.setFaces(fArNew);
 
@@ -352,7 +352,7 @@ class Masking extends SculptBase {
     newMesh.copyRenderConfig(mesh);
     newMesh.initRender();
 
-    var main = this._main;
+    const main = this._main;
     main.addNewMesh(newMesh);
     main.setMesh(mesh);
   }

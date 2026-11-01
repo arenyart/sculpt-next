@@ -2,7 +2,7 @@ import Utils from './Utils';
 
 // enum marked with /!\ shouldn't change (serialized in sgl file)
 
-var Enums = {};
+const Enums = {};
 
 Enums.Action = {
   NOTHING: 0,
@@ -71,7 +71,7 @@ Enums.MultiState = {
 
 // actions linked to shortcuts
 // tools index must match
-var acc = Object.keys(Enums.Tools).length;
+let acc = Object.keys(Enums.Tools).length;
 Enums.KeyAction = Utils.extend({
   INTENSITY: acc++,
   RADIUS: acc++,

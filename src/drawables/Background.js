@@ -33,19 +33,19 @@ class Background {
     if (event.target.files.length === 0)
       return;
 
-    var file = event.target.files[0];
+    const file = event.target.files[0];
     if (!file.type.match('image.*'))
       return;
 
-    var self = this;
-    var reader = new FileReader();
+    const self = this;
+    const reader = new FileReader();
     reader.onload = function (evt) {
-      var bg = new Image();
+      const bg = new Image();
       bg.src = evt.target.result;
 
       bg.onload = function () {
 
-        var canvas = self._main.getCanvas();
+        const canvas = self._main.getCanvas();
         self.loadBackgroundTexture(bg);
         self.onResize(canvas.width, canvas.height);
         self._main.render();
@@ -87,10 +87,10 @@ class Background {
   }
 
   onResize(width, height) {
-    var ratio = (width / height) / (this._texWidth / this._texHeight);
-    var comp = this._fill || this._type !== 0 ? 1.0 / ratio : ratio;
-    var x = comp < 1.0 ? 1.0 : 1.0 / ratio;
-    var y = comp < 1.0 ? ratio : 1.0;
+    const ratio = (width / height) / (this._texWidth / this._texHeight);
+    const comp = this._fill || this._type !== 0 ? 1.0 / ratio : ratio;
+    const x = comp < 1.0 ? 1.0 : 1.0 / ratio;
+    const y = comp < 1.0 ? ratio : 1.0;
     this.getVertexBuffer().update(new Float32Array([-x, -y, x, -y, -x, y, x, y]));
   }
 
@@ -99,8 +99,8 @@ class Background {
   }
 
   createOnePixelTexture(r, g, b, a) {
-    var gl = this._gl;
-    var tex = gl.createTexture();
+    const gl = this._gl;
+    const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([r, g, b, a]));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -110,7 +110,7 @@ class Background {
   }
 
   loadBackgroundTexture(tex) {
-    var gl = this._gl;
+    const gl = this._gl;
     this.deleteTexture();
 
     this._texWidth = tex.width;

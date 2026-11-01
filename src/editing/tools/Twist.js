@@ -21,13 +21,13 @@ class Twist extends SculptBase {
   }
 
   startSculpt() {
-    var main = this._main;
-    var mouseX = main._mouseX;
-    var mouseY = main._mouseY;
-    var picking = main.getPicking();
+    const main = this._main;
+    const mouseX = main._mouseX;
+    const mouseY = main._mouseY;
+    const picking = main.getPicking();
     this.initTwistData(picking, mouseX, mouseY, this._twistData);
     if (main.getSculptManager().getSymmetry()) {
-      var pickingSym = main.getPickingSymmetry();
+      const pickingSym = main.getPickingSymmetry();
       pickingSym.intersectionMouseMesh();
       pickingSym.setLocalRadius2(picking.getLocalRadius2());
       if (pickingSym.getMesh())
@@ -44,18 +44,18 @@ class Twist extends SculptBase {
 
   /** Make a brush twist stroke */
   sculptStroke() {
-    var main = this._main;
-    var mx = main._mouseX;
-    var my = main._mouseY;
-    var lx = main._lastMouseX;
-    var ly = main._lastMouseY;
-    var picking = main.getPicking();
-    var rLocal2 = picking.getLocalRadius2();
+    const main = this._main;
+    const mx = main._mouseX;
+    const my = main._mouseY;
+    const lx = main._lastMouseX;
+    const ly = main._lastMouseY;
+    const picking = main.getPicking();
+    const rLocal2 = picking.getLocalRadius2();
     picking.pickVerticesInSphere(rLocal2);
     this.stroke(picking, mx, my, lx, ly, this._twistData);
 
     if (main.getSculptManager().getSymmetry()) {
-      var pickingSym = main.getPickingSymmetry();
+      const pickingSym = main.getPickingSymmetry();
       if (pickingSym.getMesh()) {
         pickingSym.pickVerticesInSphere(rLocal2);
         this.stroke(pickingSym, lx, ly, mx, my, this._twistDataSym);
@@ -67,7 +67,7 @@ class Twist extends SculptBase {
 
   /** On stroke */
   stroke(picking, mx, my, lx, ly, twistData) {
-    var iVertsInRadius = picking.getPickedVertices();
+    let iVertsInRadius = picking.getPickedVertices();
 
     // undo-redo
     this._main.getStateManager().pushVertices(iVertsInRadius);
@@ -80,40 +80,40 @@ class Twist extends SculptBase {
     picking.setIdAlpha(this._idAlpha);
     this.twist(iVertsInRadius, picking.getIntersectionPoint(), picking.getLocalRadius2(), mx, my, lx, ly, twistData, picking);
 
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
     mesh.updateGeometry(mesh.getFacesFromVertices(iVertsInRadius), iVertsInRadius);
   }
 
   /** Twist the vertices around the mouse point intersection */
   twist(iVerts, center, radiusSquared, mouseX, mouseY, lastMouseX, lastMouseY, twistData, picking) {
-    var mesh = this.getMesh();
-    var mouseCenter = twistData.center;
-    var vecMouse = [mouseX - mouseCenter[0], mouseY - mouseCenter[1]];
+    const mesh = this.getMesh();
+    const mouseCenter = twistData.center;
+    const vecMouse = [mouseX - mouseCenter[0], mouseY - mouseCenter[1]];
     if (vec2.len(vecMouse) < 30)
       return;
     vec2.normalize(vecMouse, vecMouse);
-    var nPlane = twistData.normal;
-    var rot = [0.0, 0.0, 0.0, 0.0];
-    var vecOldMouse = [lastMouseX - mouseCenter[0], lastMouseY - mouseCenter[1]];
+    const nPlane = twistData.normal;
+    const rot = [0.0, 0.0, 0.0, 0.0];
+    const vecOldMouse = [lastMouseX - mouseCenter[0], lastMouseY - mouseCenter[1]];
     vec2.normalize(vecOldMouse, vecOldMouse);
-    var angle = Geometry.signedAngle2d(vecMouse, vecOldMouse);
-    var vAr = mesh.getVertices();
-    var mAr = mesh.getMaterials();
-    var invRadius = 1.0 / Math.sqrt(radiusSquared);
-    var cx = center[0];
-    var cy = center[1];
-    var cz = center[2];
-    var coord = [0.0, 0.0, 0.0];
-    for (var i = 0, l = iVerts.length; i < l; ++i) {
-      var ind = iVerts[i] * 3;
-      var vx = vAr[ind];
-      var vy = vAr[ind + 1];
-      var vz = vAr[ind + 2];
-      var dx = vx - cx;
-      var dy = vy - cy;
-      var dz = vz - cz;
-      var dist = Math.sqrt(dx * dx + dy * dy + dz * dz) * invRadius;
-      var fallOff = dist * dist;
+    const angle = Geometry.signedAngle2d(vecMouse, vecOldMouse);
+    const vAr = mesh.getVertices();
+    const mAr = mesh.getMaterials();
+    const invRadius = 1.0 / Math.sqrt(radiusSquared);
+    const cx = center[0];
+    const cy = center[1];
+    const cz = center[2];
+    const coord = [0.0, 0.0, 0.0];
+    for (let i = 0, l = iVerts.length; i < l; ++i) {
+      const ind = iVerts[i] * 3;
+      const vx = vAr[ind];
+      const vy = vAr[ind + 1];
+      const vz = vAr[ind + 2];
+      const dx = vx - cx;
+      const dy = vy - cy;
+      const dz = vz - cz;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) * invRadius;
+      let fallOff = dist * dist;
       fallOff = 3.0 * fallOff * fallOff - 4.0 * fallOff * dist + 1.0;
       fallOff *= angle * mAr[ind + 2] * picking.getAlpha(vx, vy, vz);
       quat.setAxisAngle(rot, nPlane, fallOff);

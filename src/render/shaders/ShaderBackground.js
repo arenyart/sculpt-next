@@ -5,7 +5,7 @@ import Attribute from '../Attribute';
 import pbrGLSL from './glsl/pbr.glsl?raw';
 import mainBackgroundGLSL from './glsl/mainBackground.glsl?raw';
 
-var ShaderBackground = ShaderBase.getCopy();
+const ShaderBackground = ShaderBase.getCopy();
 ShaderBackground.vertexName = ShaderBackground.fragmentName = 'Background';
 
 ShaderBackground.uniforms = {};
@@ -31,34 +31,34 @@ ShaderBackground.fragment = [
 ].join('\n');
 
 ShaderBackground.draw = function (bg) {
-  var gl = bg.getGL();
+  const gl = bg.getGL();
   gl.useProgram(this.program);
   this.bindAttributes(bg);
   this.updateUniforms(bg);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 };
 ShaderBackground.initAttributes = function (gl) {
-  var program = ShaderBackground.program;
-  var attrs = ShaderBackground.attributes;
+  const program = ShaderBackground.program;
+  const attrs = ShaderBackground.attributes;
   attrs.aVertex = new Attribute(gl, program, 'aVertex', 2, gl.FLOAT);
   attrs.aTexCoord = new Attribute(gl, program, 'aTexCoord', 2, gl.FLOAT);
 };
 ShaderBackground.bindAttributes = function (bg) {
-  var attrs = ShaderBackground.attributes;
+  const attrs = ShaderBackground.attributes;
   attrs.aVertex.bindToBuffer(bg.getVertexBuffer());
   attrs.aTexCoord.bindToBuffer(bg.getTexCoordBuffer());
 };
 
-var uIBLTmp = mat3.create();
+const uIBLTmp = mat3.create();
 ShaderBackground.updateUniforms = function (bg) {
-  var uniforms = this.uniforms;
-  var main = bg._main;
-  var env = ShaderPBR.environments[ShaderPBR.idEnv];
+  const uniforms = this.uniforms;
+  const main = bg._main;
+  const env = ShaderPBR.environments[ShaderPBR.idEnv];
 
-  var gl = bg.getGL();
+  const gl = bg.getGL();
   gl.uniform1i(uniforms.uBackgroundType, bg.getType());
 
-  var tex;
+  let tex;
   if (bg.getType() === 0) tex = bg.getTexture();
   else tex = ShaderPBR.getOrCreateEnvironment(gl, main, env) || bg.getTexture();
   gl.activeTexture(gl.TEXTURE0);

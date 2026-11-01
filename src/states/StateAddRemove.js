@@ -12,14 +12,14 @@ class StateAddRemove {
   }
 
   undo() {
-    var main = this._main;
-    var meshesMain = main.getMeshes();
-    var addMeshes = this._addedMeshes;
-    var i, l;
+    const main = this._main;
+    const meshesMain = main.getMeshes();
+    const addMeshes = this._addedMeshes;
+    let i, l;
     for (i = 0, l = addMeshes.length; i < l; ++i)
       meshesMain.splice(main.getIndexMesh(addMeshes[i]), 1);
 
-    var remMeshes = this._removedMeshes;
+    const remMeshes = this._removedMeshes;
     for (i = 0, l = remMeshes.length; i < l; ++i)
       meshesMain.push(remMeshes[i]);
 
@@ -27,9 +27,9 @@ class StateAddRemove {
       meshesMain[i].initRender();
     }
 
-    var sel = this._selectMeshes;
+    const sel = this._selectMeshes;
     main.setMesh(sel[0] ? sel[0] : null);
-    var sMeshes = main.getSelectedMeshes();
+    const sMeshes = main.getSelectedMeshes();
     sMeshes.length = 0;
     for (i = 0, l = sel.length; i < l; ++i)
       sMeshes.push(sel[i]);

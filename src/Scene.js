@@ -51,7 +51,7 @@ class Scene {
     this._torusTubular = 128;
 
     // renderable stuffs
-    var opts = getOptionsURL();
+    const opts = getOptionsURL();
     this._showContour = opts.outline;
     this._showGrid = opts.grid;
     this._grid = null;
@@ -95,7 +95,7 @@ class Scene {
     this._gui.initGui();
     this.onCanvasResize();
 
-    var modelURL = getOptionsURL().modelurl;
+    const modelURL = getOptionsURL().modelurl;
     if (modelURL) this.addModelURL(modelURL);
     else this.addSphere();
   }
@@ -185,11 +185,11 @@ class Scene {
   }
 
   initGrid() {
-    var grid = this._grid;
+    const grid = this._grid;
     grid.normalizeSize();
-    var gridm = grid.getMatrix();
+    const gridm = grid.getMatrix();
     mat4.translate(gridm, gridm, [0.0, -0.45, 0.0]);
-    var scale = 2.5;
+    const scale = 2.5;
     mat4.scale(gridm, gridm, [scale, scale, scale]);
     this._grid.setShaderType(Enums.Shader.FLAT);
     grid.setFlatColor([0.04, 0.04, 0.04]);
@@ -202,7 +202,7 @@ class Scene {
       this._selectMeshes.length = 0;
       this._selectMeshes.push(mesh);
     } else {
-      var id = this.getIndexSelectMesh(mesh);
+      const id = this.getIndexSelectMesh(mesh);
       if (id >= 0) {
         if (this._selectMeshes.length > 1) {
           this._selectMeshes.splice(id, 1);
@@ -242,7 +242,7 @@ class Scene {
     this._preventRender = false;
     this.updateMatricesAndSort();
 
-    var gl = this._gl;
+    const gl = this._gl;
     if (!gl) return;
 
     if (this._drawFullScene) this._drawScene();
@@ -263,20 +263,20 @@ class Scene {
   }
 
   _drawScene() {
-    var gl = this._gl;
-    var i = 0;
-    var meshes = this._meshes;
-    var nbMeshes = meshes.length;
+    const gl = this._gl;
+    let i = 0;
+    const meshes = this._meshes;
+    const nbMeshes = meshes.length;
 
     ///////////////
     // CONTOUR 1/2
     ///////////////
     gl.disable(gl.DEPTH_TEST);
-    var showContour = this._selectMeshes.length > 0 && this._showContour && ShaderLib[Enums.Shader.CONTOUR].color[3] > 0.0;
+    const showContour = this._selectMeshes.length > 0 && this._showContour && ShaderLib[Enums.Shader.CONTOUR].color[3] > 0.0;
     if (showContour) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttContour.getFramebuffer());
       gl.clear(gl.COLOR_BUFFER_BIT);
-      for (var s = 0, sel = this._selectMeshes, nbSel = sel.length; s < nbSel; ++s)
+      for (let s = 0, sel = this._selectMeshes, nbSel = sel.length; s < nbSel; ++s)
         sel[s].renderFlatColor(this);
     }
     gl.enable(gl.DEPTH_TEST);
@@ -295,7 +295,7 @@ class Scene {
       if (meshes[i].isTransparent()) break;
       meshes[i].render(this);
     }
-    var startTransparent = i;
+    const startTransparent = i;
     if (this._meshPreview) this._meshPreview.render(this);
 
     // background
@@ -342,13 +342,13 @@ class Scene {
 
   /** Pre compute matrices and sort meshes */
   updateMatricesAndSort() {
-    var meshes = this._meshes;
-    var cam = this._camera;
+    const meshes = this._meshes;
+    const cam = this._camera;
     if (meshes.length > 0) {
       cam.optimizeNearFar(this.computeBoundingBoxScene());
     }
 
-    for (var i = 0, nb = meshes.length; i < nb; ++i) {
+    for (let i = 0, nb = meshes.length; i < nb; ++i) {
       meshes[i].updateMatrices(cam);
     }
 
@@ -359,13 +359,13 @@ class Scene {
   }
 
   initWebGL() {
-    var attributes = {
+    const attributes = {
       antialias: false,
       stencil: true
     };
 
-    var canvas = document.getElementById('canvas');
-    var gl = this._gl = canvas.getContext('webgl', attributes) || canvas.getContext('experimental-webgl', attributes);
+    const canvas = document.getElementById('canvas');
+    const gl = this._gl = canvas.getContext('webgl', attributes) || canvas.getContext('experimental-webgl', attributes);
     if (!gl) {
       window.alert('Could not initialise WebGL. No WebGL, no SculptGL. Sorry.');
       return;
@@ -396,12 +396,12 @@ class Scene {
 
   /** Load textures (preload) */
   loadTextures() {
-    var self = this;
-    var gl = this._gl;
-    var ShaderMatcap = ShaderLib[Enums.Shader.MATCAP];
+    const self = this;
+    const gl = this._gl;
+    const ShaderMatcap = ShaderLib[Enums.Shader.MATCAP];
 
-    var loadTex = function (path, idMaterial) {
-      var mat = new Image();
+    const loadTex = function (path, idMaterial) {
+      const mat = new Image();
       mat.src = path;
 
       mat.onload = function () {
@@ -410,17 +410,17 @@ class Scene {
       };
     };
 
-    for (var i = 0, mats = ShaderMatcap.matcaps, l = mats.length; i < l; ++i)
+    for (let i = 0, mats = ShaderMatcap.matcaps, l = mats.length; i < l; ++i)
       loadTex(mats[i].path, i);
 
     this.initAlphaTextures();
   }
 
   initAlphaTextures() {
-    var alphas = Picking.INIT_ALPHAS_PATHS;
-    var names = Picking.INIT_ALPHAS_NAMES;
-    for (var i = 0, nbA = alphas.length; i < nbA; ++i) {
-      var am = new Image();
+    const alphas = Picking.INIT_ALPHAS_PATHS;
+    const names = Picking.INIT_ALPHAS_NAMES;
+    for (let i = 0, nbA = alphas.length; i < nbA; ++i) {
+      const am = new Image();
       am.src = 'resources/alpha/' + alphas[i];
       am.onload = this.onLoadAlphaImage.bind(this, am, names[i]);
     }
@@ -428,9 +428,9 @@ class Scene {
 
   /** Called when the window is resized */
   onCanvasResize() {
-    var viewport = this._viewport;
-    var newWidth = viewport.clientWidth * this._pixelRatio;
-    var newHeight = viewport.clientHeight * this._pixelRatio;
+    const viewport = this._viewport;
+    const newWidth = viewport.clientWidth * this._pixelRatio;
+    const newHeight = viewport.clientHeight * this._pixelRatio;
 
     this._canvasOffsetLeft = viewport.offsetLeft;
     this._canvasOffsetTop = viewport.offsetTop;
@@ -453,17 +453,17 @@ class Scene {
   }
 
   computeRadiusFromBoundingBox(box) {
-    var dx = box[3] - box[0];
-    var dy = box[4] - box[1];
-    var dz = box[5] - box[2];
+    const dx = box[3] - box[0];
+    const dy = box[4] - box[1];
+    const dz = box[5] - box[2];
     return 0.5 * Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   computeBoundingBoxMeshes(meshes) {
-    var bound = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
-    for (var i = 0, l = meshes.length; i < l; ++i) {
+    const bound = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+    for (let i = 0, l = meshes.length; i < l; ++i) {
       if (!meshes[i].isVisible()) continue;
-      var bi = meshes[i].computeWorldBound();
+      const bi = meshes[i].computeWorldBound();
       if (bi[0] < bound[0]) bound[0] = bi[0];
       if (bi[1] < bound[1]) bound[1] = bi[1];
       if (bi[2] < bound[2]) bound[2] = bi[2];
@@ -475,36 +475,36 @@ class Scene {
   }
 
   computeBoundingBoxScene() {
-    var scene = this._meshes.slice();
+    const scene = this._meshes.slice();
     scene.push(this._grid);
     this._sculptManager.addSculptToScene(scene);
     return this.computeBoundingBoxMeshes(scene);
   }
 
   normalizeAndCenterMeshes(meshes) {
-    var box = this.computeBoundingBoxMeshes(meshes);
-    var scale = Utils.SCALE / vec3.dist([box[0], box[1], box[2]], [box[3], box[4], box[5]]);
+    const box = this.computeBoundingBoxMeshes(meshes);
+    const scale = Utils.SCALE / vec3.dist([box[0], box[1], box[2]], [box[3], box[4], box[5]]);
 
-    var mCen = mat4.create();
+    const mCen = mat4.create();
     mat4.scale(mCen, mCen, [scale, scale, scale]);
     mat4.translate(mCen, mCen, [-(box[0] + box[3]) * 0.5, -(box[1] + box[4]) * 0.5, -(box[2] + box[5]) * 0.5]);
 
-    for (var i = 0, l = meshes.length; i < l; ++i) {
-      var mat = meshes[i].getMatrix();
+    for (let i = 0, l = meshes.length; i < l; ++i) {
+      const mat = meshes[i].getMatrix();
       mat4.mul(mat, mCen, mat);
     }
   }
 
   addSphere() {
     // make a cube and subdivide it
-    var mesh = new Multimesh(Primitives.createCube(this._gl));
+    const mesh = new Multimesh(Primitives.createCube(this._gl));
     mesh.normalizeSize();
     this.subdivideClamp(mesh);
     return this.addNewMesh(mesh);
   }
 
   addCube() {
-    var mesh = new Multimesh(Primitives.createCube(this._gl));
+    const mesh = new Multimesh(Primitives.createCube(this._gl));
     mesh.normalizeSize();
     mat4.scale(mesh.getMatrix(), mesh.getMatrix(), [0.7, 0.7, 0.7]);
     this.subdivideClamp(mesh, true);
@@ -512,7 +512,7 @@ class Scene {
   }
 
   addCylinder() {
-    var mesh = new Multimesh(Primitives.createCylinder(this._gl));
+    const mesh = new Multimesh(Primitives.createCylinder(this._gl));
     mesh.normalizeSize();
     mat4.scale(mesh.getMatrix(), mesh.getMatrix(), [0.7, 0.7, 0.7]);
     this.subdivideClamp(mesh);
@@ -520,10 +520,10 @@ class Scene {
   }
 
   addTorus(preview) {
-    var mesh = new Multimesh(Primitives.createTorus(this._gl, this._torusLength, this._torusWidth, this._torusRadius, this._torusRadial, this._torusTubular));
+    const mesh = new Multimesh(Primitives.createTorus(this._gl, this._torusLength, this._torusWidth, this._torusRadius, this._torusRadial, this._torusTubular));
     if (preview) {
       mesh.setShowWireframe(true);
-      var scale = 0.3 * Utils.SCALE;
+      const scale = 0.3 * Utils.SCALE;
       mat4.scale(mesh.getMatrix(), mesh.getMatrix(), [scale, scale, scale]);
       this._meshPreview = mesh;
       return;
@@ -551,20 +551,20 @@ class Scene {
   }
 
   loadScene(fileData, fileType) {
-    var newMeshes;
+    let newMeshes;
     if (fileType === 'obj') newMeshes = Import.importOBJ(fileData, this._gl);
     else if (fileType === 'sgl') newMeshes = Import.importSGL(fileData, this._gl, this);
     else if (fileType === 'stl') newMeshes = Import.importSTL(fileData, this._gl);
     else if (fileType === 'ply') newMeshes = Import.importPLY(fileData, this._gl);
 
-    var nbNewMeshes = newMeshes.length;
+    const nbNewMeshes = newMeshes.length;
     if (nbNewMeshes === 0) {
       return;
     }
 
-    var meshes = this._meshes;
-    for (var i = 0; i < nbNewMeshes; ++i) {
-      var mesh = newMeshes[i] = new Multimesh(newMeshes[i]);
+    const meshes = this._meshes;
+    for (let i = 0; i < nbNewMeshes; ++i) {
+      const mesh = newMeshes[i] = new Multimesh(newMeshes[i]);
 
       if (!this._vertexSRGB && mesh.getColors()) {
         Utils.convertArrayVec3toSRGB(mesh.getColors());
@@ -604,16 +604,16 @@ class Scene {
   }
 
   removeMeshes(rm) {
-    var meshes = this._meshes;
-    for (var i = 0; i < rm.length; ++i)
+    const meshes = this._meshes;
+    for (let i = 0; i < rm.length; ++i)
       meshes.splice(this.getIndexMesh(rm[i]), 1);
   }
 
   getIndexMesh(mesh, select) {
-    var meshes = select ? this._selectMeshes : this._meshes;
-    var id = mesh.getID();
-    for (var i = 0, nbMeshes = meshes.length; i < nbMeshes; ++i) {
-      var testMesh = meshes[i];
+    const meshes = select ? this._selectMeshes : this._meshes;
+    const id = mesh.getID();
+    for (let i = 0, nbMeshes = meshes.length; i < nbMeshes; ++i) {
+      const testMesh = meshes[i];
       if (testMesh === mesh || testMesh.getID() === id)
         return i;
     }
@@ -626,17 +626,17 @@ class Scene {
 
   /** Replace a mesh in the scene */
   replaceMesh(mesh, newMesh) {
-    var index = this.getIndexMesh(mesh);
+    const index = this.getIndexMesh(mesh);
     if (index >= 0) this._meshes[index] = newMesh;
     if (this._mesh === mesh) this.setMesh(newMesh);
   }
 
   duplicateSelection() {
-    var meshes = this._selectMeshes.slice();
-    var mesh = null;
-    for (var i = 0; i < meshes.length; ++i) {
+    const meshes = this._selectMeshes.slice();
+    let mesh = null;
+    for (let i = 0; i < meshes.length; ++i) {
       mesh = meshes[i];
-      var copy = new MeshStatic(mesh.getGL());
+      const copy = new MeshStatic(mesh.getGL());
       copy.copyData(mesh);
 
       this.addNewMesh(copy);
@@ -646,20 +646,20 @@ class Scene {
   }
 
   onLoadAlphaImage(img, name, tool) {
-    var can = document.createElement('canvas');
+    const can = document.createElement('canvas');
     can.width = img.width;
     can.height = img.height;
 
-    var ctx = can.getContext('2d');
+    const ctx = can.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    var u8rgba = ctx.getImageData(0, 0, img.width, img.height).data;
-    var u8lum = u8rgba.subarray(0, u8rgba.length / 4);
-    for (var i = 0, j = 0, n = u8lum.length; i < n; ++i, j += 4)
+    const u8rgba = ctx.getImageData(0, 0, img.width, img.height).data;
+    const u8lum = u8rgba.subarray(0, u8rgba.length / 4);
+    for (let i = 0, j = 0, n = u8lum.length; i < n; ++i, j += 4)
       u8lum[i] = Math.round((u8rgba[j] + u8rgba[j + 1] + u8rgba[j + 2]) / 3);
 
     name = Picking.addAlpha(u8lum, img.width, img.height, name)._name;
 
-    var entry = {};
+    const entry = {};
     entry[name] = name;
     this.getGui().addAlphaOptions(entry);
     if (tool && tool._ctrlAlpha)

@@ -15,10 +15,10 @@ class GuiCamera {
   }
 
   init(guiParent) {
-    var camera = this._camera;
+    const camera = this._camera;
 
     // Camera fold
-    var menu = this._menu = guiParent.addMenu(TR('cameraTitle'));
+    const menu = this._menu = guiParent.addMenu(TR('cameraTitle'));
 
     // reset camera
     menu.addTitle(TR('cameraReset'));
@@ -27,7 +27,7 @@ class GuiCamera {
 
     // camera type
     this._ctrlProjectionTitle = menu.addTitle(TR('cameraProjection'));
-    var optionsType = [];
+    const optionsType = [];
     optionsType[Enums.Projection.PERSPECTIVE] = TR('cameraPerspective');
     optionsType[Enums.Projection.ORTHOGRAPHIC] = TR('cameraOrthographic');
     this._ctrlProjection = menu.addCombobox('', camera.getProjectionType(), this.onCameraTypeChange.bind(this), optionsType);
@@ -38,7 +38,7 @@ class GuiCamera {
 
     // camera mode
     menu.addTitle(TR('cameraMode'));
-    var optionsMode = [];
+    const optionsMode = [];
     optionsMode[Enums.CameraMode.ORBIT] = TR('cameraOrbit');
     optionsMode[Enums.CameraMode.SPHERICAL] = TR('cameraSpherical');
     optionsMode[Enums.CameraMode.PLANE] = TR('cameraPlane');
@@ -74,8 +74,8 @@ class GuiCamera {
       return;
 
     event.preventDefault();
-    var main = this._main;
-    var camera = main.getCamera();
+    const main = this._main;
+    const camera = main.getCamera();
     event.handled = true;
     if (event.shiftKey && main._action === Enums.Action.CAMERA_ROTATE) {
       camera.snapClosestRotation();
@@ -105,7 +105,7 @@ class GuiCamera {
   }
 
   cbOnTranslation() {
-    var main = this._main;
+    const main = this._main;
     main.getCamera().updateTranslation();
     main.render();
   }
@@ -121,7 +121,7 @@ class GuiCamera {
 
     event.preventDefault();
     event.handled = true;
-    var camera = this._camera;
+    const camera = this._camera;
 
     switch (getOptionsURL.getShortKey(getKeyCode(event))) {
     case Enums.KeyAction.STRIFE_LEFT:

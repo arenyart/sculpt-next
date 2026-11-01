@@ -3,12 +3,12 @@ import getOptionsURL from '../../misc/getOptionsURL';
 import ShaderBase from './ShaderBase';
 import pbrGLSL from './glsl/pbr.glsl?raw';
 
-var ShaderPBR = ShaderBase.getCopy();
+const ShaderPBR = ShaderBase.getCopy();
 ShaderPBR.vertexName = ShaderPBR.fragmentName = 'ShadingPBR';
 
 ShaderPBR.textures = {};
 
-var texPath = 'resources/environments/';
+const texPath = 'resources/environments/';
 ShaderPBR.environments = [{
   // https://hdrihaven.com/hdri/?h=mpumalanga_veld
   path: texPath + 'mpumalanga_veld_1k.png',
@@ -41,7 +41,7 @@ ShaderPBR.environments = [{
   name: 'Winter river'
 }];
 
-var opts = getOptionsURL();
+const opts = getOptionsURL();
 ShaderPBR.idEnv = Math.min(opts.environment, ShaderPBR.environments.length - 1);
 ShaderPBR.exposure = opts.exposure === undefined ? ShaderPBR.environments[ShaderPBR.idEnv].exposure : Math.min(opts.exposure, 5);
 
@@ -148,10 +148,10 @@ ShaderPBR.getOrCreateEnvironment = function (gl, main, env) {
   return null;
 };
 
-var uIBLTmp = mat3.create();
+const uIBLTmp = mat3.create();
 ShaderPBR.updateUniforms = function (mesh, main) {
-  var gl = mesh.getGL();
-  var uniforms = this.uniforms;
+  const gl = mesh.getGL();
+  const uniforms = this.uniforms;
 
   mat3.fromMat4(uIBLTmp, main.getCamera().getView());
   gl.uniformMatrix3fv(uniforms.uIblTransform, false, mat3.transpose(uIBLTmp, uIBLTmp));
@@ -161,7 +161,7 @@ ShaderPBR.updateUniforms = function (mesh, main) {
   gl.uniform1f(uniforms.uMetallic, mesh.getMetallic());
   gl.uniform1f(uniforms.uExposure, ShaderPBR.exposure);
 
-  var env = ShaderPBR.environments[ShaderPBR.idEnv];
+  const env = ShaderPBR.environments[ShaderPBR.idEnv];
   gl.uniform3fv(uniforms.uSPH, env.sph);
   if (env.size) gl.uniform2fv(uniforms.uEnvSize, env.size);
 

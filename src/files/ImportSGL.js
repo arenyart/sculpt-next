@@ -3,13 +3,13 @@ import MeshStatic from '../mesh/meshStatic/MeshStatic';
 import ExportSGL from './ExportSGL';
 import ShaderBase from '../render/shaders/ShaderBase';
 
-var Import = {};
+const Import = {};
 
-var handleNegativeIndexFace = function (i32) {
-  var u32 = new Uint32Array(i32);
-  var nbFaces = u32.length / 4;
-  for (var i = 0; i < nbFaces; ++i) {
-    var idd = i * 4 + 3;
+const handleNegativeIndexFace = function (i32) {
+  const u32 = new Uint32Array(i32);
+  const nbFaces = u32.length / 4;
+  for (let i = 0; i < nbFaces; ++i) {
+    const idd = i * 4 + 3;
     if (i32[idd] < 0)
       u32[idd] = Utils.TRI_INDEX;
   }
@@ -21,12 +21,12 @@ var handleNegativeIndexFace = function (i32) {
 //
 /** Import SGL file */
 Import.importSGL = function (buffer, gl, main) {
-  var f32a = new Float32Array(buffer);
-  var u32a = new Uint32Array(buffer);
-  var i32a = new Int32Array(buffer);
+  const f32a = new Float32Array(buffer);
+  const u32a = new Uint32Array(buffer);
+  const i32a = new Int32Array(buffer);
 
-  var off = 0;
-  var version = u32a[off++];
+  let off = 0;
+  const version = u32a[off++];
   if (version > ExportSGL.VERSION)
     return [];
 
@@ -36,21 +36,21 @@ Import.importSGL = function (buffer, gl, main) {
     ShaderBase.showSymmetryLine = u32a[off++];
     main._showContour = u32a[off++];
 
-    var cam = main.getCamera();
+    const cam = main.getCamera();
     cam.setProjectionType(u32a[off++]);
     cam.setMode(u32a[off++]);
     cam.setFov(f32a[off++]);
     cam.setUsePivot(u32a[off++]);
   }
 
-  var nbMeshes = u32a[off++];
-  var meshes = new Array(nbMeshes);
-  for (var i = 0; i < nbMeshes; ++i) {
-    var mesh = meshes[i] = new MeshStatic(gl);
+  const nbMeshes = u32a[off++];
+  const meshes = new Array(nbMeshes);
+  for (let i = 0; i < nbMeshes; ++i) {
+    const mesh = meshes[i] = new MeshStatic(gl);
 
     // shader + matcap + wire + alpha + flat 
     if (version >= 2) {
-      var render = mesh.getRenderData();
+      const render = mesh.getRenderData();
       // we don't have the geometry buffer and data yet so
       // we don't want to call updateBuffers (so no call to )
       render._shaderType = u32a[off++];
@@ -68,7 +68,7 @@ Import.importSGL = function (buffer, gl, main) {
     off++; // scale
 
     // vertices
-    var nbElts = u32a[off++];
+    let nbElts = u32a[off++];
     mesh.setVertices(f32a.subarray(off, off + nbElts * 3));
     off += nbElts * 3;
 
@@ -95,14 +95,14 @@ Import.importSGL = function (buffer, gl, main) {
 
     // uvs
     nbElts = u32a[off++];
-    var uv = null;
+    let uv = null;
     if (nbElts)
       uv = f32a.subarray(off, off + nbElts * 2);
     off += nbElts * 2;
 
     // face uvs
     nbElts = u32a[off++];
-    var fuv = null;
+    let fuv = null;
     if (nbElts) {
       if (version <= 2) {
         fuv = handleNegativeIndexFace(i32a.subarray(off, off + nbElts * 4));

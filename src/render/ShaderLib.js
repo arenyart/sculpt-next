@@ -16,7 +16,7 @@ import ShaderContour from './shaders/ShaderContour';
 import ShaderPaintUV from './shaders/ShaderPaintUV';
 import ShaderBlur from './shaders/ShaderBlur';
 
-var ShaderLib = [];
+const ShaderLib = [];
 
 // 3D shaders
 ShaderLib[Enums.Shader.PBR] = ShaderPBR;

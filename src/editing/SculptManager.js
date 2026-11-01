@@ -47,9 +47,9 @@ class SculptManager {
   }
 
   init() {
-    var main = this._main;
-    var tools = this._tools;
-    for (var i = 0, nb = Tools.length; i < nb; ++i) {
+    const main = this._main;
+    const tools = this._tools;
+    for (let i = 0, nb = Tools.length; i < nb; ++i) {
       if (Tools[i]) tools[i] = new Tools[i](main);
     }
   }
@@ -72,8 +72,8 @@ class SculptManager {
   }
 
   start(ctrl) {
-    var tool = this.getCurrentTool();
-    var canEdit = tool.start(ctrl);
+    const tool = this.getCurrentTool();
+    const canEdit = tool.start(ctrl);
     if (this._main.getPicking().getMesh() && this.isUsingContinuous())
       this._sculptTimer = window.setInterval(tool._cbContinuous, 16.6);
     return canEdit;

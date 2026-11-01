@@ -82,7 +82,7 @@ class MeshDynamic extends Mesh {
   }
 
   initFromMesh(mesh) {
-    var nbVertices = mesh.getNbVertices();
+    const nbVertices = mesh.getNbVertices();
 
     // make sure to strip UVs
     this.setVertices(new Float32Array(mesh.getVertices().subarray(0, nbVertices * 3)));
@@ -102,14 +102,14 @@ class MeshDynamic extends Mesh {
     this.setFaces(new Uint32Array(mesh.getNbTriangles() * 4));
     this.setNbFaces(mesh.getNbTriangles());
 
-    var iArMesh = mesh.getTriangles();
-    var nbTriangles = this.getNbTriangles();
-    var fAr = this.getFaces();
+    const iArMesh = mesh.getTriangles();
+    const nbTriangles = this.getNbTriangles();
+    const fAr = this.getFaces();
     this._meshData._trianglesABC = new Uint32Array(iArMesh.subarray(0, nbTriangles * 3));
 
-    for (var i = 0; i < nbTriangles; ++i) {
-      var id3 = i * 3;
-      var id4 = i * 4;
+    for (let i = 0; i < nbTriangles; ++i) {
+      const id3 = i * 3;
+      const id4 = i * 4;
       fAr[id4] = iArMesh[id3];
       fAr[id4 + 1] = iArMesh[id3 + 1];
       fAr[id4 + 2] = iArMesh[id3 + 2];
@@ -138,15 +138,15 @@ class MeshDynamic extends Mesh {
   }
 
   updateWireframe(iFaces) {
-    var wire = this._wireframe;
-    var tris = this.getTriangles();
-    var full = iFaces === undefined;
-    var useDA = this.isUsingDrawArrays();
-    var nbTriangles = full ? this.getNbTriangles() : iFaces.length;
-    for (var i = 0; i < nbTriangles; ++i) {
-      var ind = full ? i : iFaces[i];
-      var idw = ind * 6;
-      var idt = ind * 3;
+    const wire = this._wireframe;
+    const tris = this.getTriangles();
+    const full = iFaces === undefined;
+    const useDA = this.isUsingDrawArrays();
+    const nbTriangles = full ? this.getNbTriangles() : iFaces.length;
+    for (let i = 0; i < nbTriangles; ++i) {
+      const ind = full ? i : iFaces[i];
+      const idw = ind * 6;
+      const idt = ind * 3;
       if (useDA) {
         wire[idw] = wire[idw + 5] = idt;
         wire[idw + 1] = wire[idw + 2] = idt + 2;
@@ -160,14 +160,14 @@ class MeshDynamic extends Mesh {
   }
 
   updateRenderTriangles(iFaces) {
-    var tAr = this.getTriangles();
-    var fAr = this.getFaces();
-    var full = iFaces === undefined;
-    var nbFaces = full ? this.getNbFaces() : iFaces.length;
-    for (var i = 0; i < nbFaces; ++i) {
-      var id = full ? i : iFaces[i];
-      var idt = id * 3;
-      var idf = id * 4;
+    const tAr = this.getTriangles();
+    const fAr = this.getFaces();
+    const full = iFaces === undefined;
+    const nbFaces = full ? this.getNbFaces() : iFaces.length;
+    for (let i = 0; i < nbFaces; ++i) {
+      const id = full ? i : iFaces[i];
+      const idt = id * 3;
+      const idf = id * 4;
       tAr[idt] = fAr[idf];
       tAr[idt + 1] = fAr[idf + 1];
       tAr[idt + 2] = fAr[idf + 2];
@@ -175,14 +175,14 @@ class MeshDynamic extends Mesh {
   }
 
   updateVerticesOnEdge(iVerts) {
-    var vOnEdge = this.getVerticesOnEdge();
-    var vrings = this.getVerticesRingVert();
-    var frings = this.getVerticesRingFace();
-    var full = iVerts === undefined;
-    var nbVerts = full ? this.getNbVertices() : iVerts.length;
+    const vOnEdge = this.getVerticesOnEdge();
+    const vrings = this.getVerticesRingVert();
+    const frings = this.getVerticesRingFace();
+    const full = iVerts === undefined;
+    const nbVerts = full ? this.getNbVertices() : iVerts.length;
 
-    for (var i = 0; i < nbVerts; ++i) {
-      var id = full ? i : iVerts[i];
+    for (let i = 0; i < nbVerts; ++i) {
+      const id = full ? i : iVerts[i];
       vOnEdge[id] = vrings[id].length !== frings[id].length ? 1 : 0;
     }
   }
@@ -194,7 +194,7 @@ class MeshDynamic extends Mesh {
     if (orig.length >= targetSize) return orig.subarray(0, targetSize * 2);
 
     // expand
-    var tmp = new orig.constructor(targetSize * 2);
+    const tmp = new orig.constructor(targetSize * 2);
     tmp.set(orig);
 
     return tmp;
@@ -202,11 +202,11 @@ class MeshDynamic extends Mesh {
 
   /** Reallocate mesh resources */
   reAllocateArrays(nbAddElements) {
-    var mdata = this._meshData;
+    const mdata = this._meshData;
 
-    var nbDyna = this._facesStateFlags.length;
-    var nbTriangles = this.getNbTriangles();
-    var len = nbTriangles + nbAddElements;
+    let nbDyna = this._facesStateFlags.length;
+    const nbTriangles = this.getNbTriangles();
+    let len = nbTriangles + nbAddElements;
     if (nbDyna < len || nbDyna > len * 4) {
       this._facesStateFlags = this.resizeArray(this._facesStateFlags, len);
       if (this.getShowWireframe())
@@ -227,7 +227,7 @@ class MeshDynamic extends Mesh {
     }
 
     nbDyna = mdata._verticesXYZ.length / 3;
-    var nbVertices = this.getNbVertices();
+    const nbVertices = this.getNbVertices();
     len = nbVertices + nbAddElements;
     if (nbDyna < len || nbDyna > len * 4) {
       mdata._verticesXYZ = this.resizeArray(mdata._verticesXYZ, len * 3);
@@ -245,7 +245,7 @@ class MeshDynamic extends Mesh {
     }
 
     if (this.isUsingDrawArrays()) {
-      var nbMagic = 10;
+      const nbMagic = 10;
       nbDyna = mdata._verticesXYZ.length / 9;
       len = nbTriangles + nbAddElements * nbMagic;
       if (nbDyna < len || nbDyna > len * 4) {
@@ -258,26 +258,26 @@ class MeshDynamic extends Mesh {
   }
 
   initTopology() {
-    var vrings = this.getVerticesRingVert();
-    var frings = this.getVerticesRingFace();
-    var i = 0;
-    var nbVertices = this.getNbVertices();
+    const vrings = this.getVerticesRingVert();
+    const frings = this.getVerticesRingFace();
+    let i = 0;
+    const nbVertices = this.getNbVertices();
     vrings.length = frings.length = nbVertices;
     for (i = 0; i < nbVertices; ++i) {
       vrings[i] = [];
       frings[i] = [];
     }
 
-    var nbTriangles = this.getNbTriangles();
-    var iAr = this.getTriangles();
+    const nbTriangles = this.getNbTriangles();
+    const iAr = this.getTriangles();
     for (i = 0; i < nbTriangles; ++i) {
-      var j = i * 3;
+      const j = i * 3;
       frings[iAr[j]].push(i);
       frings[iAr[j + 1]].push(i);
       frings[iAr[j + 2]].push(i);
     }
 
-    var vOnEdge = this.getVerticesOnEdge();
+    const vOnEdge = this.getVerticesOnEdge();
     for (i = 0; i < nbVertices; ++i) {
       this.computeRingVertices(i);
       vOnEdge[i] = frings[i].length !== vrings[i].length ? 1 : 0;
@@ -286,19 +286,19 @@ class MeshDynamic extends Mesh {
 
   /** Compute the vertices around a vertex */
   computeRingVertices(iVert) {
-    var tagFlag = ++Utils.TAG_FLAG;
-    var fAr = this.getFaces();
-    var vflags = this.getVerticesTagFlags();
+    const tagFlag = ++Utils.TAG_FLAG;
+    const fAr = this.getFaces();
+    const vflags = this.getVerticesTagFlags();
 
-    var vring = this._meshData._vertRingVert[iVert];
-    var fring = this._meshData._vertRingFace[iVert];
+    const vring = this._meshData._vertRingVert[iVert];
+    const fring = this._meshData._vertRingFace[iVert];
     vring.length = 0;
-    var nbTris = fring.length;
+    const nbTris = fring.length;
 
-    for (var i = 0; i < nbTris; ++i) {
-      var ind = fring[i] * 4;
-      var iVer1 = fAr[ind];
-      var iVer2 = fAr[ind + 1];
+    for (let i = 0; i < nbTris; ++i) {
+      const ind = fring[i] * 4;
+      let iVer1 = fAr[ind];
+      let iVer2 = fAr[ind + 1];
 
       if (iVer1 === iVert) iVer1 = fAr[ind + 2];
       else if (iVer2 === iVert) iVer2 = fAr[ind + 2];

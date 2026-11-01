@@ -52,7 +52,7 @@ class Paint extends SculptBase {
   }
 
   updateMeshBuffers() {
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
     if (mesh.isDynamic) {
       mesh.updateBuffers();
     } else {
@@ -62,7 +62,7 @@ class Paint extends SculptBase {
   }
 
   updatePickColor() {
-    var picking = this._main.getPicking();
+    const picking = this._main.getPicking();
     if (picking.intersectionMouseMesh())
       this.pickColor(picking);
   }
@@ -72,18 +72,18 @@ class Paint extends SculptBase {
   }
 
   pickColor(picking) {
-    var mesh = this.getMesh();
-    var color = this._color;
+    const mesh = this.getMesh();
+    const color = this._color;
     picking.polyLerp(mesh.getMaterials(), color);
-    var roughness = color[0];
-    var metallic = color[1];
+    const roughness = color[0];
+    const metallic = color[1];
     picking.polyLerp(mesh.getColors(), color);
     this._pickCallback(color, roughness, metallic);
   }
 
   stroke(picking) {
-    var iVertsInRadius = picking.getPickedVertices();
-    var intensity = this._intensity * Tablet.getPressureIntensity();
+    let iVertsInRadius = picking.getPickedVertices();
+    const intensity = this._intensity * Tablet.getPressureIntensity();
 
     // undo-redo
     this._main.getStateManager().pushVertices(iVertsInRadius);
@@ -96,42 +96,42 @@ class Paint extends SculptBase {
     picking.setIdAlpha(this._idAlpha);
     this.paint(iVertsInRadius, picking.getIntersectionPoint(), picking.getLocalRadius2(), intensity, this._hardness, picking);
 
-    var mesh = this.getMesh();
+    const mesh = this.getMesh();
     mesh.updateDuplicateColorsAndMaterials(iVertsInRadius);
     if (mesh.isUsingDrawArrays())
       mesh.updateDrawArrays(mesh.getFacesFromVertices(iVertsInRadius));
   }
 
   paint(iVerts, center, radiusSquared, intensity, hardness, picking) {
-    var mesh = this.getMesh();
-    var vAr = mesh.getVertices();
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
-    var color = this._color;
-    var roughness = this._material[0];
-    var metallic = this._material[1];
-    var radius = Math.sqrt(radiusSquared);
-    var cr = color[0];
-    var cg = color[1];
-    var cb = color[2];
-    var cx = center[0];
-    var cy = center[1];
-    var cz = center[2];
-    var softness = 2 * (1 - hardness);
-    for (var i = 0, l = iVerts.length; i < l; ++i) {
-      var ind = iVerts[i] * 3;
-      var vx = vAr[ind];
-      var vy = vAr[ind + 1];
-      var vz = vAr[ind + 2];
-      var dx = vx - cx;
-      var dy = vy - cy;
-      var dz = vz - cz;
-      var dist = Math.sqrt(dx * dx + dy * dy + dz * dz) / radius;
+    const mesh = this.getMesh();
+    const vAr = mesh.getVertices();
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
+    const color = this._color;
+    const roughness = this._material[0];
+    const metallic = this._material[1];
+    const radius = Math.sqrt(radiusSquared);
+    const cr = color[0];
+    const cg = color[1];
+    const cb = color[2];
+    const cx = center[0];
+    const cy = center[1];
+    const cz = center[2];
+    const softness = 2 * (1 - hardness);
+    for (let i = 0, l = iVerts.length; i < l; ++i) {
+      const ind = iVerts[i] * 3;
+      const vx = vAr[ind];
+      const vy = vAr[ind + 1];
+      const vz = vAr[ind + 2];
+      const dx = vx - cx;
+      const dy = vy - cy;
+      const dz = vz - cz;
+      let dist = Math.sqrt(dx * dx + dy * dy + dz * dz) / radius;
       if (dist > 1) dist = 1.0;
 
-      var fallOff = Math.pow(1 - dist, softness);
+      let fallOff = Math.pow(1 - dist, softness);
       fallOff *= intensity * mAr[ind + 2] * picking.getAlpha(vx, vy, vz);
-      var fallOffCompl = 1.0 - fallOff;
+      const fallOffCompl = 1.0 - fallOff;
 
       if (this._writeAlbedo) {
         cAr[ind] = cAr[ind] * fallOffCompl + cr * fallOff;
@@ -150,26 +150,26 @@ class Paint extends SculptBase {
   }
 
   paintAll() {
-    var mesh = this.getMesh();
-    var iVerts = this.getUnmaskedVertices();
+    const mesh = this.getMesh();
+    const iVerts = this.getUnmaskedVertices();
     if (iVerts.length === 0)
       return;
 
     this.pushState(true);
     this._main.getStateManager().pushVertices(iVerts);
 
-    var cAr = mesh.getColors();
-    var mAr = mesh.getMaterials();
-    var color = this._color;
-    var roughness = this._material[0];
-    var metallic = this._material[1];
-    var cr = color[0];
-    var cg = color[1];
-    var cb = color[2];
-    for (var i = 0, nb = iVerts.length; i < nb; ++i) {
-      var ind = iVerts[i] * 3;
-      var fallOff = mAr[ind + 2];
-      var fallOffCompl = 1.0 - fallOff;
+    const cAr = mesh.getColors();
+    const mAr = mesh.getMaterials();
+    const color = this._color;
+    const roughness = this._material[0];
+    const metallic = this._material[1];
+    const cr = color[0];
+    const cg = color[1];
+    const cb = color[2];
+    for (let i = 0, nb = iVerts.length; i < nb; ++i) {
+      const ind = iVerts[i] * 3;
+      const fallOff = mAr[ind + 2];
+      const fallOffCompl = 1.0 - fallOff;
 
       if (this._writeAlbedo) {
         cAr[ind] = cAr[ind] * fallOffCompl + cr * fallOff;

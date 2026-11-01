@@ -3,7 +3,7 @@ import Attribute from '../Attribute';
 import getOptionsURL from '../../misc/getOptionsURL';
 import fxaaGLSL from './glsl/fxaa.glsl?raw';
 
-var ShaderFxaa = ShaderBase.getCopy();
+const ShaderFxaa = ShaderBase.getCopy();
 ShaderFxaa.vertexName = ShaderFxaa.fragmentName = 'Fxaa';
 
 ShaderFxaa.FILMIC = getOptionsURL().filmic; // edited by the gui
@@ -47,7 +47,7 @@ ShaderFxaa.fragment = [
 ].join('\n');
 
 ShaderFxaa.draw = function (rtt, main) {
-  var gl = rtt.getGL();
+  const gl = rtt.getGL();
   gl.useProgram(this.program);
 
   ShaderFxaa.attributes.aVertex.bindToBuffer(rtt.getVertexBuffer());

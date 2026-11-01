@@ -1,4 +1,4 @@
-var TR = {
+const TR = {
   // background
   backgroundTitle: 'Sfondo',
   backgroundReset: 'Resetta',
